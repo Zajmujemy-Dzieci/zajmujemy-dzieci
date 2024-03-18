@@ -2,8 +2,8 @@ import path from 'path'
 import { app, ipcMain } from 'electron'
 import serve from 'electron-serve'
 import { createWindow } from './helpers'
-import { QuestionList } from './QuestionList'
-import { Question } from './Question'
+import { QuestionList } from './question/QuestionList'
+import { Question } from './question/Question'
 
 const express = require('express');
 const bodyParser = require('body-parser');
