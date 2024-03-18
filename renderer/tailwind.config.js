@@ -1,9 +1,9 @@
-const colors = require('tailwindcss/colors')
+const colors = require("tailwindcss/colors");
 
 module.exports = {
   content: [
-    './renderer/pages/**/*.{js,ts,jsx,tsx}',
-    './renderer/components/**/*.{js,ts,jsx,tsx}',
+    "./renderer/pages/**/*.{js,ts,jsx,tsx}",
+    "./renderer/components/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
     colors: {
@@ -11,8 +11,13 @@ module.exports = {
       white: colors.white,
       gray: colors.gray,
       blue: colors.blue,
+      primary: "#6DB1BF",
+      secondary: "#F39A9D",
+      childWhite: "#FFEAEC",
+      childBlack: "#301A4B",
+      childGreen: "#3F6C51",
     },
     extend: {},
   },
   plugins: [],
-}
+};
