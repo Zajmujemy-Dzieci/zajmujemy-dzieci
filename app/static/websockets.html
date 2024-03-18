@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Websockets demo</title>
+
+    <script>
+        // const ws = new WebSocket('ws://localhost:3000');
+        // ws.onopen = () => {
+        //     console.log('connected');
+        //     ws.send('Hello from client');
+        // };
+        // ws.onmessage = (msg) => {
+        //     console.log(msg.data);
+        // };
+
+        const init = () => {
+            document.getElementById('pinger').addEventListener('click', () => {
+            // ws.send('Ping');
+            console.log('Ping');
+        });
+        }
+        
+        window.onload = init
+    </script>
+</head>
+<body>
+
+    <button id="pinger">Ping</button>
+    
+</body>
+</html>
