@@ -2,11 +2,13 @@ import path from "path"
 import { app, ipcMain } from "electron"
 import serve from "electron-serve"
 import { createWindow } from "./helpers"
+import { stringify } from "querystring"
 
 const express = require("express")
 const bodyParser = require("body-parser")
 
 const express_app = express()
+var expressWs = require("express-ws")(express_app)
 const PORT = 3000
 
 express_app.use(bodyParser.urlencoded({ extended: true }))
@@ -45,11 +47,74 @@ express_app.post("/submit", (req, res) => {
 })
 
 express_app.get("/websockets", (req, res) => {
-	res.sendFile("static/websockets.html", { root: __dirname })
+	// res.send("static/websockets.html", { root: __dirname })
+	res.send(`<!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Websockets demo</title>
+    
+        <script>
+            const ws = new WebSocket('ws://localhost:3000/ws');
+            ws.onopen = () => {
+                console.log('connected');
+                ws.send(JSON.stringify({ type: 'register', nick: 'test' }));
+            };
+            ws.onmessage = (msg) => {
+                console.log(msg.data);
+            };
+    
+            const init = () => {
+                document.getElementById('pinger').addEventListener('click', () => {
+                    console.log('Ping');
+                    ws.send(JSON.stringify({type: 'ping'}));
+            });
+            }
+            
+            window.onload = init
+        </script>
+    </head>
+    <body>
+    
+        <button id="pinger">Ping</button>
+        
+    </body>
+    </html>`)
 })
 
 express_app.listen(PORT, () => {
 	console.log(`Serwer działa na porcie ${PORT}`)
+})
+
+let clients = new Map<string, WebSocket>()
+
+interface Message {
+	type: "register" | "ping"
+}
+
+interface RegisterMessage extends Message {
+	type: "register"
+	nick: string
+}
+
+express_app.ws("/ws", function (ws, req) {
+	ws.on("message", function (msg) {
+		const parsed = JSON.parse(msg) as Message
+		switch (parsed?.type) {
+			case "ping":
+				console.log("Ping")
+				ws.send("Pong")
+				break
+			case "register":
+				const registerMsg = msg as RegisterMessage
+				clients.set(registerMsg.nick, ws)
+				ws.send("Registered")
+				break
+			default:
+				console.error("Unknown message type", JSON.stringify(parsed))
+		}
+	})
 })
 
 const isProd = process.env.NODE_ENV === "production"
