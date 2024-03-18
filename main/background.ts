@@ -3,6 +3,8 @@ import { app, ipcMain } from "electron"
 import serve from "electron-serve"
 import { createWindow } from "./helpers"
 import { stringify } from "querystring"
+import { ClientMessage, handleMessage } from "./helpers/messages"
+import { websockets_client } from "./helpers/websockets_client"
 
 const os = require("os")
 const cors = require("cors")
@@ -79,40 +81,7 @@ express_app.post("/submit", (req, res) => {
 })
 
 express_app.get("/websockets", (req, res) => {
-	// res.send("static/websockets.html", { root: __dirname })
-	res.send(`<!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Websockets demo</title>
-    
-        <script>
-            const ws = new WebSocket('ws://localhost:3000/ws');
-            ws.onopen = () => {
-                console.log('connected');
-                ws.send(JSON.stringify({ type: 'register', nick: 'test' }));
-            };
-            ws.onmessage = (msg) => {
-                console.log(msg.data);
-            };
-    
-            const init = () => {
-                document.getElementById('pinger').addEventListener('click', () => {
-                    console.log('Ping');
-                    ws.send(JSON.stringify({type: 'ping'}));
-            });
-            }
-            
-            window.onload = init
-        </script>
-    </head>
-    <body>
-    
-        <button id="pinger">Ping</button>
-        
-    </body>
-    </html>`)
+	res.send(websockets_client)
 })
 
 express_app.listen(PORT, () => {
@@ -121,7 +90,13 @@ express_app.listen(PORT, () => {
 
 express_app.ws("/ws", function (ws, req) {
 	ws.on("message", function (msg) {
-		const parsed = JSON.parse(msg) as Message
+		let parsed = null
+		try {
+			parsed = JSON.parse(msg) as ClientMessage
+		} catch (error) {
+			console.error("Invalid message", msg)
+		}
+
 		handleMessage(parsed, ws)
 	})
 })
