@@ -2,6 +2,8 @@ import path from 'path'
 import { app, ipcMain } from 'electron'
 import serve from 'electron-serve'
 import { createWindow } from './helpers'
+import { QuestionList } from './QuestionList'
+import { Question } from './Question'
 
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -24,6 +26,38 @@ express_app.get('/', (req, res) => {
                   <input type="text" name="nick" placeholder="Twój nick" required>
                   <button type="submit">Zatwierdź</button>
               </form>
+          </body>
+      </html>
+  `);
+});
+
+
+
+
+express_app.get('/questionTest', (req, res) => {
+  const question1 = new Question("What is the capital of France?", ["Paris", "Madrid", "Berlin"], 0);
+  const question2 = new Question("Who wrote 'Romeo and Juliet'?", ["Shakespeare", "Hemingway", "Tolstoy"], 0);
+
+  const questionList = new QuestionList([question1, question2]);
+  var randomQuestion: Question;
+  try {
+      randomQuestion = questionList.chooseRandomQuestion();
+      console.log("Random question:", randomQuestion.content);
+  } catch (error) {
+      console.error(error.message);
+  } 
+  if (!randomQuestion){
+    randomQuestion = new Question("Question not loaded", ["Sample1", "Sample2"], 0);
+  }
+     
+  res.send(`
+      <html>
+          <head>
+              <title>Test Pytania</title>
+          </head>
+          <body>
+              <h1>Test Pytania</h1>
+              <p>` + randomQuestion.content + ` </p>
           </body>
       </html>
   `);
