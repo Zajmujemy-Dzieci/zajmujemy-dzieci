@@ -119,33 +119,10 @@ express_app.listen(PORT, () => {
 	console.log(`Serwer działa na porcie ${PORT}`)
 })
 
-let clients = new Map<string, WebSocket>()
-
-interface Message {
-	type: "register" | "ping"
-}
-
-interface RegisterMessage extends Message {
-	type: "register"
-	nick: string
-}
-
 express_app.ws("/ws", function (ws, req) {
 	ws.on("message", function (msg) {
 		const parsed = JSON.parse(msg) as Message
-		switch (parsed?.type) {
-			case "ping":
-				console.log("Ping")
-				ws.send("Pong")
-				break
-			case "register":
-				const registerMsg = msg as RegisterMessage
-				clients.set(registerMsg.nick, ws)
-				ws.send("Registered")
-				break
-			default:
-				console.error("Unknown message type", JSON.stringify(parsed))
-		}
+		handleMessage(parsed, ws)
 	})
 })
 
