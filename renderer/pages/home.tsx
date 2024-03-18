@@ -3,6 +3,9 @@ import Head from 'next/head'
 import Link from 'next/link'
 import Image from 'next/image'
 
+import {Question} from '../models/Question';
+import {QuestionList} from '../models/QuestionList';
+
 export default function HomePage() {
   return (
     <React.Fragment>
