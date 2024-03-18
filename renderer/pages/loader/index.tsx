@@ -4,7 +4,7 @@ import { QuestionList } from '../../models/QuestionList';
 import { Question } from '../../models/Question';
 
 export default function Loader() {
-  const [loadedQuestions, setLoadedQuestions] = useState([]);
+  const [loadedQuestions, setLoadedQuestions] = useState<Question[]>([]);
 
   const questionList = QuestionList.getInstance();
 
@@ -35,20 +35,22 @@ export default function Loader() {
     }
   };
 
-  const uploadQuestionsFromFile = (event) => {
-    const file = event.target.files[0];
+  const uploadQuestionsFromFile = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
     if (!file) return;
     const reader = new FileReader();
     reader.onload = (event) => {
       try {
         questionList.usedQuestions = [];
         questionList.unusedQuestions = [];
-        const content = event.target.result.toString(); // Convert ArrayBuffer to string
-        const questions = JSON.parse(content);
-        const questionObjects = questions.map((question) => {
-          questionList.addQuestion(new Question(question.content, question.answers, question.correctAnswerId));
-        });
-        loadQuestionsFromList(); // Refresh the displayed questions after loading
+        const content = event.target?.result?.toString(); // Convert ArrayBuffer to string
+        if (content) {
+          const questions = JSON.parse(content);
+          const questionObjects = questions.map((question: any) => {
+            questionList.addQuestion(new Question(question.content, question.answers, question.correctAnswerId));
+          });
+          loadQuestionsFromList(); // Refresh the displayed questions after loading
+        }
       } catch (error) {
         console.error('Error loading questions from file:', error);
       }
