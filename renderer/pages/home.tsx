@@ -3,7 +3,16 @@ import Head from 'next/head'
 import Link from 'next/link'
 import Image from 'next/image'
 
+import {Question} from '../models/Question';
+import {QuestionList} from '../models/QuestionList';
+
 export default function HomePage() {
+  const q = new Question("What is the capital of France?", ["Paris", "Madrid", "Berlin"], 0);
+  console.log(q.content);
+  const q2 = new Question("Who wrote 'Romeo and Juliet'?", ["Shakespeare", "Hemingway", "Tolstoy"], 0);
+
+  const questionList = new QuestionList([q, q2]);
+
   return (
     <React.Fragment>
       <Head>
@@ -26,6 +35,7 @@ export default function HomePage() {
         <span>tailwindcss</span>
         <span>=</span>
         <span>💕 </span>
+        
       </div>
       <div className="mt-1 w-full flex-wrap flex justify-center">
         <Link href="/next">
