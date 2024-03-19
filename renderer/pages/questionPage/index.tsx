@@ -7,10 +7,11 @@ interface Answer {
   isCorrect: boolean;
 }
 
+const questionList = new QuestionList([]); 
+
 const QuestionPage: React.FC = () => {
   const [question, setQuestion] = useState<string>('');
   const [answers, setAnswers] = useState<Answer[]>([{ text: '', isCorrect: false }]);
-  const questionList = new QuestionList([]);
   
   const handleQuestionChange = (e: ChangeEvent<HTMLInputElement>): void => {
     setQuestion(e.target.value);
@@ -55,7 +56,7 @@ const QuestionPage: React.FC = () => {
     questionList.addQuestion(newQuestion);
     
     console.log("Dodano pytanie:", newQuestion);
-    console.log("Aktualna lista pytań:", questionList);
+    console.log("Aktualna lista pytań:", questionList.unusedQuestions.length);
 
     setQuestion('');
     setAnswers([{ text: '', isCorrect: false }]);
