@@ -1,4 +1,5 @@
 import React, { useState, ChangeEvent } from 'react'; 
+import { QuestionList } from '../../models/QuestionList';
 
 interface Answer {
   text: string;
@@ -8,6 +9,7 @@ interface Answer {
 const QuestionPage: React.FC = () => {
   const [question, setQuestion] = useState<string>('');
   const [answers, setAnswers] = useState<Answer[]>([{ text: '', isCorrect: false }]);
+  const questionList = new QuestionList([]);
   
   const handleQuestionChange = (e: ChangeEvent<HTMLInputElement>): void => {
     setQuestion(e.target.value);
@@ -34,7 +36,9 @@ const QuestionPage: React.FC = () => {
   };
 
   const addAnswer = (): void => {
-    setAnswers([...answers, { text: '', isCorrect: false }]);
+    if (answers.length < 4) {
+      setAnswers([...answers, { text: '', isCorrect: false }]);
+    }
   };
 
   const removeAnswer = (index: number): void => {
@@ -43,12 +47,11 @@ const QuestionPage: React.FC = () => {
   };
 
   const handleConfirm = (): void => {
-    // Logika dla przycisku "Potwierdź"
+    // questionList.addQuestion();
     console.log("Potwierdzono odpowiedzi");
   };
 
   const handleReturn = (): void => {
-    // Logika dla przycisku "Powrót"
     console.log("Powrót do poprzedniego ekranu");
   };
 
@@ -86,18 +89,35 @@ const QuestionPage: React.FC = () => {
           />
           <button 
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" 
-            onClick={() => index === answers.length - 1 ? addAnswer() : removeAnswer(index)}>
-            {index === answers.length - 1 ? '+' : '-'}
+            style={{ backgroundColor: '#F39A9D', color: 'white' }}
+            onClick={() => removeAnswer(index)}>
+            -
           </button>
         </div>
       ))}
       
-      <div className="mt-auto">
-        <button className="text-white font-bold py-2 px-4 rounded" onClick={handleConfirm}>
-          Potwierdź
+      {answers.length < 4 &&
+        <button 
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" 
+          style={{ backgroundColor: '#F39A9D', color: 'white' }}
+          onClick={addAnswer}>
+          +
         </button>
-        <button className="text-white font-bold py-2 px-4 rounded ml-2" onClick={handleReturn}>
-          Powrót
+      }
+
+      <div className="mt-auto">
+        <button 
+          className="text-white font-bold py-2 px-4 rounded" 
+          onClick={handleConfirm}
+          style={{ backgroundColor: '#F39A9D', color: 'white' }}>
+        Potwierdź
+        </button>
+
+        <button 
+          className="text-white font-bold py-2 px-4 rounded ml-2"
+          onClick={handleReturn}
+          style={{ backgroundColor: '#F39A9D', color: 'white' }}>
+        Powrót
         </button>
       </div>
     </div>
