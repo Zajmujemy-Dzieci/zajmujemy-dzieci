@@ -1,5 +1,6 @@
 import React, { useState, ChangeEvent } from 'react'; 
 import { QuestionList } from '../../models/QuestionList';
+import { Question } from '../../models/Question'; 
 
 interface Answer {
   text: string;
@@ -47,8 +48,17 @@ const QuestionPage: React.FC = () => {
   };
 
   const handleConfirm = (): void => {
-    // questionList.addQuestion();
-    console.log("Potwierdzono odpowiedzi");
+    const questionAnswers = answers.map(answer => answer.text);
+    const correctAnswerId = answers.findIndex(answer => answer.isCorrect);
+
+    const newQuestion = new Question(question, questionAnswers, correctAnswerId);
+    questionList.addQuestion(newQuestion);
+    
+    console.log("Dodano pytanie:", newQuestion);
+    console.log("Aktualna lista pytań:", questionList);
+
+    setQuestion('');
+    setAnswers([{ text: '', isCorrect: false }]);
   };
 
   const handleReturn = (): void => {
