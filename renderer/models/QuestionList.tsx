@@ -34,7 +34,7 @@ export class QuestionList {
         return randomQuestion;
     }
 
-    getQuestionsLeft(): number {
+    getQuestionsLeftAmount(): number {
         return this.unusedQuestions.length;
     }
 
