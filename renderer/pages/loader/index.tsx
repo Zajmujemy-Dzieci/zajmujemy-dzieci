@@ -2,6 +2,15 @@ import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
 import { QuestionList } from '../../models/QuestionList';
 import { Question } from '../../models/Question';
+import { z } from "zod";
+
+const zQuestion = z.array(
+  z.object({
+    content: z.string(),
+    answers: z.array(z.string()),
+    correctAnswerId: z.number(),
+  })
+);
 
 export type QuestionType = {
   content: string;
@@ -51,8 +60,8 @@ export default function Loader() {
         questionList.unusedQuestions = [];
         const content = event.target?.result?.toString(); // Convert ArrayBuffer to string
         if (content) {
-          const questions: QuestionType[] = JSON.parse(content);
-          const questionObjects = questions.map((question: QuestionType) => {
+          const questions = zQuestion.parse(JSON.parse(content));
+          questions.map((question: QuestionType) => {
             questionList.addQuestion(
               new Question(question.content, question.answers, question.correctAnswerId));
           });
