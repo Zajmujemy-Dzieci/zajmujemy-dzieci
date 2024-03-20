@@ -3,6 +3,8 @@ import { app, ipcMain } from 'electron'
 import serve from 'electron-serve'
 import { createWindow } from './helpers'
 
+const os = require('os');
+
 const express = require('express');
 const bodyParser = require('body-parser');
 
@@ -67,6 +69,8 @@ if (isProd) {
     height: 600,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
+      sandbox: false,
+      nodeIntegration: true
     },
   })
 

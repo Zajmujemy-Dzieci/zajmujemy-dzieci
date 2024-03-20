@@ -25,6 +25,11 @@ export default function NextPage() {
         <Link href="/home">
           <a className="btn-blue">Go to home page</a>
         </Link>
+
+        <Link href="/hotspot_instruction_page">
+          <a className="btn-blue">Go to instruction page</a>
+        </Link>
+
       </div>
     </React.Fragment>
   )

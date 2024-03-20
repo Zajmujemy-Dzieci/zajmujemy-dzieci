@@ -4,6 +4,9 @@ import Link from 'next/link'
 import Image from 'next/image'
 
 export default function NextPage() {
+    const electron = (window as any).electron;
+    const ipAddress :string = electron.netInterfaces();
+
     return (
         <React.Fragment>
         <Head>
@@ -27,6 +30,15 @@ export default function NextPage() {
                     <li>Następnie klikamy w zakładce hotspot mobilny: włącz</li>
                     <li>W zakładce właściwości jest podana nazwa sieci oraz hasło do niej</li>
                 </div>
+
+                <div className="m-10">
+                    <p>Adres do polaczenia sie:{ipAddress}:3000</p>
+                    <Link href="/next">
+                    <a className="btn-blue">Return</a>
+                    </Link>
+                </div>
+                
+
             </div>
         </div>
         </React.Fragment>
