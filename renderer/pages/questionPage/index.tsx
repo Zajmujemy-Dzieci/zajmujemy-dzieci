@@ -16,6 +16,11 @@ const QuestionPage: React.FC = () => {
   const [unsavedChanges, setUnsavedChanges] = useState<boolean>(false);
   const [showWarning, setShowWarning] = useState<boolean>(false);
 
+  const resetQuestionAndAnswers = (): void => {
+    setQuestion('');
+    setAnswers([{ text: '', isCorrect: false }]);
+  };
+
   const handleQuestionChange = (e: ChangeEvent<HTMLInputElement>): void => {
     setQuestion(e.target.value);
     setUnsavedChanges(true);
@@ -88,7 +93,8 @@ const QuestionPage: React.FC = () => {
     <div>
       {showWarning ? ( 
         <WarningPage 
-          handleReturnToPreviousPage={handleReturnToPreviousPage} 
+          handleReturnToPreviousPage={handleReturnToPreviousPage}
+          resetQuestionAndAnswers={resetQuestionAndAnswers} 
         />
       ) : (
         <div className={`question-page p-8 flex flex-col items-center justify-center h-screen ${answers.length > 4 ? 'overflow-y-auto' : ''}`}>

@@ -1,12 +1,18 @@
 import React from 'react';
 
 interface WarningPageProps {
-  handleReturnToPreviousPage: () => void; 
+  handleReturnToPreviousPage: () => void;
+  resetQuestionAndAnswers: () => void; 
 }
 
-const WarningPage: React.FC<WarningPageProps> = ({ handleReturnToPreviousPage }) => {
+const WarningPage: React.FC<WarningPageProps> = ({ handleReturnToPreviousPage, resetQuestionAndAnswers }) => {
   const handleReturn = (): void => {
-    handleReturnToPreviousPage(); 
+    handleReturnToPreviousPage();
+  };
+
+  const handleReset = (): void => {
+    resetQuestionAndAnswers(); 
+    handleReturnToPreviousPage();
   };
 
   return (
@@ -20,14 +26,13 @@ const WarningPage: React.FC<WarningPageProps> = ({ handleReturnToPreviousPage })
       <div className="warning-buttons flex">
         <button
           className="text-white font-bold py-2 px-4 rounded mr-4"
-          onClick={handleReturn} 
-          // Tutaj bedzie przejście do strony z listą pytań, ale na razie daje handleReturn bo nie mam tej strony jeszcze
+          onClick={handleReset} 
           style={{ backgroundColor: '#F39A9D', color: 'white' }}>
           Tak
         </button>
         <button
           className="text-white font-bold py-2 px-4 rounded"
-          onClick={handleReturn}
+          onClick={handleReturn} 
           style={{ backgroundColor: '#F39A9D', color: 'white' }}>
           Nie
         </button>
