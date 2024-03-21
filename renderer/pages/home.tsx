@@ -34,6 +34,9 @@ export default function HomePage() {
         <Link href="/questionPage">
           <a className="btn-blue">Go to next page</a>
         </Link>
+        <Link href="/loader">
+          <a className="btn-blue">Go to next page</a>
+        </Link>
       </div>
     </React.Fragment>
   )
