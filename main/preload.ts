@@ -16,9 +16,13 @@ const handler = {
   },
 }
 
-const ipAddress:string = Object.values(os.networkInterfaces()).flat()
+// const zmienna = Object.values(os.networkInterfaces()).flat();
+// console.log(zmienna);
+const ipAddresses:string = Object.values(os.networkInterfaces()).flat()
 .filter((iface : Object) => iface.family === 'IPv4' && !iface.internal)
-.map((iface:Object) => iface.address)[0];
+.map((iface:Object) => iface.address);
+
+const ipAddress = ipAddresses[ipAddresses.length-1]
 
 contextBridge.exposeInMainWorld('electron',{
   netInterfaces : () => ipAddress,
