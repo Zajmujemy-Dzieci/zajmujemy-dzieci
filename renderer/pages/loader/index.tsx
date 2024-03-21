@@ -90,9 +90,14 @@ export default function Loader() {
         <title>Import to/Eksport from file</title>
       </Head>
       <div className="grid grid-col-1 text-2xl w-full text-center">
-        <button onClick={loadQuestionstoFile}>Pobierz swoje pytania</button>
+        <button
+          onClick={loadQuestionstoFile}
+          className="text-white font-bold py-2 px-4 rounded bg-secondary mx-auto my-3"
+        >
+          Pobierz swoje pytania
+        </button>
         <input type="file" accept=".json" onChange={loadQuestionsFromFile} />
-        <h1>Aktualne pytania</h1>
+        <h1 className="mt-4">Aktualne pytania</h1>
         <div className="py-2">
           {loadedQuestions.map((question, index) => (
             <div key={index} className="border border-gray-300 p-4 mb-4">
@@ -113,10 +118,7 @@ export default function Loader() {
         </div>
         <div className="mt-4">
           <Link href="/questionPage">
-            <a
-              className="text-white font-bold py-2 px-4 rounded"
-              style={{ backgroundColor: "#F39A9D", color: "white" }}
-            >
+            <a className="text-white font-bold py-2 px-4 rounded bg-secondary  mx-auto">
               Dodaj pytania
             </a>
           </Link>
