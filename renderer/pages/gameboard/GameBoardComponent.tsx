@@ -26,8 +26,12 @@ function mapTypeOnColor(type: BoardFieldSpecialty) {
       return "bg-red-500";
     case "empty":
       return "bg-childWhite";
+    case "start":
+      return "bg-childBlack";
   }
 }
+
+// UNUSED PURPOSELY - preparing for future use
 
 function changePosition(
   players: Player[],
@@ -45,7 +49,7 @@ function changePosition(
 
 export function GameBoardComponent({
   configuration: {
-    numberOfQuestionFields = 15,
+    numberOfQuestionFields = 14,
     numberOfGoodSpecialFields = 3,
     numberOfBadSpecialFields = 3,
   },
@@ -58,12 +62,13 @@ export function GameBoardComponent({
   const totalFields = 2 * numberOfQuestionFields + 2;
 
   const getBoardFieldSpecialty = (index: number): BoardFieldSpecialty => {
+    if (index === totalFields - 1) return "start";
     if (
       index % (numberOfBadSpecialFields + numberOfGoodSpecialFields - 1) ===
       0
     )
       return "good";
-    return index % 2 === 0 ? "question" : "empty"; // Special or question
+    return index % 2 === 0 ? "question" : "empty";
   };
 
   let currentColumn = 1;
@@ -139,12 +144,10 @@ export function GameBoardComponent({
     return { colClass, rowClass, type: getBoardFieldSpecialty(index) };
   };
 
-  console.log(gridPositions);
-
   return (
     <div className={`w-full h-full grid gap-4`}>
-      <div className="bg-childBlack row-start-1">1</div>
-      {Array.from({ length: totalFields - 3 }, (_, index) => {
+      <div className="bg-childBlack row-start-1 h-32 w-32">START</div>
+      {Array.from({ length: totalFields - 2 }, (_, index) => {
         const {
           colClass: col,
           rowClass: row,
@@ -163,7 +166,10 @@ export function GameBoardComponent({
             )}
           >
             {players[0].position === index && (
-              <div className="m-0.5 bg-gray-800 w-8 h-8 rounded-full" />
+              <div
+                className="m-0.5 bg-gray-800 w-8 h-8 rounded-full"
+                hidden={players[0].position !== index}
+              />
             )}
 
             {players[1].position === index && (
@@ -184,21 +190,6 @@ export function GameBoardComponent({
           </div>
         );
       })}
-      {gridPositions.push({
-        index: totalFields + 1,
-        colClass: 9,
-        rowClass: 7,
-        type: "finish",
-      })}
-      <button
-        className={`bg-childBlack col-start-9 row-start-7`}
-        onClick={(event) => {
-          event.preventDefault();
-          changePosition(players, players[0], players[0].position + 2);
-        }}
-      >
-        1
-      </button>
     </div>
   );
 }

@@ -14,6 +14,8 @@ export type GameBoardConfiguration = {
   numberOfBadSpecialFields: number;
 };
 
+// UNUSED PURPOSELY - preparing for future use
+
 function setNextPlayer(currentPlayer: Player, players: Player[]) {
   const nextPlayerIndex =
     currentPlayer.orderId === players.length - 1
@@ -21,6 +23,8 @@ function setNextPlayer(currentPlayer: Player, players: Player[]) {
       : 0;
   return players[nextPlayerIndex];
 }
+
+// COMMENTED PURPOSELY - preparing for future use
 
 export default function GameBoard(
   // players: Player[],
@@ -32,12 +36,12 @@ export default function GameBoard(
 
   // const [currentPlayer, setCurrentPlayer] = useState<Player>(players[0]);
   const players = [
-    { orderId: 0, nick: "Gracz 1", score: 0, position: 3 },
+    { orderId: 0, nick: "Gracz 1", score: 0, position: 6 },
     { orderId: 1, nick: "Gracz 2", score: 0, position: 6 },
-    { orderId: 2, nick: "Gracz 3", score: 0, position: 9 },
-    { orderId: 3, nick: "Gracz 4", score: 0, position: 10 },
-    { orderId: 4, nick: "Gracz 5", score: 0, position: 13 },
-    { orderId: 5, nick: "Gracz 6", score: 0, position: 13 },
+    { orderId: 2, nick: "Gracz 3", score: 0, position: 6 },
+    { orderId: 3, nick: "Gracz 4", score: 0, position: 6 },
+    { orderId: 4, nick: "Gracz 5", score: 0, position: 6 },
+    { orderId: 5, nick: "Gracz 6", score: 0, position: 6 },
   ];
 
   return (
