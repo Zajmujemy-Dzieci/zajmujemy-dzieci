@@ -31,7 +31,7 @@ export default function HomePage() {
         <span>💕 </span>
       </div>
       <div className="mt-1 w-full flex-wrap flex justify-center">
-        <Link href="/next">
+        <Link href="/questionPage">
           <a className="btn-blue">Go to next page</a>
         </Link>
       </div>
