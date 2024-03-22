@@ -34,11 +34,13 @@ export default function NextPage() {
 
                 <div className="m-10">
                     <p>Adres do polaczenia sie:{ipAddress}:3000</p>
-                    
+                    <a href={`http://${ipAddress}:3000`}>
                     <QRCode value={`http://${ipAddress}:3000`}/>
-
+                    
+                    </a>
                     <Link href="/next">
-                    <a className="btn-blue">Return</a>
+                    
+                    <a className="btn-blue">Return</a>                    
                     </Link>
                 </div>
                 
