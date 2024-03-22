@@ -2,11 +2,12 @@ import React from 'react'
 import Head from 'next/head'
 import Link from 'next/link'
 import Image from 'next/image'
+import QRCode from 'qrcode.react'
+
 
 export default function NextPage() {
     const electron = (window as any).electron;
     const ipAddress :string = electron.netInterfaces();
-
     return (
         <React.Fragment>
         <Head>
@@ -33,6 +34,9 @@ export default function NextPage() {
 
                 <div className="m-10">
                     <p>Adres do polaczenia sie:{ipAddress}:3000</p>
+                    
+                    <QRCode value={`http://${ipAddress}:3000`}/>
+
                     <Link href="/next">
                     <a className="btn-blue">Return</a>
                     </Link>
