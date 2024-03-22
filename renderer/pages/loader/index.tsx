@@ -96,7 +96,13 @@ export default function Loader() {
         >
           Pobierz swoje pytania
         </button>
-        <input type="file" accept=".json" onChange={loadQuestionsFromFile} />
+        <h1 className="mt-4">Prześlij swój plik z pytaniami: </h1>
+        <input
+          type="file"
+          accept=".json"
+          onChange={loadQuestionsFromFile}
+          className="text-white font-bold py-2 px-4 rounded bg-secondary mx-auto my-3 text-center"
+        />
         <h1 className="mt-4">Aktualne pytania</h1>
         <div className="py-2">
           {loadedQuestions.map((question, index) => (
