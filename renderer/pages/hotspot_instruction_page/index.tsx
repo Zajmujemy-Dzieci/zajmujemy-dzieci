@@ -33,7 +33,7 @@ export default function NextPage() {
                 </div>
 
                 <div className="m-10">
-                    <p>Adres do polaczenia sie:http://{ipAddress}:3000</p>
+                    <p>Adres do polaczenia sie: http://{ipAddress}:3000</p>
                     <a href={`http://${ipAddress}:3000`}>
                     <QRCode value={`http://${ipAddress}:3000`}/>
                     
