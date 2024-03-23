@@ -33,7 +33,7 @@ express_app.get('/', (req, res) => {
   `);
 });
 
-express_app.get('/ipaddress', (req, res) => {
+function getIpAddress() {
   const networkInterfaces = os.networkInterfaces();
   let ipv4Address;
   Object.keys(networkInterfaces).forEach(interfaceName => {
@@ -43,6 +43,12 @@ express_app.get('/ipaddress', (req, res) => {
       }
     });
   });
+  return ipv4Address;
+}
+
+express_app.get('/ipaddress', (req, res) => {
+  const networkInterfaces = os.networkInterfaces();
+  let ipv4Address = getIpAddress();
   if (ipv4Address) {
     res.json(ipv4Address );
   } else {
