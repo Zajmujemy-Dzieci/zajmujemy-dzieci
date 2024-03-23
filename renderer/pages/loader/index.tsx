@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Head from "next/head";
 import Link from "next/link";
+import QuestionComponent from "./QuestionComponent";
 import { QuestionList } from "../../models/QuestionList";
 import { Question } from "../../models/Question";
 import { z } from "zod";
@@ -13,7 +14,7 @@ const zQuestion = z.array(
   })
 );
 
-export type QuestionType = {
+type QuestionType = {
   content: string;
   answers: string[];
   correctAnswerId: number;
@@ -21,6 +22,16 @@ export type QuestionType = {
 
 export default function Loader() {
   const [loadedQuestions, setLoadedQuestions] = useState<Question[]>([]);
+  const [isPopupOpen, setPopupOpen] = useState<boolean>(false);
+  const [Outquestion, setOutQuestion] = useState<string>("");
+  const [OutAnswers, setOutAnswers] = useState<string[]>([]);
+  const [OutCorrectAnswerId, setOutCorrectAnswerId] = useState<number>(-1);
+  const [OutQuestionId, setOutQuestionId] = useState<number>(-1);
+
+  const togglePopup = () => {
+    setPopupOpen(!isPopupOpen);
+    loadQuestionsFromList();
+  };
 
   const questionList = QuestionList.getInstance();
 
@@ -84,6 +95,31 @@ export default function Loader() {
     reader.readAsText(file);
   };
 
+  const handleAddQuestion = () => {
+    setOutQuestion("");
+    setOutAnswers([""]);
+    setOutCorrectAnswerId(-1);
+    setPopupOpen(true);
+    loadQuestionsFromList();
+  };
+
+  const handleEditQuestion = (index: number) => () => {
+    const question = loadedQuestions[index];
+    setOutQuestion(question.content);
+    setOutAnswers(question.answers);
+    console.log(question.answers);
+    setOutCorrectAnswerId(question.correctAnswerId);
+    setOutQuestionId(index);
+    setPopupOpen(true);
+  };
+
+  const handleDeleteQuestion = (index: number) => () => {
+    questionList.unusedQuestions = questionList.unusedQuestions.filter(
+      (_, i) => i !== index
+    );
+    loadQuestionsFromList();
+  };
+
   return (
     <React.Fragment>
       <Head>
@@ -119,17 +155,40 @@ export default function Loader() {
                   </li>
                 ))}
               </ul>
+              <button
+                className="text-white font-bold py-2 px-4 rounded bg-secondary mx-auto my-3"
+                onClick={handleEditQuestion(index)}
+              >
+                Edytuj pytanie
+              </button>
+              <button
+                className="text-white font-bold py-2 px-4 rounded bg-secondary mx-auto my-3 ml-2"
+                onClick={handleDeleteQuestion(index)}
+              >
+                Usuń pytanie
+              </button>
             </div>
           ))}
         </div>
         <div className="mt-4">
-          <Link href="/questionPage">
-            <a className="text-white font-bold py-2 px-4 rounded bg-secondary  mx-auto">
-              Dodaj pytania
-            </a>
-          </Link>
+          <a
+            className="text-white font-bold py-2 px-4 rounded bg-secondary  mx-auto"
+            onClick={handleAddQuestion}
+          >
+            Dodaj pytania
+          </a>
         </div>
       </div>
+      <QuestionComponent
+        {...{
+          inQuestion: Outquestion,
+          inAnswers: OutAnswers,
+          isOpen: isPopupOpen,
+          onClose: togglePopup,
+          correctAnswerId: OutCorrectAnswerId,
+          inQuestionId: OutQuestionId,
+        }}
+      />
     </React.Fragment>
   );
 }

@@ -34,6 +34,10 @@ export class QuestionList {
         return randomQuestion;
     }
 
+    updateQuestion(index: number, question: Question) {
+        this.unusedQuestions[index] = question;
+    }
+
     getQuestionsLeftAmount(): number {
         return this.unusedQuestions.length;
     }
