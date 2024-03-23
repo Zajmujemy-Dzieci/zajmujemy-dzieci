@@ -3,6 +3,9 @@ import { app, ipcMain } from 'electron'
 import serve from 'electron-serve'
 import { createWindow } from './helpers'
 
+const os = require('os');
+const cors = require('cors');
+
 const express = require('express');
 const bodyParser = require('body-parser');
 
@@ -11,6 +14,7 @@ const PORT = 3000;
 
 
 express_app.use(bodyParser.urlencoded({ extended: true }));
+express_app.use(cors());
 
 express_app.get('/', (req, res) => {
   res.send(`
@@ -27,6 +31,29 @@ express_app.get('/', (req, res) => {
           </body>
       </html>
   `);
+});
+
+function getIpAddress() {
+  const networkInterfaces = os.networkInterfaces();
+  let ipv4Address;
+  Object.keys(networkInterfaces).forEach(interfaceName => {
+    networkInterfaces[interfaceName].forEach(networkInterface => {
+      if (networkInterface.family === 'IPv4' && !networkInterface.internal) {
+        ipv4Address = networkInterface.address;
+      }
+    });
+  });
+  return ipv4Address;
+}
+
+express_app.get('/ipaddress', (req, res) => {
+  const networkInterfaces = os.networkInterfaces();
+  let ipv4Address = getIpAddress();
+  if (ipv4Address) {
+    res.json(ipv4Address );
+  } else {
+    res.status(500).json({ error: 'Nie udało się znaleźć adresu IPv4' });
+  }
 });
 
 
@@ -67,6 +94,8 @@ if (isProd) {
     height: 600,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
+      sandbox: false,
+      nodeIntegration: true
     },
   })
 
