@@ -1,7 +1,7 @@
-import React from 'react'
-import Head from 'next/head'
-import Link from 'next/link'
-import Image from 'next/image'
+import React from "react";
+import Head from "next/head";
+import Link from "next/link";
+import Image from "next/image";
 
 export default function NextPage() {
   return (
@@ -25,12 +25,10 @@ export default function NextPage() {
         <Link href="/home">
           <a className="btn-blue">Go to home page</a>
         </Link>
-
-        <Link href="/hotspot_instruction_page">
-          <a className="btn-blue">Go to instruction page</a>
+        <Link href="/gameboard">
+          <a className="btn-blue">Go to game board page</a>
         </Link>
-
       </div>
     </React.Fragment>
-  )
+  );
 }

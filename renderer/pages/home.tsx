@@ -1,7 +1,10 @@
-import React from 'react'
-import Head from 'next/head'
-import Link from 'next/link'
-import Image from 'next/image'
+import React from "react";
+import Head from "next/head";
+import Link from "next/link";
+import Image from "next/image";
+
+import { Question } from "../models/Question";
+import { QuestionList } from "../models/QuestionList";
 
 export default function HomePage() {
   return (
@@ -28,10 +31,10 @@ export default function HomePage() {
         <span>💕 </span>
       </div>
       <div className="mt-1 w-full flex-wrap flex justify-center">
-        <Link href="/next">
+        <Link href="/loader">
           <a className="btn-blue">Go to next page</a>
         </Link>
       </div>
     </React.Fragment>
-  )
+  );
 }
