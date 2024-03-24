@@ -1,5 +1,5 @@
 // This is dumb, but html files do not like building
-export const websockets_client = `<!DOCTYPE html>
+export const websockets_client = (address: string) => `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -7,7 +7,7 @@ export const websockets_client = `<!DOCTYPE html>
     <title>Websockets demo</title>
 
     <script>
-      const ws = new WebSocket('ws://localhost:3000/ws');
+      const ws = new WebSocket('ws://${address}:3000/ws');
       ws.onopen = () => {
           console.log('connected');
           ws.send(JSON.stringify({ type: 'register', nick: 'test' }));

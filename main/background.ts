@@ -21,7 +21,7 @@ express_app.use(bodyParser.urlencoded({ extended: true }))
 express_app.use(bodyParser.urlencoded({ extended: true }))
 express_app.use(cors())
 
-express_app.get("/", (req, res) => {
+express_app.get("/", (req: any, res: any) => {
 	res.send(`
       <html>
           <head>
@@ -81,7 +81,9 @@ express_app.post("/submit", (req, res) => {
 })
 
 express_app.get("/websockets", (req, res) => {
-	res.send(websockets_client)
+	const address = getIpAddress() as any as string
+	console.log("here", address)
+	res.send(websockets_client(address))
 })
 
 express_app.listen(PORT, () => {
