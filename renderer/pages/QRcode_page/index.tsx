@@ -69,7 +69,7 @@ export default function QRcodePage() {
                     className='m-10' size={400}/>  
             </div>
 
-            <Link href="/next">
+            <Link href="/gameboard">
                 <button className="btn-blue" onClick={handleStartGame}>Rozpocznij grę</button>
             </Link>                 
             <Link href="/hotspot_instruction_page">
