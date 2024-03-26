@@ -120,6 +120,12 @@ export default function Loader() {
     loadQuestionsFromList();
   };
 
+  const handleRemoveQuestions = () => {
+    questionList.unusedQuestions = [];
+    questionList.usedQuestions = [];
+    loadQuestionsFromList();
+  };
+
   return (
     <React.Fragment>
       <Head>
@@ -170,12 +176,20 @@ export default function Loader() {
             </div>
           ))}
         </div>
-        <div className="mt-4">
+        <div className="mt-4 mb-2">
           <a
             className="text-white font-bold py-2 px-4 rounded bg-secondary  mx-auto"
             onClick={handleAddQuestion}
           >
             Dodaj pytania
+          </a>
+        </div>
+        <div className="mt-4 mb-2">
+          <a
+            className="text-white font-bold py-2 px-4 rounded bg-secondary  mx-auto"
+            onClick={handleRemoveQuestions}
+          >
+            Usuń wszystkie pytania
           </a>
         </div>
       </div>
