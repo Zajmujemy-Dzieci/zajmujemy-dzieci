@@ -7,14 +7,13 @@ import {NextRouter, useRouter} from 'next/router'
 import {useAtom} from 'jotai'
 import { Player } from '../../types/Player'
 import { playersQueueAtom } from '../../models/PlayersQueueAtom'
+import { set } from 'zod'
 
 
 export default function QRcodePage() {
     const [ipAddress, setIPAddress] = useState<string>('192.168.137.1');
-    const [players, setPlayers] = useAtom(playersQueueAtom);
-    const router: NextRouter = useRouter();
-
-    console.log(players);
+    const [players, setPlayers] = useAtom(playersQueueAtom); 
+ 
     useEffect(() => {
         axios.get<string>('http://localhost:3000/ipaddress')
         .then(response => {
@@ -24,7 +23,7 @@ export default function QRcodePage() {
             console.error('Błąd pobierania danych:', error);
         });
     }, []); 
-
+    
     const addPlayer = (nick: string) => {
         const newPlayer: Player = {
             orderId: 0,
@@ -34,7 +33,7 @@ export default function QRcodePage() {
         }
         setPlayers([...players, newPlayer]);
     }
-
+    
     const assignOrderIds = (players: Player[]): Player[] => {
         const shuffledPlayers = [...players];
         const numPlayers = shuffledPlayers.length;
@@ -47,7 +46,7 @@ export default function QRcodePage() {
         shuffledPlayers.forEach((player, index) => {
             player.orderId = index;
         });
-        
+        shuffledPlayers.sort((a, b) => a.orderId - b.orderId);
         return shuffledPlayers;
     };
     
@@ -74,7 +73,7 @@ export default function QRcodePage() {
             </Link>                 
             <Link href="/hotspot_instruction_page">
                 <a className="btn-blue m-5">Instrukcja włączenia hotspota</a>
-            </Link>                 
+            </Link>           
         </div>
         </React.Fragment>
     )
