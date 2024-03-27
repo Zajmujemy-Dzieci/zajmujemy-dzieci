@@ -1,11 +1,6 @@
 import React, { useState, useEffect, ChangeEvent } from "react";
-import Head from "next/head";
-import Link from "next/link";
 import { QuestionList } from "../../models/QuestionList";
 import { Question } from "../../models/Question";
-import { compileString } from "sass";
-import { on } from "events";
-import { set } from "zod";
 
 type QuestionProps = {
   inQuestion: string;
@@ -48,11 +43,14 @@ export default function QuestionComponent({
     }
   };
 
-  const handleAnswerChange = (e: ChangeEvent<HTMLInputElement>, index: number) => {
+  const handleAnswerChange = (
+    e: ChangeEvent<HTMLInputElement>,
+    index: number
+  ) => {
     const newAnswers = [...answers];
     newAnswers[index] = e.target.value;
     setAnswers(newAnswers);
-  }
+  };
 
   const removeAnswer = (index: number): void => {
     const newAnswers = answers.filter((_, i) => i !== index);
@@ -75,7 +73,7 @@ export default function QuestionComponent({
   };
 
   return (
-    <div className="fixed top-0 z-2 flex items-center flex-row w-full justify-center h-screen">
+    <div className="fixed bg-[#0000003f] top-0 z-2 flex items-center flex-row w-full justify-center h-screen">
       <div className="bg-childBlack rounded-3xl">
         <form
           onSubmit={handleSubmit}
@@ -113,7 +111,7 @@ export default function QuestionComponent({
               />
               <button
                 type="button"
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded bg-secondary text-white"
+                className="hover:bg-blue-700 font-bold py-2 px-4 rounded bg-secondary text-white"
                 onClick={() => removeAnswer(index)}
               >
                 -
@@ -123,7 +121,7 @@ export default function QuestionComponent({
           {answers.length < 4 && (
             <button
               type="button"
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded bg-secondary text-white"
+              className="hover:bg-blue-700 font-bold py-2 px-4 rounded bg-secondary text-white"
               onClick={addAnswer}
             >
               +
@@ -134,7 +132,7 @@ export default function QuestionComponent({
             answers.every((answer) => answer.trim() !== "") && (
               <button
                 type="submit"
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4 bg-secondary text-white"
+                className="hover:bg-blue-700 font-bold py-2 px-4 rounded mt-4 bg-secondary text-white"
               >
                 {correctAnswerId === -1
                   ? "Dodaj pytanie"
@@ -143,7 +141,7 @@ export default function QuestionComponent({
             )}
           <button
             onClick={onClose}
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4 bg-childGreen text-white"
+            className="hover:bg-blue-700 font-bold py-2 px-4 rounded mt-4 bg-childGreen text-white"
           >
             Wróć
           </button>
