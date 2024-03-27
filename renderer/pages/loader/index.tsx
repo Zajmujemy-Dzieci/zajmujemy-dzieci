@@ -22,6 +22,7 @@ export default function Loader() {
   const [OutAnswers, setOutAnswers] = useState<string[]>([]);
   const [OutCorrectAnswerId, setOutCorrectAnswerId] = useState(-1);
   const [OutQuestionId, setOutQuestionId] = useState(-1);
+  const minimumQuestionsNumber = 3;
 
   const togglePopup = () => {
     setPopupOpen(!isPopupOpen);
@@ -114,10 +115,19 @@ export default function Loader() {
     loadQuestionsFromList();
   };
 
-  const handleRemoveQuestions = () => {
+  const handleDeleteAllQuestions = () => {
     questionList.unusedQuestions = [];
     questionList.usedQuestions = [];
     loadQuestionsFromList();
+  };
+
+  const handleGoNext = () => {
+    if(minimumQuestionsNumber > questionList.getQuestionsLeftAmount()){
+      alert("Za mało pytań. Minimalna liczba pytań: " + minimumQuestionsNumber + 
+      ", aktualna liczba pytań: " + questionList.getQuestionsLeftAmount());
+    }
+    else
+      window.location.href='/QRcode_page';
   };
 
   return (
@@ -173,8 +183,11 @@ export default function Loader() {
         <button className="text-white font-bold py-2 px-4 rounded bg-secondary mx-auto" onClick={handleAddQuestion}>
           Dodaj pytanie
         </button>
-        <button className="text-white font-bold py-2 px-4 rounded bg-secondary mx-auto mt-2" onClick={handleRemoveQuestions}>
+        <button className="text-white font-bold py-2 px-4 rounded bg-secondary mx-auto mt-2" onClick={handleDeleteAllQuestions}>
           Usuń wszystkie pytania
+        </button>
+        <button className="text-white font-bold py-2 px-4 rounded bg-secondary mx-auto mt-2" onClick={handleGoNext}>
+          Przejdź dalej
         </button>
       </div>
       <QuestionComponent
