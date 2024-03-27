@@ -28,10 +28,10 @@ export default function QuestionComponent({
 }: QuestionProps) {
   if (!isOpen) return null;
 
-  const [question, setQuestion] = useState<string>("");
+  const [question, setQuestion] = useState("");
   const [answers, setAnswers] = useState<string[]>([]);
-  const [correctAnswer, setCorrectAnswer] = useState<number>(0);
-  const [questionId, setQuestionId] = useState<number>(-1);
+  const [correctAnswer, setCorrectAnswer] = useState(0);
+  const [questionId, setQuestionId] = useState(-1);
 
   useEffect(() => {
     setQuestion(inQuestion);
@@ -42,29 +42,17 @@ export default function QuestionComponent({
     }
   }, [inQuestion, inAnswers, correctAnswerId, inQuestionId]);
 
-  const handleQuestionChange = (e: ChangeEvent<HTMLInputElement>): void => {
-    setQuestion(e.target.value);
-  };
-
-  const handleAnswerChange = (
-    index: number,
-    e: ChangeEvent<HTMLInputElement>
-  ): void => {
-    const newAnswers = answers.map((answer, i) =>
-      i === index ? e.target.value : answer
-    );
-    setAnswers(newAnswers);
-  };
-
-  const handleCorrectChange = (index: number): void => {
-    setCorrectAnswer(index);
-  };
-
   const addAnswer = (): void => {
     if (answers.length < 4) {
       setAnswers([...answers, ""]);
     }
   };
+
+  const handleAnswerChange = (e: ChangeEvent<HTMLInputElement>, index: number) => {
+    const newAnswers = [...answers];
+    newAnswers[index] = e.target.value;
+    setAnswers(newAnswers);
+  }
 
   const removeAnswer = (index: number): void => {
     const newAnswers = answers.filter((_, i) => i !== index);
@@ -73,7 +61,6 @@ export default function QuestionComponent({
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
     if (correctAnswerId === -1) {
-      e.preventDefault();
       const newQuestion = new Question(question, answers, correctAnswer);
       questionList.addQuestion(newQuestion);
       onClose();
@@ -82,9 +69,9 @@ export default function QuestionComponent({
         questionId,
         new Question(question, answers, correctAnswer)
       );
-      e.preventDefault();
       onClose();
     }
+    e.preventDefault();
   };
 
   return (
@@ -92,20 +79,20 @@ export default function QuestionComponent({
       <div className="bg-childBlack rounded-3xl">
         <form
           onSubmit={handleSubmit}
-          className="question-page p-8 flex flex-col items-center justify-center"
+          className="p-8 flex flex-col items-center justify-center"
         >
-          <div className="question-text mb-4">
+          <div className="mb-4">
             <span className="text-white font-bold">Twoje pytanie</span>
           </div>
           <input
             type="text"
-            className="question-input px-4 py-2 bg-gray-100 text-gray-800 rounded"
+            className="px-4 py-2 bg-gray-100 text-gray-800 rounded"
             placeholder="Wprowadź pytanie"
             value={question}
-            onChange={handleQuestionChange}
+            onChange={(e) => setQuestion(e.target.value)}
           />
 
-          <div className="question-text mt-6 mb-4">
+          <div className="mt-6 mb-4">
             <span className="text-white font-bold">Twoje odpowiedzi</span>
           </div>
 
@@ -114,20 +101,19 @@ export default function QuestionComponent({
               <input
                 type="radio"
                 checked={index === correctAnswer}
-                onChange={() => handleCorrectChange(index)}
+                onChange={() => setCorrectAnswer(index)}
                 className="mr-2"
               />
               <input
                 type="text"
-                className="question-input px-4 py-2 bg-gray-100 text-gray-800 rounded mr-2"
+                className="px-4 py-2 bg-gray-100 text-gray-800 rounded mr-2"
                 placeholder="Wprowadź odpowiedź"
                 value={answer}
-                onChange={(e) => handleAnswerChange(index, e)}
+                onChange={(e) => handleAnswerChange(e, index)}
               />
               <button
                 type="button"
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                style={{ backgroundColor: "#F39A9D", color: "white" }}
+                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded bg-secondary text-white"
                 onClick={() => removeAnswer(index)}
               >
                 -
@@ -137,8 +123,7 @@ export default function QuestionComponent({
           {answers.length < 4 && (
             <button
               type="button"
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-              style={{ backgroundColor: "#F39A9D", color: "white" }}
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded bg-secondary text-white"
               onClick={addAnswer}
             >
               +
@@ -149,8 +134,7 @@ export default function QuestionComponent({
             answers.every((answer) => answer.trim() !== "") && (
               <button
                 type="submit"
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4"
-                style={{ backgroundColor: "#F39A9D", color: "white" }}
+                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4 bg-secondary text-white"
               >
                 {correctAnswerId === -1
                   ? "Dodaj pytanie"
@@ -159,8 +143,7 @@ export default function QuestionComponent({
             )}
           <button
             onClick={onClose}
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4"
-            style={{ backgroundColor: "#3F6C51", color: "white" }}
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4 bg-childGreen text-white"
           >
             Wróć
           </button>

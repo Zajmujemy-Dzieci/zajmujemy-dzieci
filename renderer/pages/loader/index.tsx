@@ -5,6 +5,7 @@ import QuestionComponent from "./QuestionComponent";
 import { QuestionList } from "../../models/QuestionList";
 import { Question } from "../../models/Question";
 import { z } from "zod";
+import { QuestionType } from "../../types/QuestionType";
 
 const zQuestion = z.array(
   z.object({
@@ -14,19 +15,13 @@ const zQuestion = z.array(
   })
 );
 
-type QuestionType = {
-  content: string;
-  answers: string[];
-  correctAnswerId: number;
-};
-
 export default function Loader() {
   const [loadedQuestions, setLoadedQuestions] = useState<Question[]>([]);
-  const [isPopupOpen, setPopupOpen] = useState<boolean>(false);
-  const [Outquestion, setOutQuestion] = useState<string>("");
+  const [isPopupOpen, setPopupOpen] = useState(false);
+  const [Outquestion, setOutQuestion] = useState("");
   const [OutAnswers, setOutAnswers] = useState<string[]>([]);
-  const [OutCorrectAnswerId, setOutCorrectAnswerId] = useState<number>(-1);
-  const [OutQuestionId, setOutQuestionId] = useState<number>(-1);
+  const [OutCorrectAnswerId, setOutCorrectAnswerId] = useState(-1);
+  const [OutQuestionId, setOutQuestionId] = useState(-1);
 
   const togglePopup = () => {
     setPopupOpen(!isPopupOpen);
@@ -107,7 +102,6 @@ export default function Loader() {
     const question = loadedQuestions[index];
     setOutQuestion(question.content);
     setOutAnswers(question.answers);
-    console.log(question.answers);
     setOutCorrectAnswerId(question.correctAnswerId);
     setOutQuestionId(index);
     setPopupOpen(true);
@@ -176,22 +170,12 @@ export default function Loader() {
             </div>
           ))}
         </div>
-        <div className="mt-4 mb-2">
-          <a
-            className="text-white font-bold py-2 px-4 rounded bg-secondary  mx-auto"
-            onClick={handleAddQuestion}
-          >
-            Dodaj pytania
-          </a>
-        </div>
-        <div className="mt-4 mb-2">
-          <a
-            className="text-white font-bold py-2 px-4 rounded bg-secondary  mx-auto"
-            onClick={handleRemoveQuestions}
-          >
-            Usuń wszystkie pytania
-          </a>
-        </div>
+        <button className="text-white font-bold py-2 px-4 rounded bg-secondary mx-auto" onClick={handleAddQuestion}>
+          Dodaj pytanie
+        </button>
+        <button className="text-white font-bold py-2 px-4 rounded bg-secondary mx-auto mt-2" onClick={handleRemoveQuestions}>
+          Usuń wszystkie pytania
+        </button>
       </div>
       <QuestionComponent
         {...{
