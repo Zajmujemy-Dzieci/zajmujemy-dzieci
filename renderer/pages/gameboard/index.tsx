@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { GameBoardComponent } from "./GameBoardComponent";
+import GameBoardComponent from "./GameBoardComponent";
 
 export type Player = {
   orderId: number;
@@ -26,10 +26,9 @@ function setNextPlayer(currentPlayer: Player, players: Player[]) {
 
 // COMMENTED PURPOSELY - preparing for future use
 
-export default function GameBoard(
+export default function GameBoard() {
   // players: Player[],
-  configuration: GameBoardConfiguration
-) {
+  // configuration: GameBoardConfiguration | undefined | null
   // if (!players) {
   //   return <div>Nie ma z kim grać...</div>;
   // }
@@ -43,6 +42,11 @@ export default function GameBoard(
     { orderId: 4, nick: "Gracz 5", score: 0, position: 6 },
     { orderId: 5, nick: "Gracz 6", score: 0, position: 6 },
   ];
+  const configuration = {
+    numberOfQuestionFields: 9,
+    numberOfGoodSpecialFields: 2,
+    numberOfBadSpecialFields: 3,
+  };
 
   return (
     <div className="w-[100vw] h-[100vh] p-32">
