@@ -3,11 +3,9 @@ import Head from 'next/head'
 import Link from 'next/link'
 import QRCode from 'qrcode.react'
 import axios from 'axios'
-import {NextRouter, useRouter} from 'next/router'
 import {useAtom} from 'jotai'
 import { Player } from '../../types/Player'
 import { playersQueueAtom } from '../../models/PlayersQueueAtom'
-import { set } from 'zod'
 
 
 export default function QRcodePage() {
