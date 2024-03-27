@@ -47,17 +47,24 @@ function changePosition(
   return newPlayers;
 }
 
-export function GameBoardComponent({
-  configuration: {
-    numberOfQuestionFields = 14,
-    numberOfGoodSpecialFields = 3,
-    numberOfBadSpecialFields = 3,
-  },
+export default function GameBoardComponent({
+  configuration,
   players,
 }: {
   configuration: GameBoardConfiguration;
   players: Player[];
 }) {
+  if (!players) {
+    return <div>Nie ma z kim grać...</div>;
+  }
+  if (!configuration) {
+    return <div>Brak konfiguracji planszy...</div>;
+  }
+  const {
+    numberOfQuestionFields,
+    numberOfGoodSpecialFields,
+    numberOfBadSpecialFields,
+  } = configuration;
   const numberOfColumns = Math.floor((numberOfQuestionFields * 2) / 3) - 1;
   const totalFields = 2 * numberOfQuestionFields + 2;
 
