@@ -3,11 +3,15 @@ import Head from 'next/head'
 import Link from 'next/link'
 import QRCode from 'qrcode.react'
 import axios from 'axios'
+import {useAtom} from 'jotai'
+import { Player } from '../../types/Player'
+import { playersQueueAtom } from '../../models/PlayersQueueAtom'
 
 
 export default function QRcodePage() {
     const [ipAddress, setIPAddress] = useState<string>('192.168.137.1');
-
+    const [players, setPlayers] = useAtom(playersQueueAtom); 
+ 
     useEffect(() => {
         axios.get<string>('http://localhost:3000/ipaddress')
         .then(response => {
@@ -17,6 +21,38 @@ export default function QRcodePage() {
             console.error('Błąd pobierania danych:', error);
         });
     }, []); 
+    
+    const addPlayer = (nick: string) => {
+        const newPlayer: Player = {
+            orderId: 0,
+            nick: nick,
+            score: 0,
+            position: 0
+        }
+        setPlayers([...players, newPlayer]);
+    }
+    
+    const assignOrderIds = (players: Player[]): Player[] => {
+        const shuffledPlayers = [...players];
+        const numPlayers = shuffledPlayers.length;
+
+        for (let i = numPlayers - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffledPlayers[i], shuffledPlayers[j]] = [shuffledPlayers[j], shuffledPlayers[i]];
+        }
+
+        shuffledPlayers.forEach((player, index) => {
+            player.orderId = index;
+        });
+        shuffledPlayers.sort((a, b) => a.orderId - b.orderId);
+        return shuffledPlayers;
+    };
+    
+    const handleStartGame = () => {
+        const playersWithOrderIds = assignOrderIds(players);
+        setPlayers(playersWithOrderIds);
+    }
+
        
     return (
         <React.Fragment>
@@ -30,12 +66,12 @@ export default function QRcodePage() {
                     className='m-10' size={400}/>  
             </div>
 
-            <Link href="/next">
-                <a className="btn-blue">Przejdź dalej</a>
+            <Link href="/gameboard">
+                <button className="btn-blue" onClick={handleStartGame}>Rozpocznij grę</button>
             </Link>                 
             <Link href="/hotspot_instruction_page">
                 <a className="btn-blue m-5">Instrukcja włączenia hotspota</a>
-            </Link>                 
+            </Link>           
         </div>
         </React.Fragment>
     )

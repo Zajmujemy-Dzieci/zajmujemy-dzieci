@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
 import Head from "next/head";
 import Link from "next/link";
+import QuestionComponent from "./QuestionComponent";
 import { QuestionList } from "../../models/QuestionList";
 import { Question } from "../../models/Question";
 import { z } from "zod";
+import { QuestionType } from "../../types/QuestionType";
 
 const zQuestion = z.array(
   z.object({
@@ -13,14 +15,18 @@ const zQuestion = z.array(
   })
 );
 
-export type QuestionType = {
-  content: string;
-  answers: string[];
-  correctAnswerId: number;
-};
-
 export default function Loader() {
   const [loadedQuestions, setLoadedQuestions] = useState<Question[]>([]);
+  const [isPopupOpen, setPopupOpen] = useState(false);
+  const [Outquestion, setOutQuestion] = useState("");
+  const [OutAnswers, setOutAnswers] = useState<string[]>([]);
+  const [OutCorrectAnswerId, setOutCorrectAnswerId] = useState(-1);
+  const [OutQuestionId, setOutQuestionId] = useState(-1);
+
+  const togglePopup = () => {
+    setPopupOpen(!isPopupOpen);
+    loadQuestionsFromList();
+  };
 
   const questionList = QuestionList.getInstance();
 
@@ -84,6 +90,36 @@ export default function Loader() {
     reader.readAsText(file);
   };
 
+  const handleAddQuestion = () => {
+    setOutQuestion("");
+    setOutAnswers([""]);
+    setOutCorrectAnswerId(-1);
+    setPopupOpen(true);
+    loadQuestionsFromList();
+  };
+
+  const handleEditQuestion = (index: number) => () => {
+    const question = loadedQuestions[index];
+    setOutQuestion(question.content);
+    setOutAnswers(question.answers);
+    setOutCorrectAnswerId(question.correctAnswerId);
+    setOutQuestionId(index);
+    setPopupOpen(true);
+  };
+
+  const handleDeleteQuestion = (index: number) => () => {
+    questionList.unusedQuestions = questionList.unusedQuestions.filter(
+      (_, i) => i !== index
+    );
+    loadQuestionsFromList();
+  };
+
+  const handleRemoveQuestions = () => {
+    questionList.unusedQuestions = [];
+    questionList.usedQuestions = [];
+    loadQuestionsFromList();
+  };
+
   return (
     <React.Fragment>
       <Head>
@@ -119,17 +155,38 @@ export default function Loader() {
                   </li>
                 ))}
               </ul>
+              <button
+                className="text-white font-bold py-2 px-4 rounded bg-secondary mx-auto my-3"
+                onClick={handleEditQuestion(index)}
+              >
+                Edytuj pytanie
+              </button>
+              <button
+                className="text-white font-bold py-2 px-4 rounded bg-secondary mx-auto my-3 ml-2"
+                onClick={handleDeleteQuestion(index)}
+              >
+                Usuń pytanie
+              </button>
             </div>
           ))}
         </div>
-        <div className="mt-4">
-          <Link href="/questionPage">
-            <a className="text-white font-bold py-2 px-4 rounded bg-secondary  mx-auto">
-              Dodaj pytania
-            </a>
-          </Link>
-        </div>
+        <button className="text-white font-bold py-2 px-4 rounded bg-secondary mx-auto" onClick={handleAddQuestion}>
+          Dodaj pytanie
+        </button>
+        <button className="text-white font-bold py-2 px-4 rounded bg-secondary mx-auto mt-2" onClick={handleRemoveQuestions}>
+          Usuń wszystkie pytania
+        </button>
       </div>
+      <QuestionComponent
+        {...{
+          inQuestion: Outquestion,
+          inAnswers: OutAnswers,
+          isOpen: isPopupOpen,
+          onClose: togglePopup,
+          correctAnswerId: OutCorrectAnswerId,
+          inQuestionId: OutQuestionId,
+        }}
+      />
     </React.Fragment>
   );
 }
