@@ -3,17 +3,14 @@ import Head from "next/head";
 import Link from "next/link";
 import Image from "next/image";
 
-import { Question } from "../models/Question";
-import { QuestionList } from "../models/QuestionList";
-
 export default function HomePage() {
   return (
     <React.Fragment>
       <Head>
         <title>Home - Nextron (with-tailwindcss)</title>
       </Head>
-      <div className="grid grid-col-1 text-2xl w-full text-center">
-        <div>
+      <div className="grid grid-col-1 p-5 text-2xl w-full text-center">
+        <div className="p-5">
           <Image
             className="ml-auto mr-auto"
             src="/images/logo.png"
@@ -22,17 +19,11 @@ export default function HomePage() {
             height="256px"
           />
         </div>
-        <span>⚡ Electron ⚡</span>
-        <span>+</span>
-        <span>Next.js</span>
-        <span>+</span>
-        <span>tailwindcss</span>
-        <span>=</span>
-        <span>💕 </span>
+        <div className="p-5 text-3xl">Welcome to Nextron!</div>
       </div>
       <div className="mt-1 w-full flex-wrap flex justify-center">
         <Link href="/loader">
-          <a className="btn-blue">Go to next page</a>
+          <a className="btn-blue">Rozpocznij przygodę!</a>
         </Link>
       </div>
     </React.Fragment>

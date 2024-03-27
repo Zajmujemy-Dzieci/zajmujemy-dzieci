@@ -5,6 +5,7 @@
 @layer base {
   body {
     @apply bg-primary text-white;
+    font-family: "Nerko One", cursive;
   }
 }
 
