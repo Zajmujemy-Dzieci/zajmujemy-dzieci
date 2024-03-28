@@ -121,15 +121,6 @@ export default function Loader() {
     loadQuestionsFromList();
   };
 
-  const handleGoNext = () => {
-    if(minimumQuestionsNumber > questionList.getQuestionsLeftAmount()){
-      alert("Za mało pytań. Minimalna liczba pytań: " + minimumQuestionsNumber + 
-      ", aktualna liczba pytań: " + questionList.getQuestionsLeftAmount());
-    }
-    else
-      window.location.href='/QRcode_page';
-  };
-
   return (
     <React.Fragment>
       <Head>
@@ -186,9 +177,16 @@ export default function Loader() {
         <button className="text-white font-bold py-2 px-4 rounded bg-secondary mx-auto mt-2" onClick={handleDeleteAllQuestions}>
           Usuń wszystkie pytania
         </button>
-        <button className="text-white font-bold py-2 px-4 rounded bg-secondary mx-auto mt-2" onClick={handleGoNext}>
-          Przejdź dalej
-        </button>
+        { minimumQuestionsNumber <= questionList.getQuestionsLeftAmount() &&
+          <Link href='/QRcode_page'>
+          <button className="text-white font-bold py-2 px-4 rounded bg-secondary mx-auto mt-2">
+            Przejdź dalej
+          </button>
+          </Link>
+        }
+        {minimumQuestionsNumber > questionList.getQuestionsLeftAmount() && 
+          <h1 className="mt-4">Dodaj więcej pytań by przejść dalej</h1>
+        }
       </div>
       <QuestionComponent
         {...{
