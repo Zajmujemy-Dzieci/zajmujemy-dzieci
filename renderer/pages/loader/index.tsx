@@ -22,6 +22,7 @@ export default function Loader() {
   const [OutAnswers, setOutAnswers] = useState<string[]>([]);
   const [OutCorrectAnswerId, setOutCorrectAnswerId] = useState(-1);
   const [OutQuestionId, setOutQuestionId] = useState(-1);
+  const minimumQuestionsNumber = 3;
 
   const togglePopup = () => {
     setPopupOpen(!isPopupOpen);
@@ -114,7 +115,7 @@ export default function Loader() {
     loadQuestionsFromList();
   };
 
-  const handleRemoveQuestions = () => {
+  const handleDeleteAllQuestions = () => {
     questionList.unusedQuestions = [];
     questionList.usedQuestions = [];
     loadQuestionsFromList();
@@ -173,9 +174,19 @@ export default function Loader() {
         <button className="text-white font-bold py-2 px-4 rounded bg-secondary mx-auto" onClick={handleAddQuestion}>
           Dodaj pytanie
         </button>
-        <button className="text-white font-bold py-2 px-4 rounded bg-secondary mx-auto mt-2" onClick={handleRemoveQuestions}>
+        <button className="text-white font-bold py-2 px-4 rounded bg-secondary mx-auto mt-2" onClick={handleDeleteAllQuestions}>
           Usuń wszystkie pytania
         </button>
+        { minimumQuestionsNumber <= questionList.getQuestionsLeftAmount() &&
+          <Link href='/QRcode_page'>
+          <button className="text-white font-bold py-2 px-4 rounded bg-secondary mx-auto mt-2">
+            Przejdź dalej
+          </button>
+          </Link>
+        }
+        {minimumQuestionsNumber > questionList.getQuestionsLeftAmount() && 
+          <h1 className="mt-4">Dodaj więcej pytań by przejść dalej</h1>
+        }
       </div>
       <QuestionComponent
         {...{
