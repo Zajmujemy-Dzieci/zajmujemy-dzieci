@@ -1,5 +1,6 @@
 import { useState } from "react";
 import GameBoardComponent from "./GameBoardComponent";
+import Link from 'next/link'
 
 export type Player = {
   orderId: number;
@@ -50,6 +51,9 @@ export default function GameBoard() {
 
   return (
     <div className="w-[100vw] h-[100vh] p-32">
+      <Link href="/ranking">
+        <a className="btn-blue absolute top-0 right-0 m-5">Zakończ grę</a>
+      </Link>   
       <GameBoardComponent configuration={configuration} players={players} />
     </div>
   );
