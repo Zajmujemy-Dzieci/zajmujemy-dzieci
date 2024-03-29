@@ -1,19 +1,10 @@
 import { useState } from "react";
 import GameBoardComponent from "./GameBoardComponent";
 import Link from 'next/link'
-
-export type Player = {
-  orderId: number;
-  nick: string;
-  score: number;
-  position: number;
-};
-
-export type GameBoardConfiguration = {
-  numberOfQuestionFields: number;
-  numberOfGoodSpecialFields: number;
-  numberOfBadSpecialFields: number;
-};
+import { useAtom } from "jotai";
+import { Player } from "../../types/Player";
+import { GameBoardConfiguration } from "../../types/GameBoardConfiguration";
+import { gameBoardConfigurationAtom } from "../../models/GameConfigAtom";
 
 // UNUSED PURPOSELY - preparing for future use
 
@@ -43,11 +34,7 @@ export default function GameBoard() {
     { orderId: 4, nick: "Gracz 5", score: 0, position: 6 },
     { orderId: 5, nick: "Gracz 6", score: 0, position: 6 },
   ];
-  const configuration = {
-    numberOfQuestionFields: 9,
-    numberOfGoodSpecialFields: 2,
-    numberOfBadSpecialFields: 3,
-  };
+  const [ configuration, setConfiguration] = useAtom<GameBoardConfiguration>(gameBoardConfigurationAtom);
 
   return (
     <div className="w-[100vw] h-[100vh] p-32">
