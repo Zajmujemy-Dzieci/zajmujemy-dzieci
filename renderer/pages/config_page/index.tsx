@@ -76,8 +76,11 @@ export default function ConfigPage() {
             />
           </div>
           <div className="text-center">
+            <Link href="/loader">
+              <a className="btn-blue mx-4">Wróć</a>
+            </Link>
             <Link href="/QRcode_page">
-              <a className="btn-blue">Przejdź dalej</a>
+              <a className="btn-blue mx-4">Przejdź dalej</a>
             </Link>
           </div>
         </form>

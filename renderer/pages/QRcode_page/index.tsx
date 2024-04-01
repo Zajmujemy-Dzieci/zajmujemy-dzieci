@@ -72,8 +72,8 @@ export default function QRcodePage() {
             <Link href="/hotspot_instruction_page">
                 <a className="btn-blue m-5">Instrukcja włączenia hotspota</a>
             </Link>     
-            <Link href="/loader">
-                <a className="btn-blue m-5">Powrót do ustawień pytań</a>
+            <Link href="/config_page">
+                <a className="btn-blue m-5">Powrót do ustawień</a>
             </Link>        
         </div>
         </React.Fragment>
