@@ -1,5 +1,6 @@
 import { twMerge } from "tailwind-merge";
-import { GameBoardConfiguration, Player } from ".";
+import { GameBoardConfiguration } from "../../types/GameBoardConfiguration";
+import { Player } from "../../types/Player";
 
 type BoardFieldSpecialty =
   | "question"
