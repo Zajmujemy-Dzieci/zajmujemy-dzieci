@@ -27,7 +27,7 @@ export default function ConfigPage() {
         <form>
           <div className="mb-4">
             <label htmlFor="numberOfQuestionFields" className="block mb-2">
-              Number of Question Fields:
+              Liczba pól z pytaniami:
             </label>
             <input
               type="number"
@@ -35,12 +35,13 @@ export default function ConfigPage() {
               name="numberOfQuestionFields"
               value={gameBoardConfiguration.numberOfQuestionFields}
               onChange={handleInputChange}
+              min="1"
               className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500 text-gray-800"
             />
           </div>
           <div className="mb-4">
             <label htmlFor="numberOfGoodSpecialFields" className="block mb-2">
-              Number of Good Special Fields:
+              Liczba pól specjalnych dobrych:
             </label>
             <input
               type="number"
@@ -48,12 +49,17 @@ export default function ConfigPage() {
               name="numberOfGoodSpecialFields"
               value={gameBoardConfiguration.numberOfGoodSpecialFields}
               onChange={handleInputChange}
+              min="0"
+              max={
+                gameBoardConfiguration.numberOfQuestionFields -
+                gameBoardConfiguration.numberOfBadSpecialFields
+              }
               className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500 text-gray-800"
             />
           </div>
           <div className="mb-4">
             <label htmlFor="numberOfBadSpecialFields" className="block mb-2">
-              Number of Bad Special Fields:
+              Liczba pól specjalnych złych:
             </label>
             <input
               type="number"
@@ -61,12 +67,17 @@ export default function ConfigPage() {
               name="numberOfBadSpecialFields"
               value={gameBoardConfiguration.numberOfBadSpecialFields}
               onChange={handleInputChange}
+              min="0"
+              max={
+                gameBoardConfiguration.numberOfQuestionFields -
+                gameBoardConfiguration.numberOfGoodSpecialFields
+              }
               className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500 text-gray-800"
             />
           </div>
           <div className="text-center">
-            <Link href="/gameboard">
-                <a className="btn-blue">Start Game</a>
+            <Link href="/QRcode_page">
+              <a className="btn-blue">Przejdź dalej</a>
             </Link>
           </div>
         </form>
