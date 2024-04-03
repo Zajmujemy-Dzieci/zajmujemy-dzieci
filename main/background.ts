@@ -16,6 +16,9 @@ const express_app = express()
 var expressWs = require("express-ws")(express_app)
 const PORT = 3000
 
+export let clients = new Map<string, WebSocket>()
+export let websocketsToNick = new Map<WebSocket, String>()
+
 express_app.use(bodyParser.urlencoded({ extended: true }))
 
 express_app.use(bodyParser.urlencoded({ extended: true }))
