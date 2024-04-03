@@ -89,7 +89,7 @@ export const throwDice = (nick: string) => {
 
 
 const handleRegister = (msg: RegisterMessage, ws: WebSocket) => {
-	if(msg.nick == "test"){
+	if(msg.nick == "Gracz "){
 		msg.nick = msg.nick + globalNumber.toString()   // tymczasowo aby nazwy były różne i aby można było połaczyć różnych użytkowników
 		globalNumber += 1
 	}

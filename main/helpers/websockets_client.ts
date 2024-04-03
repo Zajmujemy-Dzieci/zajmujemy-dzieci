@@ -10,7 +10,7 @@ export const websockets_client = (address: string) => `<!DOCTYPE html>
       const ws = new WebSocket('ws://${address}:3000/ws');
       ws.onopen = () => {
           console.log('connected');
-          handleNick('test', ws)
+          handleNick('Gracz ', ws)
       };
 
       ws.onmessage = (msg) => {

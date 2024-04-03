@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import WebSocketPage from '../websocket_connection'; // Import WebSocketPage component to connect host with server
 import Head from 'next/head'
 import Link from 'next/link'
 import QRCode from 'qrcode.react'
@@ -75,7 +74,6 @@ export default function QRcodePage() {
                 </Link>
 
                 {/* Render WebSocketPage component */}
-                <WebSocketPage />
             </div>
         </React.Fragment>
     )

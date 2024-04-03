@@ -1,10 +1,11 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import GameBoardComponent from "./GameBoardComponent";
 import Link from 'next/link'
 import { useAtom } from "jotai";
 import { Player } from "../../types/Player";
 import { GameBoardConfiguration } from "../../types/GameBoardConfiguration";
 import { gameBoardConfigurationAtom } from "../../models/GameConfigAtom";
+import WebSocketPage from '../websocket_connection'; // Import WebSocketPage component to connect host with server
 
 // UNUSED PURPOSELY - preparing for future use
 
@@ -42,6 +43,8 @@ export default function GameBoard() {
         <a className="btn-blue absolute top-0 right-0 m-5">Zakończ grę</a>
       </Link>   
       <GameBoardComponent configuration={configuration} players={players} />
+      <WebSocketPage />
+
     </div>
   );
 }
