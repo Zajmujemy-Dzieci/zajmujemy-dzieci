@@ -1,3 +1,5 @@
+//aby nawiązać połączenie apki i serwera należy otworzyć strone z kodem qr
+
 import React, { useState, useEffect } from 'react';
 import { useSetWebSocket, useClearWebSocket } from '../../models/WebsocketAtom';
 
@@ -28,6 +30,8 @@ const WebSocketPage: React.FC = () => {
             if (parsed.type === 'ping') {
                 const from = parsed.from;
                 ws.send(JSON.stringify({ type: "pong", destination: from }));
+
+                //dla testów
                 sendDicePermission("test0", ws)
                 sendQuestion("pytanie testowe", ["tak","nie","może"], "test0", ws)
             }
@@ -83,8 +87,6 @@ const WebSocketPage: React.FC = () => {
 
     return (
         <div>
-            <h1>WebSocket Page</h1>
-            <div>Status: {status}</div>
         </div>
     );
 };
