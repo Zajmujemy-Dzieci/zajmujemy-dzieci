@@ -1,8 +1,9 @@
 import { twMerge } from "tailwind-merge";
 import { GameBoardConfiguration } from "../../types/GameBoardConfiguration";
 import { Player } from "../../types/Player";
+import GameBoardPawn from "./GameBoardPawn";
 
-type BoardFieldSpecialty =
+export type BoardFieldSpecialty =
   | "question"
   | "good"
   | "bad"
@@ -10,7 +11,7 @@ type BoardFieldSpecialty =
   | "start"
   | "empty";
 
-type BoardField = {
+export type BoardField = {
   index: number;
   colClass: number;
   rowClass: number;
@@ -66,6 +67,7 @@ export default function GameBoardComponent({
     numberOfGoodSpecialFields,
     numberOfBadSpecialFields,
   } = configuration;
+
   const numberOfColumns = Math.floor((numberOfQuestionFields * 2) / 3) - 1;
   const totalFields = 2 * numberOfQuestionFields + 2;
 
@@ -86,12 +88,7 @@ export default function GameBoardComponent({
   let colClass = currentColumn;
   let rowClass = currentRow;
 
-  const gridPositions: {
-    index: number;
-    colClass: number;
-    rowClass: number;
-    type: BoardFieldSpecialty;
-  }[] = [];
+  const gridPositions: BoardField[] = [];
   gridPositions.push({ index: 1, colClass: 1, rowClass: 1, type: "start" });
 
   const getGridPosition = (index: number, numberOfColumns: number) => {
@@ -153,8 +150,13 @@ export default function GameBoardComponent({
   };
 
   return (
-    <div className={`w-full h-full grid gap-4`}>
-      <div className="bg-childBlack row-start-1 h-32 w-32">START</div>
+    <div className={`w-full h-full place-content-center grid gap-4`}>
+      <div
+        style={{ gridRow: 1, gridColumn: 1 }}
+        className="bg-childBlack h-32 w-32"
+      >
+        START
+      </div>
       {Array.from({ length: totalFields - 2 }, (_, index) => {
         const {
           colClass: col,
@@ -165,39 +167,26 @@ export default function GameBoardComponent({
           <div
             key={index}
             style={{
-              gridColumnStart: col,
-              gridRowStart: row,
+              gridColumn: col,
+              gridRow: row,
             }}
             className={twMerge(
               mapTypeOnColor(type),
               "h-32 w-32 flex flex-wrap justify-center content-center items-center p-3"
             )}
-          >
-            {players[0].position === index && (
-              <div
-                className="m-0.5 bg-gray-800 w-8 h-8 rounded-full"
-                hidden={players[0].position !== index}
-              />
-            )}
-
-            {players[1].position === index && (
-              <div className="m-0.5 bg-gray-600 w-8 h-8 rounded-full" />
-            )}
-            {players[2].position === index && (
-              <div className="m-0.5 bg-gray-400 w-8 h-8 rounded-full" />
-            )}
-            {players[3].position === index && (
-              <div className="m-0.5 bg-blue-400 w-8 h-8 rounded-full" />
-            )}
-            {players[4].position === index && (
-              <div className="m-0.5 bg-blue-600 w-8 h-8 rounded-full" />
-            )}
-            {players[5].position === index && (
-              <div className="m-0.5 bg-blue-800 w-8 h-8 rounded-full" />
-            )}
-          </div>
+          ></div>
         );
       })}
+      {players.map((player, i) => (
+        <GameBoardPawn
+          player={player}
+          shift={{
+            x: (i % 2) * 50,
+            y: Math.floor((Math.floor(i / 2) * 100 * 2) / players.length),
+          }}
+          boardFields={gridPositions}
+        />
+      ))}
     </div>
   );
 }
