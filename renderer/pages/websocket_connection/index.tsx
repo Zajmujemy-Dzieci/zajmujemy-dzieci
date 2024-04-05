@@ -1,14 +1,16 @@
 //trzeba ropocząć grę aby połączyć sie z serwerem
 
 import React, { useState, useEffect } from 'react';
-import { useSetWebSocket, useClearWebSocket } from '../../models/WebsocketAtom';
+import {useSetWebSocket, useClearWebSocket, webSocketAtom} from '../../models/WebsocketAtom';
+import {useAtom} from "jotai/index";
 
 const WebSocketPage: React.FC = () => {
     const [serverAddress, setServerAddress] = useState<string>('192.168.137.1');
-    const [status, setStatus] = useState<string>('');
+    const [status, setStatus] = useState('');
     const setWebSocket = useSetWebSocket();
     const clearWebSocket = useClearWebSocket();
     let ws: WebSocket | null = null;
+    const [, updateWebSocket] = useAtom(webSocketAtom);
 
     const connectToWebSocket = () => {
         if (!serverAddress) {
