@@ -19,24 +19,38 @@ export default function RankingPage() {
 
   const emojis = ['🥇', '🥈', '🥉'];
 
+  let currentPlace = 0;
+  let currentMedalIndex = 0;
   let currentPlayerIndex = 0;
+
   while (currentPlayerIndex < sortedPlayers.length) {
     const currentScore = sortedPlayers[currentPlayerIndex].score;
     let playersWithSameScore = [sortedPlayers[currentPlayerIndex].nick];
     let nextPlayerIndex = currentPlayerIndex + 1;
+
+    // Zliczanie graczy o tym samym wyniku
     while (nextPlayerIndex < sortedPlayers.length && sortedPlayers[nextPlayerIndex].score === currentScore) {
       playersWithSameScore.push(sortedPlayers[nextPlayerIndex].nick);
       nextPlayerIndex++;
     }
-    const placeEmoji = emojis[Math.min(currentPlayerIndex, 2)] || ''; // Wybierz emotkę w zależności od miejsca
 
     const playersString = playersWithSameScore.join(', ');
+
+    // Wybór emotki w zależności od miejsca
+    let placeEmoji = '';
+    if (currentPlace < emojis.length) {
+      placeEmoji = emojis[currentPlace];
+    }
+
+    // Dodawanie graczy do tabeli
     playersTable.push(
       <div className="flex justify-center items-center text-3xl" key={currentPlayerIndex}>
         <span>{placeEmoji} {playersString} - {currentScore}</span>
       </div>
     );
 
+    // Przejście do kolejnej pozycji
+    currentPlace++;
     currentPlayerIndex = nextPlayerIndex;
   }
 
