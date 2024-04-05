@@ -1,16 +1,39 @@
-import { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { Player } from "../../types/Player";
 import { twMerge } from "tailwind-merge";
 import { BoardField } from "./GameBoardComponent";
+import { WebSocketState, webSocketAtom } from "../../models/WebsocketAtom";
+import { useAtom } from "jotai";
+// import { sendDicePermission } from "../../models/WebsocketAtom";
+import { listenOnSocket } from "../websocket_connection";
+import { sendQuestion } from "../websocket_connection";
 
 type GameBoardPawnProps = {
   player: Player;
   shift: { x: number; y: number };
   boardFields: BoardField[];
+  showQuestion: (player: Player) => void;
+  showAnswer: (answer: string) => void;
 };
 
 // TODO: socket communication attachment
-function redirectToQuestionPage(player: Player) {}
+function redirectToQuestionPage(
+  player: Player,
+  ws: WebSocketState,
+  showQuestion: (player: Player) => void
+) {
+  if (!ws) {
+    return;
+  }
+  showQuestion(player);
+  // TODO: load question from QuestionList
+  sendQuestion(
+    ws,
+    "Czy wiesz, jakie jest najczęściej występujące imię w Polsce?",
+    ["Tak", "Nie", "Nie wiem"],
+    player.nick
+  );
+}
 
 function handleFinishGame(player: Player) {}
 
@@ -18,19 +41,24 @@ function handleGoodField(player: Player) {}
 
 function handleBadField(player: Player) {}
 
-function listenOnSocket(
+function communicateWithPlayer(
+  ws: WebSocketState,
   player: Player,
-  movePawn: (fieldsToMove: number) => void
+  movePawn: (fieldsToMove: number) => void,
+  showAnswer: (answer: string) => void
 ) {
-  // socket.on("movePawn", (fieldsToMove: number) => {
-  //   movePawn(fieldsToMove);
-  // });
+  if (!ws) {
+    return;
+  }
+  listenOnSocket(ws, movePawn, showAnswer);
 }
 
 export default function GameBoardPawn({
   player,
   shift,
   boardFields,
+  showQuestion,
+  showAnswer,
 }: GameBoardPawnProps) {
   if (!boardFields) {
     return <div>Nie ma z kim grać...</div>;
@@ -39,6 +67,7 @@ export default function GameBoardPawn({
     return <div>Brak gracza...</div>;
   }
   const [currentPosition, setCurrentPosition] = useState(0);
+  const [ws, _] = useAtom(webSocketAtom);
 
   function movePawn(fieldsToMove: number) {
     if (fieldsToMove + currentPosition >= boardFields.length) {
@@ -48,7 +77,7 @@ export default function GameBoardPawn({
     }
     setCurrentPosition(currentPosition + fieldsToMove);
     if (boardFields[currentPosition].type == "question") {
-      redirectToQuestionPage(player);
+      redirectToQuestionPage(player, ws, showQuestion);
       return;
     }
     if (boardFields[currentPosition].type == "finish") {
@@ -65,7 +94,7 @@ export default function GameBoardPawn({
     }
   }
 
-  listenOnSocket(player, movePawn);
+  communicateWithPlayer(ws, player, movePawn, showAnswer);
 
   return (
     <div

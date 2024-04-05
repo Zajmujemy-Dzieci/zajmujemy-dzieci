@@ -49,6 +49,16 @@ function changePosition(
   return newPlayers;
 }
 
+function showQuestion(player: Player) {
+  // TODO: show question to all players
+  console.log("Showing question to player: ", player);
+}
+
+function showAnswer(answer: string) {
+  // TODO: show answer to all players
+  console.log("Showing answer: ", answer);
+}
+
 export default function GameBoardComponent({
   configuration,
   players,
@@ -185,6 +195,8 @@ export default function GameBoardComponent({
             y: Math.floor((Math.floor(i / 2) * 100 * 2) / players.length),
           }}
           boardFields={gridPositions}
+          showQuestion={showQuestion}
+          showAnswer={showAnswer}
         />
       ))}
     </div>
