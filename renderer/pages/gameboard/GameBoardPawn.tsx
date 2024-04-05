@@ -43,10 +43,12 @@ export default function GameBoardPawn({
   function movePawn(fieldsToMove: number) {
     if (fieldsToMove + currentPosition >= boardFields.length) {
       setCurrentPosition(boardFields.length - 1);
+      player.score = boardFields.length - 1;
       handleFinishGame(player);
       return;
     }
     setCurrentPosition(currentPosition + fieldsToMove);
+    player.score = currentPosition + fieldsToMove;
     if (boardFields[currentPosition].type == "question") {
       redirectToQuestionPage(player);
       return;
