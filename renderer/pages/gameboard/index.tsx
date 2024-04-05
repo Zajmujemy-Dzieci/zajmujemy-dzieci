@@ -36,7 +36,7 @@ export default function GameBoard() {
     { orderId: 5, nick: "Gracz 6", score: 0, position: 6 },
   ];
   const [ configuration, setConfiguration] = useAtom<GameBoardConfiguration>(gameBoardConfigurationAtom);
-
+//tmp
   return (
     <div className="w-[100vw] h-[100vh] p-32">
       <Link href="/ranking">
