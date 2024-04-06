@@ -6,12 +6,52 @@ import axios from "axios";
 import { useAtom } from "jotai";
 import { Player } from "../../types/Player";
 import { playersQueueAtom } from "../../models/PlayersQueueAtom";
+import { set } from "zod";
 
 export default function QRcodePage() {
   const [ipAddress, setIPAddress] = useState<string>("192.168.137.1");
   const [players, setPlayers] = useAtom(playersQueueAtom);
+  const p = [
+    {
+      orderId: 0,
+      nick: "Gracz 1",
+      score: 0,
+      background: "bg-blue-400",
+    },
+    {
+      orderId: 1,
+      nick: "Gracz 2",
+      score: 0,
+      background: "bg-blue-500",
+    },
+    {
+      orderId: 2,
+      nick: "Gracz 3",
+      score: 0,
+      background: "bg-blue-300",
+    },
+    {
+      orderId: 3,
+      nick: "Gracz 4",
+      score: 0,
+      background: "bg-blue-200",
+    },
+    {
+      orderId: 4,
+      nick: "Gracz 5",
+      score: 0,
+      background: "bg-blue-100",
+    },
+    {
+      orderId: 5,
+      nick: "Gracz 6",
+      score: 0,
+      background: "bg-blue-600",
+    },
+  ];
 
   useEffect(() => {
+    setPlayers([]);
     axios
       .get<string>("http://localhost:3000/ipaddress")
       .then((response) => {
@@ -20,7 +60,9 @@ export default function QRcodePage() {
       .catch((error) => {
         console.error("Błąd pobierania danych:", error);
       });
+    
   }, []);
+
 
   const addPlayer = (nick: string) => {
     const newPlayer: Player = {
@@ -62,6 +104,11 @@ export default function QRcodePage() {
       <Head>
         <title>Join do game!</title>
       </Head>
+      <div className="text-3xl absolute m-5 top-0">Gracze:
+        {players.map((player) => (
+          <div key={player.nick} className="text-2xl">{player.nick}</div>
+        ))}
+      </div>
       <div className="flex justify-center text-4xl flex-col items-center m-10">
         <p>Adres do połączenia się: {ipAddress}:3000</p>
         <div className="m-10">
