@@ -1,6 +1,6 @@
 import { clients } from "../background";
 import { websocketsToNick } from "../background";
-let globalNumber: number = 0;
+let globalNumber: number = 1;
 
 export interface ClientMessage {
   type:

@@ -1,10 +1,7 @@
-//trzeba ropocząć grę aby połączyć sie z serwerem
-
-import React, { useState, useEffect, Dispatch, SetStateAction } from "react";
+import React, { useState, useEffect } from "react";
 import { webSocketAtom } from "../../models/WebsocketAtom";
 import { useAtom } from "jotai/index";
-import { DiceThrowMessage } from "../../types/MessageTypes";
-import { ClientMessage } from "../../types/MessageTypes";
+import axios from 'axios';
 
 export const sendDicePermission = (nick: string, ws: WebSocket) => {
   if (!ws) {
@@ -15,94 +12,95 @@ export const sendDicePermission = (nick: string, ws: WebSocket) => {
 };
 
 export const sendQuestion = (
-  ws: WebSocket,
-  content: string,
-  answers: string[],
-  nick: string
+    ws: WebSocket,
+    content: string,
+    answers: string[],
+    nick: string
 ) => {
   if (!ws) {
     throw new Error("Brak połączenia z serwerem");
   }
 
   ws.send(
-    JSON.stringify({
-      type: "question",
-      destination: nick,
-      content: content,
-      answers: answers,
-    })
+      JSON.stringify({
+        type: "question",
+        destination: nick,
+        content: content,
+        answers: answers,
+      })
   );
 };
 
 export function listenOnSocket(
-  ws: WebSocket,
-  movePawn: (fieldsToMove: number) => void,
-  showAnswer: (answer: string) => void
+    ws: WebSocket,
+    movePawn: (fieldsToMove: number) => void,
+    showAnswer: (answer: string) => void
 ) {
   ws!.onmessage = (msg: MessageEvent<any>) => {
     const parsed = JSON.parse(msg.data);
 
-    // if (parsed.type === "ping") {
-    //   const from = parsed.from;
-    //   ws?.send(JSON.stringify({ type: "pong", destination: from }));
-    //   // sendDicePermission("Gracz 0");
-    //   sendQuestion("pytanie testowe", ["tak", "nie", "może"], "Gracz 0");
-    // }
-
     if (parsed.type === "answer") {
       const from = parsed.from;
       showAnswer(parsed.answer);
-      ws?.send(
-        JSON.stringify({
-          type: "ACK",
-          destination: from,
-          text: "Received answer " + parsed.answer + " from player " + from,
-        })
+      ws!.send(
+          JSON.stringify({
+            type: "ACK",
+            destination: from,
+            text: "Received answer " + parsed.answer + " from player " + from,
+          })
       );
     }
 
     if (parsed.type === "dice") {
       const from = parsed.from;
       movePawn(parsed.dice);
-      ws?.send(
-        JSON.stringify({
-          type: "ACK",
-          destination: from,
-          text: "Received dice " + parsed.dice + " from player " + from,
-        })
+      ws!.send(
+          JSON.stringify({
+            type: "ACK",
+            destination: from,
+            text: "Received dice " + parsed.dice + " from player " + from,
+          })
       );
     }
   };
 }
 
 const WebSocketPage: React.FC = () => {
-  const [serverAddress, setServerAddress] = useState<string>("192.168.137.1");
+  const [serverAddress, setServerAddress] = useState("");
   const [status, setStatus] = useState("");
-  // const setWebSocket = useSetWebSocket();
-  // const clearWebSocket = useClearWebSocket();
-  // let ws: WebSocket | null = null;
   const [ws, setWebSocket] = useAtom(webSocketAtom);
+
+  useEffect(() => {
+    axios.get('http://localhost:3000/ipaddress')
+        .then(response => {
+          setServerAddress(response.data);
+        })
+        .catch(error => {
+          console.error('Błąd pobierania danych:', error);
+        });
+  }, []);
 
   const connectToWebSocket = () => {
     if (!serverAddress) {
-      setStatus("Please enter server address");
+      setStatus("Please wait while getting server address");
       return;
     }
 
-    setWebSocket(new WebSocket(`ws://${serverAddress}:3000/ws`));
+    const newWs = new WebSocket(`ws://${serverAddress}:3000/ws`)
+    setWebSocket(newWs);
 
-    ws!.onopen = () => {
+    newWs!.onopen = () => {
       setStatus("Connected to WebSocket server");
-      ws?.send(JSON.stringify({ type: "register", nick: "host" }));
+      newWs!.send(JSON.stringify({ type: "register", nick: "host" }));
       console.log("sent host address");
       if (ws != null) setWebSocket(ws);
     };
 
-    ws!.onerror = (error) => {
+    newWs!.onerror = (error) => {
       setStatus("WebSocket error: " + error);
     };
 
-    ws!.onclose = () => {
+    newWs!.onclose = () => {
       setStatus("WebSocket connection closed");
       setWebSocket(null);
     };

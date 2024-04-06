@@ -2,7 +2,7 @@ import { twMerge } from "tailwind-merge";
 import { GameBoardConfiguration } from "../../types/GameBoardConfiguration";
 import { Player } from "../../types/Player";
 import GameBoardPawn from "./GameBoardPawn";
-
+import Websocket_connection from "../websocket_connection";
 export type BoardFieldSpecialty =
   | "question"
   | "good"
@@ -199,6 +199,7 @@ export default function GameBoardComponent({
           showAnswer={showAnswer}
         />
       ))}
+      <Websocket_connection/>
     </div>
   );
 }
