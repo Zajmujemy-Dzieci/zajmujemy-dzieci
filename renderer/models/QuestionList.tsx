@@ -2,13 +2,11 @@ import { Question } from './Question';
 
 export class QuestionList {
     static instance: QuestionList;
-    usedQuestions: Question[];
-    unusedQuestions: Question[];
+    questions: Question[];
 
     constructor() {
         const q = new Question("What is the capital of France?", ["Paris", "Madrid", "Berlin"], 0);
-        this.usedQuestions = [];
-        this.unusedQuestions = [];
+        this.questions = [];
     }
 
     public static getInstance(): QuestionList {
@@ -19,31 +17,26 @@ export class QuestionList {
     }
 
     addQuestion(question: Question) {
-        this.unusedQuestions.push(question);
+        this.questions.push(question);
     }
 
-    chooseRandomQuestion(): Question {
-        if (this.unusedQuestions.length === 0) {
-            throw new Error("No unused questions available.");
+    getQuestion(): Question {
+        if (this.questions.length === 0) {
+            throw new Error("No questions available.");
         }
 
-        const randomIndex = Math.floor(Math.random() * this.unusedQuestions.length);
-        const randomQuestion = this.unusedQuestions.splice(randomIndex, 1)[0];
-        this.usedQuestions.push(randomQuestion);
+        const question = this.questions.splice(0, 1)[0];
+        this.questions.push(question);
 
-        return randomQuestion;
+        return question;
     }
 
     updateQuestion(index: number, question: Question) {
-        this.unusedQuestions[index] = question;
+        this.questions[index] = question;
     }
 
-    getQuestionsLeftAmount(): number {
-        return this.unusedQuestions.length;
-    }
-
-    getAllQuestions(): Question[] {
-        return this.usedQuestions.concat(this.unusedQuestions);
+    getQuestionsNumber(): number {
+        return this.questions.length;
     }
 }
 

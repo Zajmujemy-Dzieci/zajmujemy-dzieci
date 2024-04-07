@@ -36,15 +36,13 @@ export default function Loader() {
   }, []);
 
   const loadQuestionsFromList = () => {
-    const allQuestions = questionList.getAllQuestions();
+    const allQuestions = questionList.questions;
     setLoadedQuestions(allQuestions);
   };
 
   const loadQuestionstoFile = () => {
     try {
-      const questions = questionList.unusedQuestions.concat(
-        questionList.usedQuestions
-      );
+      const questions = questionList.questions;
       const jsonData = JSON.stringify(questions, null, 2);
       const blob = new Blob([jsonData], { type: "application/json" });
       const url = URL.createObjectURL(blob);
@@ -68,8 +66,7 @@ export default function Loader() {
     const reader: FileReader = new FileReader();
     reader.onload = (event) => {
       try {
-        questionList.usedQuestions = [];
-        questionList.unusedQuestions = [];
+        questionList.questions = [];
         const content = event.target?.result?.toString();
         if (content) {
           const questions = zQuestion.parse(JSON.parse(content));
@@ -109,15 +106,14 @@ export default function Loader() {
   };
 
   const handleDeleteQuestion = (index: number) => () => {
-    questionList.unusedQuestions = questionList.unusedQuestions.filter(
+    questionList.questions = questionList.questions.filter(
       (_, i) => i !== index
     );
     loadQuestionsFromList();
   };
 
   const handleDeleteAllQuestions = () => {
-    questionList.unusedQuestions = [];
-    questionList.usedQuestions = [];
+    questionList.questions = [];
     loadQuestionsFromList();
   };
 
@@ -183,14 +179,14 @@ export default function Loader() {
         >
           Usuń wszystkie pytania
         </button>
-        {minimumQuestionsNumber <= questionList.getQuestionsLeftAmount() && (
+        {minimumQuestionsNumber <= questionList.getQuestionsNumber() && (
           <Link href="/config_page">
             <button className="text-white font-bold py-2 px-4 rounded bg-secondary mx-auto mt-2">
               Przejdź dalej
             </button>
           </Link>
         )}
-        {minimumQuestionsNumber > questionList.getQuestionsLeftAmount() && (
+        {minimumQuestionsNumber > questionList.getQuestionsNumber() && (
           <h1 className="mt-4">Dodaj więcej pytań by przejść dalej</h1>
         )}
       </div>

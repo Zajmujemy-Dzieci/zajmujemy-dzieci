@@ -6,8 +6,11 @@ import { Player } from "../../types/Player";
 import { GameBoardConfiguration } from "../../types/GameBoardConfiguration";
 import { gameBoardConfigurationAtom } from "../../models/GameConfigAtom";
 import { playersQueueAtom } from "../../models/PlayersQueueAtom";
+import { QuestionList } from "../../models/QuestionList";
 
 export default function GameBoard() {
+  // Getting question from questionList: const question = questionList.getQuestion();
+  const questionList = QuestionList.getInstance();
   const [playersQueue, setPlayersQueue] = useAtom<Player[]>(playersQueueAtom);
   const players = [
     {
