@@ -70,7 +70,7 @@ export default function GameBoard() {
   }
 
   return (    
-    <div className="w-[100vw] h-[100vh] p-32">      
+    <div className="w-[100vw] h-[100vh] p-27">      
       <Popup/>
       <Link href="/ranking">
         <a className="btn-blue absolute top-0 right-0 m-5">Zakończ grę</a>
