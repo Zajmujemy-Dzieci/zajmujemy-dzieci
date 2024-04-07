@@ -33,7 +33,6 @@ export const handleMessage = (msg: ClientMessage, ws: WebSocket) => {
 	switch (msg.type) {
 		case "ping":
 			handlePing(ws)
-			// throwDice("test")
 			break
 
 		case "register":
@@ -66,10 +65,30 @@ const handlePing = (ws: WebSocket) => {
 	ws.send(JSON.stringify({ type: "pong" }))
 }
 
+const nicks = ["player1", "player2", "player3", "player4", "player5", "player6"]
+let currentTurn = 0
+
 const handleRegister = (msg: RegisterMessage, ws: WebSocket) => {
-	clients.set(msg.nick, ws)
-	console.log("Registered", msg.nick, clients.size)
+	if (msg.nick === "host") {
+		if (clients.has("host")) {
+			console.error("Host already registered")
+			return
+		}
+		clients.set("host", ws)
+		console.log("Host registered")
+		ws.send(JSON.stringify({ type: "registered" }))
+		return
+	}
+	let nick = nicks[currentTurn]
+	currentTurn++
+	clients.set(nick, ws)
+	console.log("Registered", nick, clients.size)
 	ws.send(JSON.stringify({ type: "registered" }))
+	clients.get("host")?.send(JSON.stringify({ type: "newPlayer", nick }))
+}
+
+const handleMessageToClient = (msg: ServerMessage, ws: WebSocket) => {
+	ws.send(JSON.stringify(msg))
 }
 
 const handleDiceThrow = (msg: DiceThrowMessage) => {

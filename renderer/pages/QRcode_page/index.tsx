@@ -6,16 +6,35 @@ import axios from "axios";
 import { useAtom } from "jotai";
 import { Player } from "../../types/Player";
 import { playersQueueAtom } from "../../models/PlayersQueueAtom";
+import { webSocketAtom } from "../../models/WebSocketAtom";
+import { set } from "zod";
 
 export default function QRcodePage() {
   const [ipAddress, setIPAddress] = useState<string>("192.168.137.1");
   const [players, setPlayers] = useAtom(playersQueueAtom);
+  const [ws, setWs] = useAtom(webSocketAtom);
 
   useEffect(() => {
+    setPlayers([]);
     axios
       .get<string>("http://localhost:3000/ipaddress")
       .then((response) => {
         setIPAddress(response.data);
+        const newWs = new WebSocket(`ws://${response.data}:3000/ws`);
+        setWs(newWs);
+        if (newWs) {
+          newWs.onopen = async () => {
+            console.log("Connected to server");
+            newWs.send(JSON.stringify({ type: "register", nick: "host" }));
+          };
+          newWs.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            if (data.type === "newPlayer" && data.nick) {
+              addPlayer(data.nick);
+              console.log("Nowy gracz: ", data.nick);
+            }
+          };
+        }
       })
       .catch((error) => {
         console.error("Błąd pobierania danych:", error);
@@ -23,14 +42,19 @@ export default function QRcodePage() {
   }, []);
 
   const addPlayer = (nick: string) => {
-    const newPlayer: Player = {
-      orderId: 0,
-      nick: nick,
-      score: 0,
-      // TODO: randomize background
-      background: "bg-blue-400",
-    };
-    setPlayers([...players, newPlayer]);
+    setPlayers((prevPlayers) => {
+      console.log("Dodaję gracza: ", nick);
+      const newPlayer: Player = {
+        orderId: 0,
+        nick: nick,
+        score: 0,
+        // TODO: randomize background
+        background: "bg-blue-400",
+      };
+      const updatedPlayers = [...prevPlayers, newPlayer];
+      console.log("Gracze: ", updatedPlayers);
+      return updatedPlayers;
+    });
   };
 
   const assignOrderIds = (players: Player[]): Player[] => {
@@ -53,9 +77,12 @@ export default function QRcodePage() {
   };
 
   const handleStartGame = () => {
+    console.log(players);
     const playersWithOrderIds = assignOrderIds(players);
     setPlayers(playersWithOrderIds);
   };
+
+  
 
   return (
     <React.Fragment>
