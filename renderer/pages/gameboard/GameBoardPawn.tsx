@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Player } from "../../types/Player";
 import { twMerge } from "tailwind-merge";
 import { BoardField } from "./GameBoardComponent";
+import SpecialPopupComponent from "./SpecialPopupComponent";
 
 type GameBoardPawnProps = {
   player: Player;
@@ -39,6 +40,7 @@ export default function GameBoardPawn({
     return <div>Brak gracza...</div>;
   }
   const [currentPosition, setCurrentPosition] = useState(0);
+  const [isPopupOpen, setPopupOpen] = useState(false);
 
   function movePawn(fieldsToMove: number) {
     if (fieldsToMove + currentPosition >= boardFields.length) {
@@ -68,18 +70,27 @@ export default function GameBoardPawn({
   listenOnSocket(player, movePawn);
 
   return (
-    <div
-      style={{
-        gridRow: boardFields[currentPosition].rowClass,
-        gridColumn: boardFields[currentPosition].colClass,
-        transform: `translate(${shift.x}px, ${shift.y}px)`,
-      }}
-      // TODO: remove after connecting to socket
-      onClick={() => movePawn(3)}
-      className={twMerge(
-        "bg-white h-6 w-6 rounded-full my-5 mx-6",
-        player.background
+    <div>
+      <div
+        style={{
+          gridRow: boardFields[currentPosition].rowClass,
+          gridColumn: boardFields[currentPosition].colClass,
+          transform: `translate(${shift.x}px, ${shift.y}px)`,
+        }}
+        // TODO: remove after connecting to socket
+        onClick={() => movePawn(3)}
+        className={twMerge(
+          "bg-white h-6 w-6 rounded-full my-5 mx-6",
+          player.background
+        )}
+      ></div>
+      {isPopupOpen && (
+        <SpecialPopupComponent
+          text="Zadanie specjalne"
+          onClose={() => setPopupOpen(false)}
+        />
       )}
-    ></div>
+    </div>
   );
 }
+
