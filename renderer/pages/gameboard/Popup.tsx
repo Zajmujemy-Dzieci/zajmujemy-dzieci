@@ -2,13 +2,13 @@ import React, {useState} from 'react'
 import { Question } from '../../models/Question'
 // nalezy podeslac .trigger, .question 
 
-const popupStyle = {
-    fontSize: '25px',    
-    borderBottom: '0px',
-    width: '25%'  ,
-    borderRadius: "7px",
-    textAlign: "center",
-}
+// const popupStyle = {
+//     fontSize: '25px',    
+//     borderBottom: '0px',
+//     width: '25%'  ,
+//     borderRadius: "7px",
+//     textAlign: "center",
+// }
 
 // const popupQuestionStyle = {
 //     borderBottom: '2px solid black',
@@ -27,12 +27,12 @@ const popupStyle = {
 //     margin: "20px"
 // }
 
-const popupAnswerArrStyle = {
-    backgroundColor: 'rgb(51, 51, 51)',
-    justifyContent: "center",
-    padding: "10px",
-    display: "flex"
-}
+// const popupAnswerArrStyle = {
+//     backgroundColor: 'rgb(51, 51, 51)',
+//     justifyContent: "center",
+//     padding: "10px",
+//     display: "flex"
+// }
 
 
 // const outerDivStyle = {
@@ -71,22 +71,22 @@ function Popup() {
 
     const questionList = question==null ? null : question.answers.map((question :string,index:number)=>{
         if(chosen==null || (index!=correct && index!=chosen)){
-            return <div className="border-0 justify-center rounded-lg bg-gradient-to-br from-purple-700 to-secondary m-10">{question}</div>;            
+            return <div className="border-0 justify-center rounded-[20px] bg-gradient-to-br from-purple-700 to-secondary m-5">{question}</div>;            
         } 
         else if(index == correct){
-            return <div className="border-0 justify-center rounded-lg bg-green-500 m-5" >{question}</div>;
+            return <div className="border-0 justify-center rounded-[20px] bg-green-500 m-5" >{question}</div>;
         } 
         else if(index == chosen && index!=correct){
-            return <div className="border-0 justify-center rounded-lg bg-red-500 m-5" >{question}</div>;
+            return <div className="border-0 justify-center rounded-[20px] bg-red-500 m-5" >{question}</div>;
         } 
 
     });
     
     return (question) ? (
         <div className="w-full h-full mt-2 absolute flex justify-center"> 
-            <div className="text-2xl border-b-5 w-1/4 rounded-lg text-center">
-                <div className="border-b-0 border-black justify-center flex items-center pt-10 pb-10 bg-blue-700" >{question.content}</div>
-                <div className="bg-gray-700 justify-center p-10 flex"><div className="w-1/2">{questionList}</div></div>            
+            <div className="text-2xl border-b-5 w-1/5 text-center mt-3">
+                <div className="border-b-0 border-black justify-center flex items-center pt-10 pb-10 bg-blue-800" >{question.content}</div>
+                <div className="bg-gray-700 justify-center p-5 flex"><div className="w-2/4">{questionList}</div></div>            
             </div>
         </div>
         

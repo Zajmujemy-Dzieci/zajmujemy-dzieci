@@ -53,22 +53,6 @@ export default function GameBoard() {
     gameBoardConfigurationAtom
   );
 
-
-  //This is for testing purposes only. Remove it if i forgot to.
-  const handleClick1 = () => {
-    const sampleQuestion = new Question(
-      "What is the capital of France?",
-      ["Paris", "Berlin", "Madrid", "Rome"],
-      0 // Index of the correct answer (Paris)
-    );
-    
-    loadQuestion(sampleQuestion);
-  }
-
-  const handleClick2 = () => {
-    revealAnswer(2);
-  }
-
   return (    
     <div className="w-[100vw] h-[100vh] p-27">      
       <Popup/>
@@ -76,8 +60,6 @@ export default function GameBoard() {
         <a className="btn-blue absolute top-0 right-0 m-5">Zakończ grę</a>
       </Link>
       <GameBoardComponent configuration={configuration} players={players} />
-      <button className="btn-blue absolute left-20" onClick={handleClick1}>Zaladuj</button>
-      <button className="btn-blue absolute left-0" onClick={handleClick2}>Pokaz</button>
     </div>
   );
 }
