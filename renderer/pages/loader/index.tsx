@@ -179,6 +179,13 @@ export default function Loader() {
         >
           Usuń wszystkie pytania
         </button>
+        <div>
+          <label>
+            <input type="checkbox" className="default-checkbox mx-4" />
+            Pytania w losowej kolejności
+          </label>
+        </div>
+        
         {minimumQuestionsNumber <= questionList.getQuestionsNumber() && (
           <Link href="/config_page">
             <button className="text-white font-bold py-2 px-4 rounded bg-secondary mx-auto mt-2">
@@ -187,7 +194,9 @@ export default function Loader() {
           </Link>
         )}
         {minimumQuestionsNumber > questionList.getQuestionsNumber() && (
-          <h1 className="mt-4">Dodaj więcej pytań by przejść dalej</h1>
+          <h1 className="mt-4">
+            Dodaj więcej pytań by przejść dalej
+          </h1>
         )}
       </div>
       <QuestionComponent
