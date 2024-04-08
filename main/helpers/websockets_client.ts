@@ -18,6 +18,8 @@ export const websockets_client = (address: string) => `<!DOCTYPE html>
         console.log(parsed);
         if(parsed?.type === 'throwDice') 
             ws.send(JSON.stringify({ type: 'dice', dice: Math.floor(Math.random() * 6) + 1 }));
+        if(parsed?.type === 'question')
+            ws.send(JSON.stringify({ type: 'answer', answer: 'C' }));
       };
 
 
@@ -30,6 +32,12 @@ export const websockets_client = (address: string) => `<!DOCTYPE html>
           document.getElementById('answer').addEventListener('click', () => {
               ws.send(JSON.stringify({type: 'answer', answer: 'C'}));
           });
+            document.getElementById('throwDice').addEventListener('click', () => {
+                ws.send(JSON.stringify({type: 'dice', dice: Math.floor(Math.random() * 6) + 1, nick: 'player1'}));
+            });
+            document.getElementById('throwDice2').addEventListener('click', () => {
+                ws.send(JSON.stringify({type: 'dice', dice: Math.floor(Math.random() * 6) + 1, nick: 'player2'}));
+            });
         }
 
         window.onload = init
@@ -39,6 +47,8 @@ export const websockets_client = (address: string) => `<!DOCTYPE html>
 
     <button id="pinger">Ping</button>
     <button id="answer">Answer</button>
+    <button id="throwDice">Throw dice</button>
+    <button id="throwDice2">Throw dice2</button>
 
 </body>
 </html>`

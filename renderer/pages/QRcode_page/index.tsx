@@ -7,7 +7,6 @@ import { useAtom } from "jotai";
 import { Player } from "../../types/Player";
 import { playersQueueAtom } from "../../models/PlayersQueueAtom";
 import { webSocketAtom } from "../../models/WebSocketAtom";
-import { set } from "zod";
 
 export default function QRcodePage() {
   const [ipAddress, setIPAddress] = useState<string>("192.168.137.1");
@@ -89,6 +88,11 @@ export default function QRcodePage() {
       <Head>
         <title>Join do game!</title>
       </Head>
+      <div className="text-3xl absolute m-5 top-0">Gracze:
+        {players.map((player) => (
+          <div key={player.nick} className="text-2xl">{player.nick}</div>
+        ))}
+      </div>
       <div className="flex justify-center text-4xl flex-col items-center m-10">
         <p>Adres do połączenia się: {ipAddress}:3000</p>
         <div className="m-10">
