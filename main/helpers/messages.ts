@@ -1,5 +1,5 @@
 export interface ClientMessage {
-	type: "register" | "ping" | "dice" | "answer" | "regPawn" | "movePawn" | "question"
+	type: "register" | "ping" | "dice" | "answer" | "regPawn" | "movePawn" | "question" | 'NICK'
 }
 
 export interface RegisterMessage extends ClientMessage {
@@ -33,10 +33,16 @@ export interface MovePawnMessage extends ClientMessage {
 	nick: string
 }
 
-export type QuestionMessage = {
+export interface QuestionMessage extends ClientMessage {
 	type: "question",
 	nick: string
 }
+
+export interface NickMessage extends ClientMessage {
+	type: "NICK",
+	nick: string
+}
+
 
 export type TurnMessage = {
 	type: "yourTurn"
@@ -99,7 +105,7 @@ const handlePing = (ws: WebSocket) => {
 	ws.send(JSON.stringify({ type: "pong" }))
 }
 
-const nicks = ["player1", "player2", "player3", "player4", "player5", "player6"]
+const nicks = ["żółw", "wiewiórka", "szynszyl", "pies", "kot", "player6"]
 let currentTurn = 0
 
 const handleRegister = (msg: RegisterMessage, ws: WebSocket) => {
@@ -117,7 +123,7 @@ const handleRegister = (msg: RegisterMessage, ws: WebSocket) => {
 	currentTurn++
 	clients.set(nick, ws)
 	console.log("Registered", nick, clients.size)
-	ws.send(JSON.stringify({ type: "registered" }))
+	ws.send(JSON.stringify({ type: "NICK", nick: nick }))
 	clients.get("host")?.send(JSON.stringify({ type: "newPlayer", nick }))
 }
 
