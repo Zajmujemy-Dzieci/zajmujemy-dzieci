@@ -157,13 +157,10 @@ export default function GameBoardComponent({
     return new Promise<void>((resolve) => {
         setPopupOpen(true);
         setPopupText(text);
-
-        while (true) {
-            if (isPopupOpen == false) {
-                resolve();
-                break;
-            }
-        }
+        setTimeout(() => {
+            setPopupOpen(false);
+            resolve();
+        }, 5000);
     });
   };
 
