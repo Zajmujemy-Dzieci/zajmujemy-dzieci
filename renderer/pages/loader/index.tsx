@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Head from "next/head";
 import Link from "next/link";
 import QuestionComponent from "./QuestionComponent";
@@ -23,6 +23,7 @@ export default function Loader() {
   const [OutCorrectAnswerId, setOutCorrectAnswerId] = useState(-1);
   const [OutQuestionId, setOutQuestionId] = useState(-1);
   const minimumQuestionsNumber = 3;
+  const shuffleCheckboxRef = useRef<HTMLInputElement | null>(null);
 
   const togglePopup = () => {
     setPopupOpen(!isPopupOpen);
@@ -117,6 +118,12 @@ export default function Loader() {
     loadQuestionsFromList();
   };
 
+  const handleGoNext = () => {
+    if (shuffleCheckboxRef.current)
+      if(shuffleCheckboxRef.current.checked)
+        questionList.shuffleQuestions();
+  };
+
   return (
     <React.Fragment>
       <Head>
@@ -179,16 +186,18 @@ export default function Loader() {
         >
           Usuń wszystkie pytania
         </button>
-        <div>
+        <div className='has-tooltip mt-3'>
+          <span className='tooltip rounded shadow-lg p-1 bg-gray-900 text-base -mt-8'>Pytania będą pojawiały się w losowej kolejności po zaznaczeniu tej opcji</span>
           <label>
-            <input type="checkbox" className="default-checkbox mx-4" />
+            <input type="checkbox" className="default-checkbox mx-4" id="shuffle-checkbox" ref={shuffleCheckboxRef}/>
             Pytania w losowej kolejności
           </label>
         </div>
-        
         {minimumQuestionsNumber <= questionList.getQuestionsNumber() && (
           <Link href="/config_page">
-            <button className="text-white font-bold py-2 px-4 rounded bg-secondary mx-auto mt-2">
+            <button 
+            className="text-white font-bold py-2 px-4 rounded bg-secondary mx-auto mt-2" 
+            onClick={handleGoNext}>
               Przejdź dalej
             </button>
           </Link>
