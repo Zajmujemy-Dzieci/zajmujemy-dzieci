@@ -158,21 +158,25 @@ export default function GameBoardComponent({
         setPopupOpen(true);
         setPopupText(text);
 
-        setTimeout(() => {
-            setPopupOpen(false);
-            resolve();
-        }, 5000);
+        while (true) {
+            if (isPopupOpen == false) {
+                resolve();
+                break;
+            }
+        }
     });
   };
 
   return (
     <div className={`w-full h-full place-content-center grid gap-4`}>
       {isPopupOpen && (
-        <SpecialPopupComponent
-          text={popupText}
-          isOpen={isPopupOpen}
-          onClose={() => setPopupOpen(false)}
-        />
+        <div onClick={() => setPopupOpen(false)}>
+          <SpecialPopupComponent
+            text={popupText}
+            isOpen={isPopupOpen}
+            onClose={() => setPopupOpen(false)}
+          />
+        </div>
       )}
       <div
         style={{ gridRow: 1, gridColumn: 1 }}
