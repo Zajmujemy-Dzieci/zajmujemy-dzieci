@@ -79,9 +79,11 @@ export default function GameBoardPawn({
     await setCurrentPosition((prevPosition) => {
       const newPosition = prevPosition + fieldsToMove;
       if (newPosition >= boardFields.length - 1) {
+        player.score = boardFields.length - 1;
         handleFinishGame(player, ws);
         return boardFields.length - 1;
       }
+      player.score = currentPosition + fieldsToMove;
       if (boardFields[newPosition].type === "question") {
         redirectToQuestionPage(player, ws);
       } else if (boardFields[newPosition].type === "finish") {
