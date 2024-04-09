@@ -29,7 +29,7 @@ function mapTypeOnColor(type: BoardFieldSpecialty) {
     case "good":
       return "bg-childGreen";
     case "bad":
-      return "bg-red-500";
+      return "bg-childRed";
     case "empty":
       return "bg-childWhite";
     case "start":
@@ -68,7 +68,6 @@ export default function GameBoardComponent({
   }
 
   const [ws, setWs] = useAtom(webSocketAtom);
-  
 
   const {
     numberOfQuestionFields,
@@ -81,12 +80,10 @@ export default function GameBoardComponent({
 
   const getBoardFieldSpecialty = (index: number): BoardFieldSpecialty => {
     if (index === totalFields - 1) return "start";
-    if (
-      index % (numberOfBadSpecialFields + numberOfGoodSpecialFields - 1) ===
-      0
-    )
-      return "good";
-    return index % 2 === 0 ? "question" : "empty";
+    if (index % (2 * (numberOfGoodSpecialFields - 1)) === 0) return "good";
+    if (index % (2 * (numberOfBadSpecialFields - 1)) === 0) return "bad";
+
+    return index % 2 === 0 ? "empty" : "question";
   };
 
   let currentColumn = 1;
@@ -98,7 +95,7 @@ export default function GameBoardComponent({
 
   const gridPositions: BoardField[] = [];
   gridPositions.push({ index: 1, colClass: 1, rowClass: 1, type: "start" });
-    
+
   const getGridPosition = (index: number, numberOfColumns: number) => {
     colClass = currentColumn;
     rowClass = currentRow;
@@ -161,15 +158,15 @@ export default function GameBoardComponent({
   const [popupText, setPopupText] = useState("");
   async function handleOpenSpecialPopup(text: string) {
     return new Promise<void>((resolve) => {
-        setPopupOpen(true);
-        setPopupText(text);
-        setTimeout(() => {
-            setPopupOpen(false);
-            resolve();
-        }, 5000);
+      setPopupOpen(true);
+      setPopupText(text);
+      setTimeout(() => {
+        setPopupOpen(false);
+        resolve();
+      }, 5000);
     });
-  };
-  
+  }
+
   return (
     <div className={`w-full h-full place-content-center grid gap-4`}>
       {isPopupOpen && (
@@ -184,7 +181,7 @@ export default function GameBoardComponent({
       <div
         style={{ gridRow: 1, gridColumn: 1 }}
         className="bg-childBlack h-32 w-32"
-        >
+      >
         START
       </div>
       {Array.from({ length: totalFields - 2 }, (_, index) => {
@@ -195,10 +192,10 @@ export default function GameBoardComponent({
         } = getGridPosition(index + 2, numberOfColumns);
         return (
           <div
-          key={index}
-          style={{
-            gridColumn: col,
-            gridRow: row,
+            key={index}
+            style={{
+              gridColumn: col,
+              gridRow: row,
             }}
             className={twMerge(
               mapTypeOnColor(type),
@@ -211,8 +208,8 @@ export default function GameBoardComponent({
         <GameBoardPawn
           player={player}
           shift={{
-            x: (i % 2) * 50,
-            y: Math.floor((Math.floor(i / 2) * 100 * 2) / players.length),
+            x: (i % 3) * 33,
+            y: Math.floor((Math.floor(i / 3) * 100 * 3) / players.length),
           }}
           boardFields={gridPositions}
           handleOpenSpecialPopup={handleOpenSpecialPopup}

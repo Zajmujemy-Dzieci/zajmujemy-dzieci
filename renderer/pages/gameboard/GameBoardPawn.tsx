@@ -107,7 +107,7 @@ export default function GameBoardPawn({
       // TODO: remove after connecting to socket
       onClick={() => movePawn(1)}
       className={twMerge(
-        "bg-white h-6 w-6 rounded-full my-5 mx-6",
+        "bg-white h-6 w-6 rounded-full my-5 mx-5",
         player.background
       )}
     ></div>
