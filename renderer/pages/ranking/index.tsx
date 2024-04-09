@@ -44,7 +44,7 @@ export default function RankingPage() {
 
     // Dodawanie graczy do tabeli
     playersTable.push(
-      <div className="flex justify-center items-center text-5xl" key={currentPlayerIndex}>
+      <div className="flex justify-center items-center text-8xl" key={currentPlayerIndex}>
         <span>{placeEmoji} {playersString} - {currentScore}</span>
       </div>
     );
@@ -58,15 +58,15 @@ export default function RankingPage() {
       <Head>
         <title>Ranking - Nextron (z-tailwindcss)</title>
       </Head>
-      <div className="grid grid-col-1 p-5 text-7xl w-full text-center">
-        <h1 className="text-4xl font-bold">Ranking graczy</h1>
-        <div className="mt-5 text-8xl">
+      <div className="grid grid-col-1 p-5 text-8xl w-full text-center">
+        <h1 className="font-bold">Ranking graczy</h1>
+        <div className="mt-5 text-9xl">
           {playersTable}
         </div>
       </div>
       <div className="mt-1 w-full flex-wrap flex justify-center">
         <Link href="/loader">
-          <a className="btn-blue">Rozpocznij przygodę od nowa!</a>
+          <a className="btn-blue text-5xl">Rozpocznij przygodę od nowa!</a>
         </Link>
       </div>
     </React.Fragment>
