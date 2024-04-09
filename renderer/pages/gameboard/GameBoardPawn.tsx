@@ -8,6 +8,7 @@ type GameBoardPawnProps = {
   player: Player;
   shift: { x: number; y: number };
   boardFields: BoardField[];
+  handleOpenSpecialPopup: (text: string) => void;
 };
 
 // TODO: socket communication attachment
@@ -17,14 +18,11 @@ function redirectToQuestionPage(player: Player, ws: WebSocket) {
 
 function handleFinishGame(player: Player, ws: WebSocket) {}
 
-function handleGoodField(player: Player, ws: WebSocket) {}
-
-function handleBadField(player: Player, ws: WebSocket) {}
-
 export default function GameBoardPawn({
   player,
   shift,
   boardFields,
+  handleOpenSpecialPopup = (text: string) => {},
 }: GameBoardPawnProps) {
   if (!boardFields) {
     return <div>Nie ma z kim grać...</div>;
@@ -67,6 +65,16 @@ export default function GameBoardPawn({
       });
   }, []);
 
+  async function handleGoodField(player: Player) {
+    await handleOpenSpecialPopup('Idziesz 3 pola do przodu!');
+    // TODO: communicates + actions SCRUM-55
+  }
+
+  async function handleBadField(player: Player) {
+    await handleOpenSpecialPopup('Idziesz 3 pola do tyłu!');
+    // TODO: communicates + actions SCRUM-55
+  }
+
   async function movePawn(fieldsToMove: number) {
     await setCurrentPosition((prevPosition) => {
       const newPosition = prevPosition + fieldsToMove;
@@ -95,7 +103,7 @@ export default function GameBoardPawn({
         transform: `translate(${shift.x}px, ${shift.y}px)`,
       }}
       // TODO: remove after connecting to socket
-      onClick={() => movePawn(3)}
+      onClick={() => movePawn(1)}
       className={twMerge(
         "bg-white h-6 w-6 rounded-full my-5 mx-6",
         player.background
@@ -103,3 +111,4 @@ export default function GameBoardPawn({
     ></div>
   );
 }
+
