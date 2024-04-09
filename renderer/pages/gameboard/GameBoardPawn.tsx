@@ -65,13 +65,13 @@ export default function GameBoardPawn({
       });
   }, []);
 
-  async function handleGoodField(player: Player) {
-    await handleOpenSpecialPopup('Idziesz 3 pola do przodu!');
+  async function handleGoodField(player: Player, ws: WebSocket) {
+    await handleOpenSpecialPopup("Idziesz 3 pola do przodu!");
     // TODO: communicates + actions SCRUM-55
   }
 
-  async function handleBadField(player: Player) {
-    await handleOpenSpecialPopup('Idziesz 3 pola do tyłu!');
+  async function handleBadField(player: Player, ws: WebSocket) {
+    await handleOpenSpecialPopup("Idziesz 3 pola do tyłu!");
     // TODO: communicates + actions SCRUM-55
   }
 
@@ -111,4 +111,3 @@ export default function GameBoardPawn({
     ></div>
   );
 }
-
