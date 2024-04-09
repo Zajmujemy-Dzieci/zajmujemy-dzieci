@@ -16,6 +16,7 @@ module.exports = {
       childWhite: "#FFEAEC",
       childBlack: "#301A4B",
       childGreen: "#3F6C51",
+      childRed: "#A23E48",
     },
     extend: {},
   },

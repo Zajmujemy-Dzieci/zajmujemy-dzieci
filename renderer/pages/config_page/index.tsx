@@ -22,9 +22,9 @@ export default function ConfigPage() {
       <Head>
         <title>Game configuration</title>
       </Head>
-      <div className="w-full max-w-md p-6 rounded-lg">
-        <h1 className="text-3xl mb-6 text-center">Game Configuration</h1>
-        <form>
+      <div className="w-full max-w-lg p-6 rounded-lg">
+        <h1 className="text-6xl mb-6 text-center">Konfiguracja Gry</h1>
+        <form className="text-3xl">
           <div className="mb-4">
             <label htmlFor="numberOfQuestionFields" className="block mb-2">
               Liczba pól z pytaniami:
@@ -36,6 +36,7 @@ export default function ConfigPage() {
               value={gameBoardConfiguration.numberOfQuestionFields}
               onChange={handleInputChange}
               min="1"
+              max="15"
               className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500 text-gray-800"
             />
           </div>
@@ -75,7 +76,7 @@ export default function ConfigPage() {
               className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500 text-gray-800"
             />
           </div>
-          <div className="text-center">
+          <div className="text-center p-3">
             <Link href="/loader">
               <a className="btn-blue mx-4">Wróć</a>
             </Link>
