@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import Head from "next/head";
 import Link from "next/link";
 import QRCode from "qrcode.react";
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 import { useAtom } from "jotai";
 import { Player } from "../../types/Player";
 import { playersQueueAtom } from "../../models/PlayersQueueAtom";
@@ -13,28 +13,30 @@ export default function QRcodePage() {
   const [players, setPlayers] = useAtom(playersQueueAtom);
   const [ws, setWs] = useAtom(webSocketAtom);
 
+  function handleConnectToServer(response: AxiosResponse) {
+    setIPAddress(response.data);
+    const newWs = new WebSocket(`ws://${response.data}:3000/ws`);
+    setWs(newWs);
+    if (newWs) {
+      newWs.onopen = async () => {
+        console.log("Connected to server");
+        newWs.send(JSON.stringify({ type: "register", nick: "host" }));
+      };
+      newWs.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        if (data.type === "newPlayer" && data.nick) {
+          addPlayer(data.nick);
+          console.log("Nowy gracz: ", data.nick);
+        }
+      };
+    }
+  }
+
   useEffect(() => {
     setPlayers([]);
     axios
       .get<string>("http://localhost:3000/ipaddress")
-      .then((response) => {
-        setIPAddress(response.data);
-        const newWs = new WebSocket(`ws://${response.data}:3000/ws`);
-        setWs(newWs);
-        if (newWs) {
-          newWs.onopen = async () => {
-            console.log("Connected to server");
-            newWs.send(JSON.stringify({ type: "register", nick: "host" }));
-          };
-          newWs.onmessage = (event) => {
-            const data = JSON.parse(event.data);
-            if (data.type === "newPlayer" && data.nick) {
-              addPlayer(data.nick);
-              console.log("Nowy gracz: ", data.nick);
-            }
-          };
-        }
-      })
+      .then((response) => handleConnectToServer(response))
       .catch((error) => {
         console.error("Błąd pobierania danych:", error);
       });
@@ -81,16 +83,17 @@ export default function QRcodePage() {
     setPlayers(playersWithOrderIds);
   };
 
-  
-
   return (
     <React.Fragment>
       <Head>
         <title>Join do game!</title>
       </Head>
-      <div className="text-3xl absolute m-5 top-0">Gracze:
+      <div className="text-3xl absolute m-5 top-0">
+        Gracze:
         {players.map((player) => (
-          <div key={player.nick} className="text-2xl">{player.nick}</div>
+          <div key={player.nick} className="text-2xl">
+            {player.nick}
+          </div>
         ))}
       </div>
       <div className="flex justify-center text-4xl flex-col items-center m-10">
