@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Player } from "../../types/Player";
 import { twMerge } from "tailwind-merge";
 import { BoardField } from "./GameBoardComponent";
+import axios, { Axios, AxiosResponse } from "axios";
 
 type GameBoardPawnProps = {
   player: Player;
@@ -11,68 +12,88 @@ type GameBoardPawnProps = {
 };
 
 // TODO: socket communication attachment
-function redirectToQuestionPage(player: Player) {}
+function redirectToQuestionPage(player: Player, ws: WebSocket) {
+  ws.send(JSON.stringify({ type: "question", nick: player.nick }));
+}
 
-function handleFinishGame(player: Player) {}
+function handleFinishGame(player: Player, ws: WebSocket) {}
 
-
-
-
-function listenOnSocket(
-  player: Player,
-  movePawn: (fieldsToMove: number) => void
-) {
-  // socket.on("movePawn", (fieldsToMove: number) => {
-    //   movePawn(fieldsToMove);
-    // });
+export default function GameBoardPawn({
+  player,
+  shift,
+  boardFields,
+  handleOpenSpecialPopup = (text: string) => {},
+}: GameBoardPawnProps) {
+  if (!boardFields) {
+    return <div>Nie ma z kim grać...</div>;
   }
-  
-  export default function GameBoardPawn({
-    player,
-    shift,
-    boardFields,
-    handleOpenSpecialPopup = (text: string) => {},
-  }: GameBoardPawnProps) {
-    if (!boardFields) {
-      return <div>Nie ma z kim grać...</div>;
-    }
-    if (!player) {
-      return <div>Brak gracza...</div>;
-    }
+  if (!player) {
+    return <div>Brak gracza...</div>;
+  }
+  const [currentPosition, setCurrentPosition] = useState(0);
+  const [ws, setWs] = useState<WebSocket>(
+    new WebSocket("ws://localhost:3000/ws")
+  );
+  const [ipAddress, setIPAddress] = useState<string>("");
 
-    async function handleGoodField(player: Player) {
-      await handleOpenSpecialPopup('Idziesz 3 pola do przodu!');
-      // TODO: communicates + actions SCRUM-55
+  function handleConnection(response: AxiosResponse) {
+    setIPAddress(response.data);
+    const newWs = new WebSocket(`ws://${response.data}:3000/ws`);
+    setWs(newWs);
+    if (newWs) {
+      newWs.onopen = async () => {
+        console.log("Connected to server");
+        newWs.send(JSON.stringify({ type: "regPawn", nick: player.nick }));
+      };
+      newWs.onmessage = (event) => {
+        let data = JSON.parse(event.data);
+        console.log("Received message: ", event.data);
+        console.log("Data type: ", data.type);
+        if (data.type === "movePawn" && data.nick == player.nick) {
+          movePawn(data.fieldsToMove);
+        }
+      };
     }
+  }
 
-    async function handleBadField(player: Player) {
-      await handleOpenSpecialPopup('Idziesz 3 pola do tyłu!');
-      // TODO: communicates + actions SCRUM-55
-    }
+  useEffect(() => {
+    axios
+      .get<string>("http://localhost:3000/ipaddress")
+      .then((response) => handleConnection(response))
+      .catch((error) => {
+        console.error("Błąd pobierania danych:", error);
+      });
+  }, []);
 
-    const [currentPosition, setCurrentPosition] = useState(0);
-    
-    async function movePawn(fieldsToMove: number) {
-      await setCurrentPosition(prevPosition => {
-        const newPosition = prevPosition + fieldsToMove;
-      if (newPosition >= boardFields.length-1) {
-        handleFinishGame(player);
+  async function handleGoodField(player: Player) {
+    await handleOpenSpecialPopup('Idziesz 3 pola do przodu!');
+    // TODO: communicates + actions SCRUM-55
+  }
+
+  async function handleBadField(player: Player) {
+    await handleOpenSpecialPopup('Idziesz 3 pola do tyłu!');
+    // TODO: communicates + actions SCRUM-55
+  }
+
+  async function movePawn(fieldsToMove: number) {
+    await setCurrentPosition((prevPosition) => {
+      const newPosition = prevPosition + fieldsToMove;
+      if (newPosition >= boardFields.length - 1) {
+        handleFinishGame(player, ws);
         return boardFields.length - 1;
       }
       if (boardFields[newPosition].type === "question") {
-        redirectToQuestionPage(player);
+        redirectToQuestionPage(player, ws);
       } else if (boardFields[newPosition].type === "finish") {
-        handleFinishGame(player);
+        handleFinishGame(player, ws);
       } else if (boardFields[newPosition].type === "good") {
-        handleGoodField(player);
+        handleGoodField(player, ws);
       } else if (boardFields[newPosition].type === "bad") {
-        handleBadField(player);
+        handleBadField(player, ws);
       }
       return newPosition;
     });
   }
-
-  listenOnSocket(player, movePawn);
 
   return (
     <div

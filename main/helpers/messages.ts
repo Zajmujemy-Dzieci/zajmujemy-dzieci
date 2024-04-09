@@ -1,5 +1,5 @@
 export interface ClientMessage {
-	type: "register" | "ping" | "dice" | "answer"
+	type: "register" | "ping" | "dice" | "answer" | "regPawn" | "movePawn" | "question" | 'NICK'
 }
 
 export interface RegisterMessage extends ClientMessage {
@@ -10,6 +10,7 @@ export interface RegisterMessage extends ClientMessage {
 export interface DiceThrowMessage extends ClientMessage {
 	type: "dice"
 	dice: 1 | 2 | 3 | 4 | 5 | 6
+	nick: string
 }
 
 export interface AnswerMessage extends ClientMessage {
@@ -21,19 +22,42 @@ export interface ServerMessage {
 	type: "pong" | "throwDice" | "registered"
 }
 
+export interface PawnRegisterMessage extends ClientMessage {
+	type: "regPawn"
+	nick: string
+}
+
+export interface MovePawnMessage extends ClientMessage {
+	type: "movePawn"
+	fieldsToMove: number,
+	nick: string
+}
+
+export interface QuestionMessage extends ClientMessage {
+	type: "question",
+	nick: string
+}
+
+export interface NickMessage extends ClientMessage {
+	type: "NICK",
+	nick: string
+}
+
+
 export type TurnMessage = {
 	type: "yourTurn"
 	nick: string
 }
 
+
 // This should not stay here
 export let clients = new Map<string, WebSocket>()
+export let pawns = new Map<string, WebSocket>()
 
 export const handleMessage = (msg: ClientMessage, ws: WebSocket) => {
 	switch (msg.type) {
 		case "ping":
 			handlePing(ws)
-			// throwDice("test")
 			break
 
 		case "register":
@@ -49,6 +73,21 @@ export const handleMessage = (msg: ClientMessage, ws: WebSocket) => {
 		case "answer":
 			const answerMsg = msg as AnswerMessage
 			handleAnswer(answerMsg)
+			break
+		
+		case "regPawn":
+			const pawnMsg = msg as PawnRegisterMessage
+			handlePawnRegister(pawnMsg, ws)
+			break
+		
+		case "movePawn":
+			const movePawnMsg = msg as MovePawnMessage
+			handleMovePawn(movePawnMsg.nick, movePawnMsg.fieldsToMove);
+			break
+
+		case "question":
+			const questionMsg = msg as QuestionMessage
+			handleQuestion(questionMsg);
 			break
 
 		default:
@@ -66,14 +105,56 @@ const handlePing = (ws: WebSocket) => {
 	ws.send(JSON.stringify({ type: "pong" }))
 }
 
+const nicks = ["żółw", "wiewiórka", "szynszyla", "pies", "kot", "słoń"]
+let currentTurn = 0
+
 const handleRegister = (msg: RegisterMessage, ws: WebSocket) => {
-	clients.set(msg.nick, ws)
-	console.log("Registered", msg.nick, clients.size)
-	ws.send(JSON.stringify({ type: "registered" }))
+	if (msg.nick === "host") {
+		if (clients.has("host")) {
+			console.error("Host already registered")
+			return
+		}
+		clients.set("host", ws)
+		console.log("Host registered")
+		ws.send(JSON.stringify({ type: "registered" }))
+		return
+	}
+	let nick = nicks[currentTurn]
+	currentTurn++
+	clients.set(nick, ws)
+	console.log("Registered", nick, clients.size)
+	ws.send(JSON.stringify({ type: "NICK", nick: nick }))
+	clients.get("host")?.send(JSON.stringify({ type: "newPlayer", nick }))
+}
+
+const handlePawnRegister = (msg: PawnRegisterMessage, ws: WebSocket) => {
+	if (pawns.has(msg.nick)) {
+		console.error("Pawn already registered")
+		return
+	}
+	pawns.set(msg.nick, ws)
+	console.log("Pawn registered" + msg.nick)
+}
+
+const handleMovePawn = (nick: string, fieldsToMove: number) => {
+	const ws = pawns.get(nick)
+	console.log("Move pawn", nick, fieldsToMove)
+	ws?.send(JSON.stringify({ type: "movePawn", fieldsToMove: fieldsToMove, nick: nick }))
+}
+
+const handleQuestion = (msg: QuestionMessage) => {
+	const ws = clients.get(msg.nick)
+	console.log("Question", msg.nick)
+	ws?.send(JSON.stringify({ type: "question" }))
+}
+
+const handleMessageToClient = (msg: ServerMessage, ws: WebSocket) => {
+	ws.send(JSON.stringify(msg))
 }
 
 const handleDiceThrow = (msg: DiceThrowMessage) => {
 	console.log("Dice throw", msg.dice)
+	handleMovePawn(msg.nick, msg.dice)
 }
 
 const handleAnswer = (msg: AnswerMessage) => {

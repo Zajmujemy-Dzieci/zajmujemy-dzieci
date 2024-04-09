@@ -8,6 +8,7 @@ export const websockets_client = (address: string) => `<!DOCTYPE html>
 
     <script>
       const ws = new WebSocket('ws://${address}:3000/ws');
+      let nick = "";
       ws.onopen = () => {
           console.log('connected');
           ws.send(JSON.stringify({ type: 'register', nick: 'test' }));
@@ -16,8 +17,14 @@ export const websockets_client = (address: string) => `<!DOCTYPE html>
       ws.onmessage = (msg) => {
         const parsed = JSON.parse(msg.data);
         console.log(parsed);
+        if (parsed?.type === 'NICK'){
+            nick = parsed.nick;
+            console.log('Nick:', nick);
+        }
         if(parsed?.type === 'throwDice') 
             ws.send(JSON.stringify({ type: 'dice', dice: Math.floor(Math.random() * 6) + 1 }));
+        if(parsed?.type === 'question')
+            ws.send(JSON.stringify({ type: 'answer', answer: 'C' }));
       };
 
 
@@ -30,6 +37,10 @@ export const websockets_client = (address: string) => `<!DOCTYPE html>
           document.getElementById('answer').addEventListener('click', () => {
               ws.send(JSON.stringify({type: 'answer', answer: 'C'}));
           });
+            document.getElementById('throwDice').addEventListener('click', () => {
+                console.log('Throwing dice' + nick);
+                ws.send(JSON.stringify({type: 'dice', dice: Math.floor(Math.random() * 6) + 1, nick: nick}));
+            });
         }
 
         window.onload = init
@@ -39,6 +50,7 @@ export const websockets_client = (address: string) => `<!DOCTYPE html>
 
     <button id="pinger">Ping</button>
     <button id="answer">Answer</button>
+    <button id="throwDice">Throw dice</button>
 
 </body>
 </html>`

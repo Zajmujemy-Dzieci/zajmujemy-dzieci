@@ -2,8 +2,10 @@ import { twMerge } from "tailwind-merge";
 import { GameBoardConfiguration } from "../../types/GameBoardConfiguration";
 import { Player } from "../../types/Player";
 import GameBoardPawn from "./GameBoardPawn";
+import { useEffect, useState } from "react";
+import { useAtom } from "jotai";
+import { webSocketAtom } from "../../models/WebSocketAtom";
 import SpecialPopupComponent from "./SpecialPopupComponent";
-import { useState } from "react";
 
 export type BoardFieldSpecialty =
   | "question"
@@ -64,6 +66,10 @@ export default function GameBoardComponent({
   if (!configuration) {
     return <div>Brak konfiguracji planszy...</div>;
   }
+
+  const [ws, setWs] = useAtom(webSocketAtom);
+  
+
   const {
     numberOfQuestionFields,
     numberOfGoodSpecialFields,
@@ -92,7 +98,7 @@ export default function GameBoardComponent({
 
   const gridPositions: BoardField[] = [];
   gridPositions.push({ index: 1, colClass: 1, rowClass: 1, type: "start" });
-
+    
   const getGridPosition = (index: number, numberOfColumns: number) => {
     colClass = currentColumn;
     rowClass = currentRow;
@@ -163,7 +169,7 @@ export default function GameBoardComponent({
         }, 5000);
     });
   };
-
+  
   return (
     <div className={`w-full h-full place-content-center grid gap-4`}>
       {isPopupOpen && (
@@ -178,7 +184,7 @@ export default function GameBoardComponent({
       <div
         style={{ gridRow: 1, gridColumn: 1 }}
         className="bg-childBlack h-32 w-32"
-      >
+        >
         START
       </div>
       {Array.from({ length: totalFields - 2 }, (_, index) => {
@@ -189,10 +195,10 @@ export default function GameBoardComponent({
         } = getGridPosition(index + 2, numberOfColumns);
         return (
           <div
-            key={index}
-            style={{
-              gridColumn: col,
-              gridRow: row,
+          key={index}
+          style={{
+            gridColumn: col,
+            gridRow: row,
             }}
             className={twMerge(
               mapTypeOnColor(type),
