@@ -21,23 +21,6 @@ express_app.use(bodyParser.urlencoded({ extended: true }))
 express_app.use(bodyParser.urlencoded({ extended: true }))
 express_app.use(cors())
 
-express_app.get("/", (req: any, res: any) => {
-	res.send(`
-      <html>
-          <head>
-              <title>Podaj nick</title>
-          </head>
-          <body>
-              <h1>Podaj nick</h1>
-              <form action="/submit" method="post">
-                  <input type="text" name="nick" placeholder="Twój nick" required>
-                  <button type="submit">Zatwierdź</button>
-              </form>
-          </body>
-      </html>
-  `)
-})
-
 function getIpAddress() {
 	const networkInterfaces = os.networkInterfaces()
 	let ipv4Address
@@ -52,6 +35,7 @@ function getIpAddress() {
 		})
 	})
 	return ipv4Address
+	// return '192.168.137.1'
 }
 
 express_app.get("/ipaddress", (req, res) => {
@@ -64,23 +48,8 @@ express_app.get("/ipaddress", (req, res) => {
 	}
 })
 
-express_app.post("/submit", (req, res) => {
-	var nick = req.body.nick
-	console.log(nick)
-	res.send(`
-        <html>
-            <head>
-                <title>Witaj!</title>
-            </head>
-            <body>
-                <h1>Witaj</h1>
-                <p>Dziękujemy za podanie nicku.</p>
-            </body>
-        </html>
-    `)
-})
 
-express_app.get("/websockets", (req, res) => {
+express_app.get("/", (req, res) => {
 	const address = getIpAddress() as any as string
 	console.log("here", address)
 	res.send(websockets_client(address))
