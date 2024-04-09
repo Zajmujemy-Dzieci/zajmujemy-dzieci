@@ -2,9 +2,10 @@ import { twMerge } from "tailwind-merge";
 import { GameBoardConfiguration } from "../../types/GameBoardConfiguration";
 import { Player } from "../../types/Player";
 import GameBoardPawn from "./GameBoardPawn";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useAtom } from "jotai";
 import { webSocketAtom } from "../../models/WebSocketAtom";
+import SpecialPopupComponent from "./SpecialPopupComponent";
 
 export type BoardFieldSpecialty =
   | "question"
@@ -155,9 +156,31 @@ export default function GameBoardComponent({
     });
     return { colClass, rowClass, type: getBoardFieldSpecialty(index) };
   };
+
+  const [isPopupOpen, setPopupOpen] = useState(false);
+  const [popupText, setPopupText] = useState("");
+  async function handleOpenSpecialPopup(text: string) {
+    return new Promise<void>((resolve) => {
+        setPopupOpen(true);
+        setPopupText(text);
+        setTimeout(() => {
+            setPopupOpen(false);
+            resolve();
+        }, 5000);
+    });
+  };
   
   return (
     <div className={`w-full h-full place-content-center grid gap-4`}>
+      {isPopupOpen && (
+        <div onClick={() => setPopupOpen(false)}>
+          <SpecialPopupComponent
+            text={popupText}
+            isOpen={isPopupOpen}
+            onClose={() => setPopupOpen(false)}
+          />
+        </div>
+      )}
       <div
         style={{ gridRow: 1, gridColumn: 1 }}
         className="bg-childBlack h-32 w-32"
@@ -192,6 +215,7 @@ export default function GameBoardComponent({
             y: Math.floor((Math.floor(i / 2) * 100 * 2) / players.length),
           }}
           boardFields={gridPositions}
+          handleOpenSpecialPopup={handleOpenSpecialPopup}
         />
       ))}
     </div>
