@@ -27,7 +27,7 @@ export default function GameBoard() {
       <Link href="/ranking">
         <a className="btn-blue absolute top-0 right-0 m-5">Zakończ grę</a>
       </Link>
-      <GameBoardComponent configuration={configuration} players={playersQueueQueue} />
+      <GameBoardComponent configuration={configuration} players={playersQueue} />
     </div>
   );
 }

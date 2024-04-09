@@ -10,7 +10,7 @@ export default function RankingPage() {
 
   const sortedPlayers: Player[] = players.slice().sort((a, b) => {
     if (b.score === a.score) {
-      return a.nick.localeCompare(b.nick); // Sortowanie alfabetyczne, jeśli punkty są równe
+      return a.nick.localeCompare(b.nick);
     }
     return b.score - a.score;
   });
@@ -44,12 +44,11 @@ export default function RankingPage() {
 
     // Dodawanie graczy do tabeli
     playersTable.push(
-      <div className="flex justify-center items-center text-3xl" key={currentPlayerIndex}>
+      <div className="flex justify-center items-center text-5xl" key={currentPlayerIndex}>
         <span>{placeEmoji} {playersString} - {currentScore}</span>
       </div>
     );
 
-    // Przejście do kolejnej pozycji
     currentPlace++;
     currentPlayerIndex = nextPlayerIndex;
   }
@@ -59,7 +58,7 @@ export default function RankingPage() {
       <Head>
         <title>Ranking - Nextron (z-tailwindcss)</title>
       </Head>
-      <div className="grid grid-col-1 p-5 text-2xl w-full text-center">
+      <div className="grid grid-col-1 p-5 text-7xl w-full text-center">
         <h1 className="text-4xl font-bold">Ranking graczy</h1>
         <div className="mt-5 text-8xl">
           {playersTable}
