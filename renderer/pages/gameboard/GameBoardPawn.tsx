@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Player } from "../../types/Player";
 import { twMerge } from "tailwind-merge";
 import { BoardField } from "./GameBoardComponent";
-import axios from "axios";
+import axios, { Axios, AxiosResponse } from "axios";
 
 type GameBoardPawnProps = {
   player: Player;
@@ -33,58 +33,59 @@ export default function GameBoardPawn({
     return <div>Brak gracza...</div>;
   }
   const [currentPosition, setCurrentPosition] = useState(0);
-  const [ws, setWs] = useState<WebSocket>(new WebSocket('ws://localhost:3000/ws'));
+  const [ws, setWs] = useState<WebSocket>(
+    new WebSocket("ws://localhost:3000/ws")
+  );
   const [ipAddress, setIPAddress] = useState<string>("");
+
+  function handleConnection(response: AxiosResponse) {
+    setIPAddress(response.data);
+    const newWs = new WebSocket(`ws://${response.data}:3000/ws`);
+    setWs(newWs);
+    if (newWs) {
+      newWs.onopen = async () => {
+        console.log("Connected to server");
+        newWs.send(JSON.stringify({ type: "regPawn", nick: player.nick }));
+      };
+      newWs.onmessage = (event) => {
+        let data = JSON.parse(event.data);
+        console.log("Received message: ", event.data);
+        console.log("Data type: ", data.type);
+        if (data.type === "movePawn" && data.nick == player.nick) {
+          movePawn(data.fieldsToMove);
+        }
+      };
+    }
+  }
 
   useEffect(() => {
     axios
       .get<string>("http://localhost:3000/ipaddress")
-      .then((response) => {
-        setIPAddress(response.data);
-        const newWs = new WebSocket(`ws://${response.data}:3000/ws`);
-        setWs(newWs);
-        if (newWs) {
-          newWs.onopen = async () => {
-            console.log("Connected to server");
-            newWs.send(JSON.stringify({ type: "regPawn", nick: player.nick }));
-          };
-          newWs.onmessage = (event) => {
-            let data = JSON.parse(event.data);
-            console.log("Received message: ", event.data);
-            console.log("Data type: ", data.type);
-            if (data.type === "movePawn" && data.nick == player.nick) {
-              movePawn(data.fieldsToMove);
-            }
-          };
-        }
-      })
+      .then((response) => handleConnection(response))
       .catch((error) => {
         console.error("Błąd pobierania danych:", error);
       });
   }, []);
 
   async function movePawn(fieldsToMove: number) {
-    await setCurrentPosition(prevPosition => {
+    await setCurrentPosition((prevPosition) => {
       const newPosition = prevPosition + fieldsToMove;
-    if (newPosition >= boardFields.length-1) {
-      handleFinishGame(player, ws);
-      return boardFields.length - 1;
-    }
-    if (boardFields[newPosition].type === "question") {
-      redirectToQuestionPage(player, ws);
-    } else if (boardFields[newPosition].type === "finish") {
-      handleFinishGame(player, ws);
-    } else if (boardFields[newPosition].type === "good") {
-      handleGoodField(player, ws);
-    } else if (boardFields[newPosition].type === "bad") {
-      handleBadField(player, ws);
-    }
-    return newPosition;
-  });
-}
-
-
-
+      if (newPosition >= boardFields.length - 1) {
+        handleFinishGame(player, ws);
+        return boardFields.length - 1;
+      }
+      if (boardFields[newPosition].type === "question") {
+        redirectToQuestionPage(player, ws);
+      } else if (boardFields[newPosition].type === "finish") {
+        handleFinishGame(player, ws);
+      } else if (boardFields[newPosition].type === "good") {
+        handleGoodField(player, ws);
+      } else if (boardFields[newPosition].type === "bad") {
+        handleBadField(player, ws);
+      }
+      return newPosition;
+    });
+  }
 
   return (
     <div
