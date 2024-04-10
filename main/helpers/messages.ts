@@ -1,5 +1,5 @@
 export interface ClientMessage {
-	type: "register" | "ping" | "dice" | "answer" | "regPawn" | "movePawn" | "question" | 'NICK' | 'yourTurn'
+	type: "register" | "ping" | "dice" | "answer" | "regPawn" | "movePawn" | "question" | 'NICK' 
 }
 
 export interface RegisterMessage extends ClientMessage {
@@ -44,10 +44,6 @@ export interface NickMessage extends ClientMessage {
 }
 
 
-export type TurnMessage = {
-	type: "yourTurn"
-	nick: string
-}
 
 
 // This should not stay here
