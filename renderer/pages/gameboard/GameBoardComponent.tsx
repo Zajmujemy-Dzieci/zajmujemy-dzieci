@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { useAtom } from "jotai";
 import { webSocketAtom } from "../../models/WebSocketAtom";
 import SpecialPopupComponent from "./SpecialPopupComponent";
+import {QuestionPopup} from "./QuestionPopup"
 
 export type BoardFieldSpecialty =
   | "question"
@@ -233,6 +234,9 @@ export default function GameBoardComponent({
           />
         </div>
       )}
+
+      <QuestionPopup/>
+
       <div
         style={{ gridRow: 1, gridColumn: 1 }}
         className="bg-childBlack h-28 w-28"
