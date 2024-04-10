@@ -1,3 +1,5 @@
+import game from './state'
+
 export interface ClientMessage {
 	type: "register" | "ping" | "dice" | "answer" | "regPawn" | "movePawn" | "question" | 'NICK' 
 }
@@ -44,13 +46,6 @@ export interface NickMessage extends ClientMessage {
 }
 
 
-
-
-// This should not stay here
-export let clients = new Map<string, WebSocket>()
-export let pawns = new Map<string, WebSocket>()
-export let order = new Array<string>()
-
 export const handleMessage = (msg: ClientMessage, ws: WebSocket) => {
 	switch (msg.type) {
 		case "ping":
@@ -93,7 +88,7 @@ export const handleMessage = (msg: ClientMessage, ws: WebSocket) => {
 }
 
 export const throwDice = (nick: string) => {
-	const ws = clients.get(nick)
+	const ws = game.clients.get(nick)
 
 	if (!ws) {
 		console.error("No such ws", nick)
@@ -113,45 +108,54 @@ let currentTurn = 0
 
 const handleRegister = (msg: RegisterMessage, ws: WebSocket) => {
 	if (msg.nick === "host") {
-		if (clients.has("host")) {
+		if (game.clients.has("host")) {
 			console.error("Host already registered")
 			return
 		}
-		clients.set("host", ws)
+		game.clients.set("host", ws)
 		console.log("Host registered")
 		ws.send(JSON.stringify({ type: "registered" }))
 		return
 	}
 	let nick = nicks[currentTurn]
 	currentTurn++
-	clients.set(nick, ws)
-	order.push(nick)
+	game.clients.set(nick, ws)
+	game.order.push(nick)
 
-	console.log("Registered", nick, clients.size)
+	console.log("Registered", nick, game.clients.size)
 	ws.send(JSON.stringify({ type: "NICK", nick: nick }))
-	clients.get("host")?.send(JSON.stringify({ type: "newPlayer", nick }))
+	game.clients.get("host")?.send(JSON.stringify({ type: "newPlayer", nick }))
 }
 
 const handlePawnRegister = (msg: PawnRegisterMessage, ws: WebSocket) => {
-	if (pawns.has(msg.nick)) {
+	if (game.pawns.has(msg.nick)) {
 		// TODO: handle on reconnect
 		console.error("Pawn already registered")
 		return
 	}
-	pawns.set(msg.nick, ws)
-	console.log("Pawn registered" + msg.nick)
+	game.pawns.set(msg.nick, ws)
+
+	// when all connected clients except 'host' have registered their pawns
+	if(game.pawns.size + 1 === game.clients.size) {
+		game.start() 
+		notifyNextPlayer()
+	}
+
+
+	console.log(`Pawn registered: ${msg.nick}, ${game.pawns.size} of ${game.clients.size} pawns registered`)
 }
 
 const handleMovePawn = (nick: string, fieldsToMove: number) => {
-	const ws = pawns.get(nick)
+	const ws = game.pawns.get(nick)
 	console.log("Move pawn", nick, fieldsToMove)
 	ws?.send(JSON.stringify({ type: "movePawn", fieldsToMove: fieldsToMove, nick: nick }))
 }
 
 const handleQuestion = (msg: QuestionMessage) => {
-	const ws = clients.get(msg.nick)
-	console.log("Question", msg.nick)
-	ws?.send(JSON.stringify({ type: "question" }))
+	const ws = game.validateQuestion(msg.nick)
+
+	if(ws) 
+		ws.send(JSON.stringify({ type: "question" }))
 }
 
 const handleMessageToClient = (msg: ServerMessage, ws: WebSocket) => {
@@ -159,26 +163,25 @@ const handleMessageToClient = (msg: ServerMessage, ws: WebSocket) => {
 }
 
 const handleDiceThrow = (msg: DiceThrowMessage) => {
-	console.log("Dice throw", msg.dice)
+	if (game.validateDiceThrow(msg.nick, msg.dice)) {
+		handleMovePawn(msg.nick, msg.dice)
 
-	if (msg.nick !== order[0]) {
-		console.error("Not your turn", msg.nick, order[0])
-		return
+		handleQuestion({ type: "question", nick: game.order[0] }) // TEST FLOW! REMOVE LATER!
 	}
-	order = [...order.slice(1), order[0]] // update order
-
-	handleMovePawn(msg.nick, msg.dice)
 }
 
-const handleAnswer = (msg: AnswerMessage) => {
-	console.log("Answer", msg.answer)
-	const next = clients.get(order[0])
+export const handleAnswer = (msg: AnswerMessage) => {
+	if(game.validateAnswer(game.order[0], msg.answer))	
+		notifyNextPlayer()
+}
 
+const notifyNextPlayer = () => {
+	const next = game.clients.get(game.order[0])
 
 	if(next == undefined) {
 		console.error("No next player")
 		return
 	}
-	next.send(JSON.stringify({ type: "throwDice", nick: order[0] }))
-	console.log("sent to ",  order[0])
+	next.send(JSON.stringify({ type: "throwDice", nick: game.order[0] }))
+
 }
