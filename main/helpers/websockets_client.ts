@@ -16,13 +16,16 @@ export const websockets_client = (address: string) => `<!DOCTYPE html>
 
       ws.onmessage = (msg) => {
         const parsed = JSON.parse(msg.data);
-        console.log(parsed);
+        console.log('got', parsed);
         if (parsed?.type === 'NICK'){
             nick = parsed.nick;
             console.log('Nick:', nick);
+            document.getElementById('nick').innerText = 'Jesteś: ' + nick;
         }
-        if(parsed?.type === 'throwDice') 
-            ws.send(JSON.stringify({ type: 'dice', dice: Math.floor(Math.random() * 6) + 1 }));
+        if(parsed?.type === 'throwDice') {
+            document.getElementById('turn').innerText = "No rusz się!";
+            // ws.send(JSON.stringify({ type: 'dice', dice: Math.floor(Math.random() * 6) + 1, nick }));
+        }
         if(parsed?.type === 'question')
             ws.send(JSON.stringify({ type: 'answer', answer: 'C' }));
       };
@@ -39,6 +42,7 @@ export const websockets_client = (address: string) => `<!DOCTYPE html>
           });
             document.getElementById('throwDice').addEventListener('click', () => {
                 console.log('Throwing dice' + nick);
+                document.getElementById('turn').innerText = "Czekaj..";
                 ws.send(JSON.stringify({type: 'dice', dice: Math.floor(Math.random() * 6) + 1, nick: nick}));
             });
         }
@@ -48,9 +52,12 @@ export const websockets_client = (address: string) => `<!DOCTYPE html>
 </head>
 <body>
 
+    <h1 id="nick">Jesteś: </h1>
+    <h1 id="turn">Czekaj..</h1>
+
     <button id="pinger">Ping</button>
     <button id="answer">Answer</button>
     <button id="throwDice">Throw dice</button>
 
 </body>
-</html>`
+</html>`;
