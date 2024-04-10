@@ -7,6 +7,9 @@
     @apply bg-primary text-white;
     font-family: "Nerko One", cursive;
   }
+  .btn {
+    @apply text-white font-bold px-4 py-2 rounded bg-blue-600 hover:bg-blue-500;
+  }
 }
 
 @layer components {
@@ -14,12 +17,12 @@
     @apply text-white font-bold px-4 py-2 rounded bg-blue-600 hover:bg-blue-500;
   }
   .default-checkbox {
-    @apply w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded dark:ring-offset-gray-800 dark:bg-gray-700 dark:border-gray-600
+    @apply w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded dark:ring-offset-gray-800 dark:bg-gray-700 dark:border-gray-600;
   }
   .tooltip {
     @apply invisible absolute;
   }
-  
+
   .has-tooltip:hover .tooltip {
     @apply visible z-50;
   }
