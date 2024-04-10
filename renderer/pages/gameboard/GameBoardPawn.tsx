@@ -3,6 +3,8 @@ import { Player } from "../../types/Player";
 import { twMerge } from "tailwind-merge";
 import { BoardField } from "./GameBoardComponent";
 import axios, { Axios, AxiosResponse } from "axios";
+import { loadQuestion, revealAnswer } from "./QuestionPopup";
+import { Question } from "../../models/Question";
 
 type GameBoardPawnProps = {
   player: Player;
@@ -14,6 +16,17 @@ type GameBoardPawnProps = {
 // TODO: socket communication attachment
 function redirectToQuestionPage(player: Player, ws: WebSocket) {
   ws.send(JSON.stringify({ type: "question", nick: player.nick }));
+  const sampleQuestion = new Question(
+    "What is the capital of France?",
+    ["Paris", "Berlin", "Madrid", "Yekaterinburgh"],
+    0 
+  );
+
+  loadQuestion(sampleQuestion);
+  //revealAnswer(0);
+
+  //loadQuestion(sampleQuestion);
+
 }
 
 function handleFinishGame(player: Player, ws: WebSocket) {}
