@@ -129,6 +129,8 @@ const handleRegister = (msg: RegisterMessage, ws: WebSocket) => {
 	let nick = nicks[currentTurn]
 	currentTurn++
 	clients.set(nick, ws)
+	order.push(nick)
+
 	console.log("Registered", nick, clients.size)
 	ws.send(JSON.stringify({ type: "NICK", nick: nick }))
 	clients.get("host")?.send(JSON.stringify({ type: "newPlayer", nick }))
@@ -176,7 +178,6 @@ const handleAnswer = (msg: AnswerMessage) => {
 	console.log("Answer", msg.answer)
 	const next = clients.get(order[0])
 
-	console.log(pawns.keys(), "Next", next)
 
 	if(next == undefined) {
 		console.error("No next player")
