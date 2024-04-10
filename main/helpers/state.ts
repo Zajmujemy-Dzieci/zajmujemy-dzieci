@@ -69,6 +69,7 @@ class Game {
 
     this.state = GameState.Answer;
     this.timer = setTimeout(() => {
+      console.log("Timeout");
       handleAnswer({ type: "answer", answer: "Timeout" });
     }, 5000); // 10 seconds timeout
 

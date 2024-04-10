@@ -178,8 +178,13 @@ const handleDiceThrow = (msg: DiceThrowMessage) => {
 }
 
 export const handleAnswer = (msg: AnswerMessage) => {
-	if(game.validateAnswer(game.order[0], msg.answer))	
+	const who = game.getActivePlayer()
+	if(game.validateAnswer(who, msg.answer))	{
 		notifyNextPlayer()
+		if (msg.answer === "Timeout") {
+			game.clients.get(who)?.send(JSON.stringify({ type: "timeout" }))
+		}
+	}
 }
 
 const notifyNextPlayer = () => {
