@@ -33,7 +33,8 @@ export const websockets_client = (address: string) => `<!DOCTYPE html>
                 ws.send(JSON.stringify({ type: 'dice', dice: Math.floor(Math.random() * 6) + 1 }));
             if(parsed?.type === 'question'){
                 console.log("call")
-                showAnswers(4); //Tu nalezy przeslac ile odpowiedzi trzeba wyswietlic
+                console.log(parsed.possibleAnswers)
+                showAnswers(parsed.possibleAnswers); //Tu nalezy przeslac ile odpowiedzi trzeba wyswietlic
                 //Przyda sie jeszcze 
             }
                 
@@ -49,7 +50,7 @@ export const websockets_client = (address: string) => `<!DOCTYPE html>
             });
 
             document.getElementById('answer').addEventListener('click', () => {
-                ws.send(JSON.stringify({type: 'answer', answer: 'C'}));
+                ws.send(JSON.stringify({type: 'answer', answer: 'C', nick:nick}));
             });
             document.getElementById('throwDice').addEventListener('click', () => {
                 console.log('Throwing dice' + nick);
@@ -120,7 +121,7 @@ export const websockets_client = (address: string) => `<!DOCTYPE html>
         }
 
         function sendAnswer(answer){
-            ws.send(JSON.stringify({ type: 'answer', answer: answer }));
+            ws.send(JSON.stringify({ type: 'answer', nick:nick ,answer: answer }));
         }        
 
         

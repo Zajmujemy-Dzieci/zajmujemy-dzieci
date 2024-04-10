@@ -53,10 +53,28 @@ const loadQuestion = (question:Question | null) => {
     globalSetQuestion(question);        
 };
 
-const revealAnswer = (chosen:number|null) => {
+const revealAnswer = (chosen:string|null) => {
     if(!globalSetChosen) return;
-
-    globalSetChosen(chosen);
+    switch(chosen){
+        case "A":
+            globalSetChosen(0);
+            break;
+        case "B":
+            globalSetChosen(1);
+            break;
+        case "C":
+            globalSetChosen(2);
+            break;
+        case "D":
+            globalSetChosen(3);
+            break;
+        case "E":
+            globalSetChosen(4);
+            break;
+        case "F":
+            globalSetChosen(5);
+            break;
+    }
 };
 
 function QuestionPopup() {

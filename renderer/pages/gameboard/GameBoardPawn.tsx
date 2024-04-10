@@ -14,18 +14,19 @@ type GameBoardPawnProps = {
 };
 
 // TODO: socket communication attachment
-function redirectToQuestionPage(player: Player, ws: WebSocket) {
-  ws.send(JSON.stringify({ type: "question", nick: player.nick }));
+function redirectToQuestionPage(player: Player, ws: WebSocket) {  
   const sampleQuestion = new Question(
     "What is the capital of France?",
     ["Paris", "Berlin", "Madrid", "Yekaterinburgh"],
     0 
   );
 
+  const possibleAnswers = sampleQuestion.answers.length; // To powinno byc pobierane z Quesion
+  console.log("PosAnswers:" + possibleAnswers);
   loadQuestion(sampleQuestion);
-  //revealAnswer(0);
 
-  //loadQuestion(sampleQuestion);
+  ws.send(JSON.stringify({ type: "question", possibleAnswers: possibleAnswers, nick: player.nick }));
+
 
 }
 
@@ -64,6 +65,9 @@ export default function GameBoardPawn({
         console.log("Data type: ", data.type);
         if (data.type === "movePawn" && data.nick == player.nick) {
           movePawn(data.fieldsToMove);
+        }
+        else if(data.type == 'answer' && data.nick == player.nick){
+          revealAnswer(data.answer)
         }
       };
     }

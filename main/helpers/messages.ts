@@ -16,6 +16,7 @@ export interface DiceThrowMessage extends ClientMessage {
 export interface AnswerMessage extends ClientMessage {
 	type: "answer"
 	answer: string
+	nick: string
 }
 
 export interface ServerMessage {
@@ -36,6 +37,7 @@ export interface MovePawnMessage extends ClientMessage {
 export interface QuestionMessage extends ClientMessage {
 	type: "question",
 	nick: string
+	possibleAnswers: number
 }
 
 export interface NickMessage extends ClientMessage {
@@ -144,8 +146,9 @@ const handleMovePawn = (nick: string, fieldsToMove: number) => {
 
 const handleQuestion = (msg: QuestionMessage) => {
 	const ws = clients.get(msg.nick)
-	console.log("Question", msg.nick)
-	ws?.send(JSON.stringify({ type: "question" }))
+	const possibleAnswers = msg.possibleAnswers
+	console.log("Question", msg.nick,msg.possibleAnswers)
+	ws?.send(JSON.stringify({ type: "question" ,possibleAnswers: possibleAnswers}))
 }
 
 const handleMessageToClient = (msg: ServerMessage, ws: WebSocket) => {
@@ -158,5 +161,8 @@ const handleDiceThrow = (msg: DiceThrowMessage) => {
 }
 
 const handleAnswer = (msg: AnswerMessage) => {
-	console.log("Answer", msg.answer)
+	console.log("Answer", msg.answer, msg.nick)
+	const ws = pawns.get(msg.nick)
+	ws?.send(JSON.stringify({ type: "answer" ,answer:msg.answer ,nick:msg.nick}))
+	
 }
