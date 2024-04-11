@@ -100,7 +100,7 @@ function QuestionPopup() {
     });
     //}
     return (question) ? (
-        <div className="w-full h-full mt-2 absolute left-0 top-0 flex justify-center items-center" onClick={()=>loadQuestion(null)} > 
+        <div className="w-full h-full mt-2 absolute left-0 top-0 flex justify-center items-center z-10" onClick={()=>loadQuestion(null)} > 
             <div className="text-5xl border-b-5 w-2/5 text-center mt-3">
                 <div className="border-b-0 border-black justify-center flex items-center pt-10 pb-10 bg-blue-800" >{question.content}</div>
                 <div className="bg-childBlack justify-center p-5 flex"><div className="w-3/4">{questionList}</div></div>            

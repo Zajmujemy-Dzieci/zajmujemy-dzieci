@@ -1,5 +1,5 @@
 export interface ClientMessage {
-	type: "register" | "ping" | "dice" | "answer" | "regPawn" | "movePawn" | "question" | 'NICK'
+	type: "register" | "ping" | "dice" | "answer" | "regPawn" | "movePawn" | "question" | 'NICK' | 'gameFinish'
 }
 
 export interface RegisterMessage extends ClientMessage {
@@ -43,6 +43,10 @@ export interface QuestionMessage extends ClientMessage {
 export interface NickMessage extends ClientMessage {
 	type: "NICK",
 	nick: string
+}
+
+export interface GameFinishMessage extends ClientMessage {
+	type: "gameFinish"
 }
 
 
@@ -91,6 +95,13 @@ export const handleMessage = (msg: ClientMessage, ws: WebSocket) => {
 			const questionMsg = msg as QuestionMessage
 			handleQuestion(questionMsg);
 			break
+
+		case "gameFinish":
+			console.log("Received game finish msg");
+			const gameFinishMsg = msg as GameFinishMessage;
+			handleGameFinish(gameFinishMsg)
+			break;
+		
 
 		default:
 			console.error("Unknown message type", JSON.stringify(msg))
@@ -164,5 +175,15 @@ const handleAnswer = (msg: AnswerMessage) => {
 	console.log("Answer", msg.answer, msg.nick)
 	const ws = pawns.get(msg.nick)
 	ws?.send(JSON.stringify({ type: "answer" ,answer:msg.answer ,nick:msg.nick}))
+	
+}
+
+const handleGameFinish = (msg : GameFinishMessage) => {
+	console.log("Game Finish Message")
+	const clientEntries = Array.from(clients.entries());
+	clientEntries.forEach(([key,value]) => {
+		const ws = value; 
+		ws?.send(JSON.stringify({ type: "gameFinish"}))
+	})
 	
 }
