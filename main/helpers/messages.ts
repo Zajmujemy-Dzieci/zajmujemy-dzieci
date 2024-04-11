@@ -10,6 +10,7 @@ export interface ClientMessage {
     | "movePawn"
     | "question"
     | "NICK"
+    | "gameFinish"
     | "reset";
 }
 
@@ -56,6 +57,15 @@ export interface NickMessage extends ClientMessage {
   nick: string;
 }
 
+export interface GameFinishMessage extends ClientMessage {
+  type: "gameFinish";
+}
+
+export type TurnMessage = {
+  type: "yourTurn";
+  nick: string;
+};
+
 export const handleMessage = (msg: ClientMessage, ws: WebSocket) => {
   switch (msg.type) {
     case "ping":
@@ -94,9 +104,11 @@ export const handleMessage = (msg: ClientMessage, ws: WebSocket) => {
 
     case "reset":
       console.log("Game ended, resetting state");
-      game.clients.clear();
-      game.pawns.clear();
-      game.order = [];
+
+    case "gameFinish":
+      console.log("Received game finish msg");
+      const gameFinishMsg = msg as GameFinishMessage;
+      handleGameFinish(gameFinishMsg);
       break;
 
     default:
@@ -229,4 +241,17 @@ const notifyNextPlayer = () => {
     return;
   }
   next.send(JSON.stringify({ type: "throwDice", nick: game.order[0] }));
+};
+
+const handleGameFinish = (msg: GameFinishMessage) => {
+  console.log("Game Finish Message");
+  const clientEntries = Array.from(game.clients.entries());
+  clientEntries.forEach(([key, value]) => {
+    const ws = value;
+    ws?.send(JSON.stringify({ type: "gameFinish" }));
+  });
+
+  game.clients.clear();
+  game.pawns.clear();
+  game.order = [];
 };

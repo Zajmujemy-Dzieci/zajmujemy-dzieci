@@ -22,7 +22,7 @@ function redirectToQuestionPage(player: Player, ws: WebSocket) {
     0 
   );
 
-  const possibleAnswers = sampleQuestion.answers.length; // To powinno byc pobierane z Quesion
+  const possibleAnswers = sampleQuestion.answers.length; // To powinno byc pobierane z Question
   console.log("PosAnswers:" + possibleAnswers);
   loadQuestion(sampleQuestion);
 
@@ -31,7 +31,9 @@ function redirectToQuestionPage(player: Player, ws: WebSocket) {
 
 }
 
-function handleFinishGame(player: Player, ws: WebSocket) {}
+function handleFinishGame(player: Player, ws: WebSocket) {
+  ws.send(JSON.stringify({ type: "gameFinish"}));
+}
 
 export default function GameBoardPawn({
   player,

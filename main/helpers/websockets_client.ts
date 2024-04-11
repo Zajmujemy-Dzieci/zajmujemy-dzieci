@@ -38,7 +38,11 @@ export const websockets_client = (address: string) => `<!DOCTYPE html>
             }
             if(parsed?.type === 'timeout') // only useful for timeout
                 showWaitForYourTurn(true);
-                
+            if(parsed?.type === 'gameFinish'){
+                showWaitForYourTurn(false); 
+                showAnswers(0); 
+                showFinishGame(true); 
+            }
         };
 
       
@@ -104,14 +108,26 @@ export const websockets_client = (address: string) => `<!DOCTYPE html>
 
         function showWaitForYourTurn(showOrNot){
             let waitDiv = document.getElementById("waitDiv");
-            waitDiv.innerText = "Czekaj na swoją kolej"
+            let children = waitDiv.children;
+            children[1].innerText = "Czekaj na swoją kolej"
             waitDiv.style.display = showOrNot ? "flex" : "none";        
         }
 
         function showWaitForGameStart(showOrNot){
             let waitDiv = document.getElementById("waitDiv");
-            waitDiv.innerText = "Poczekaj na rozpoczęcie gry"
+            let children = waitDiv.children;
+            children[1].innerText = "Poczekaj na rozpoczęcie gry"
             waitDiv.style.display = showOrNot ? "flex" : "none";        
+        }
+
+        function showFinishGame(showOrNot){
+            let waitDiv = document.getElementById("waitDiv");
+            let children = waitDiv.children;
+            children[1].innerText = "Gra zakończyła się"
+            children[0].src = "./images/finishFlag.png"
+
+            waitDiv.style.display = showOrNot ? "flex" : "none";            
+ 
         }
 
         function askToConfirm(whichAns){
@@ -240,7 +256,7 @@ export const websockets_client = (address: string) => `<!DOCTYPE html>
     </div>
 
     <div id="waitDiv">
-        <img src="./images/hourglass.png"></img>
+        <img src="./images/hourglass.png" id="waitDivImg"></img>
         <p>Poczekaj na rozpoczęcie gry</p>
     </div>
 
