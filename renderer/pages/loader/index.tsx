@@ -186,7 +186,7 @@ export default function Loader() {
           Usuń wszystkie pytania
         </button>
         <div className="has-tooltip mt-3">
-          <span className="tooltip rounded shadow-lg p-1 bg-gray-900 text-base -mt-8">
+          <span className="tooltip rounded shadow-lg p-1 bg-childBlack text-base -mt-8">
             Pytania będą pojawiały się w losowej kolejności po zaznaczeniu tej
             opcji
           </span>

@@ -1,11 +1,12 @@
 import Head from "next/head";
-import React, { useState } from "react";
+import React from "react";
 import { useAtom } from "jotai";
 import { GameBoardConfiguration } from "../../types/GameBoardConfiguration";
 import { gameBoardConfigurationAtom } from "../../models/GameConfigAtom";
 import Link from "next/link";
 
 export default function ConfigPage() {
+
   const [gameBoardConfiguration, setGameBoardConfiguration] =
     useAtom<GameBoardConfiguration>(gameBoardConfigurationAtom);
 
@@ -27,18 +28,22 @@ export default function ConfigPage() {
         <form className="text-3xl">
           <div className="mb-4">
             <label htmlFor="numberOfQuestionFields" className="block mb-2">
-              Liczba pól z pytaniami:
+              Łączna liczba pól:
             </label>
-            <input
-              type="number"
-              id="numberOfQuestionFields"
-              name="numberOfQuestionFields"
-              value={gameBoardConfiguration.numberOfQuestionFields}
-              onChange={handleInputChange}
-              min="1"
-              max="15"
-              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500 text-gray-800"
-            />
+            <div className="flex justify-evenly items-center">
+              <div>
+                <input type="radio" id="option30" name="numberOfQuestionFields" value="14" defaultChecked onChange={handleInputChange}/>
+                <label>30</label>
+              </div>
+              <div>
+                <input type="radio" id="option28" name="numberOfQuestionFields" value="13" onChange={handleInputChange}/>
+                <label>28</label>
+              </div>
+              <div>
+                <input type="radio" id="option26" name="numberOfQuestionFields" value="12" onChange={handleInputChange}/>
+                <label>26</label>
+              </div>
+            </div>
           </div>
           <div className="mb-4">
             <label htmlFor="numberOfGoodSpecialFields" className="block mb-2">
@@ -52,8 +57,9 @@ export default function ConfigPage() {
               onChange={handleInputChange}
               min="0"
               max={
-                gameBoardConfiguration.numberOfQuestionFields -
-                gameBoardConfiguration.numberOfBadSpecialFields
+                Math.max(0, 
+                  gameBoardConfiguration.numberOfQuestionFields -
+                  gameBoardConfiguration.numberOfBadSpecialFields)
               }
               className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500 text-gray-800"
             />
@@ -70,8 +76,9 @@ export default function ConfigPage() {
               onChange={handleInputChange}
               min="0"
               max={
-                gameBoardConfiguration.numberOfQuestionFields -
-                gameBoardConfiguration.numberOfGoodSpecialFields
+                Math.max(0, 
+                  gameBoardConfiguration.numberOfQuestionFields -
+                  gameBoardConfiguration.numberOfGoodSpecialFields)
               }
               className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500 text-gray-800"
             />
@@ -81,7 +88,10 @@ export default function ConfigPage() {
               <a className="btn-blue mx-4">Wróć</a>
             </Link>
             <Link href="/QRcode_page">
-              <a className="btn-blue mx-4">Przejdź dalej</a>
+              {/* This ugly beast below is the thing that must stay as the "useState" didn't work properly here */}
+              <a className={`btn-blue mx-4 ${!(gameBoardConfiguration.numberOfBadSpecialFields >= 0 && gameBoardConfiguration.numberOfGoodSpecialFields >= 0 && gameBoardConfiguration.numberOfBadSpecialFields + gameBoardConfiguration.numberOfGoodSpecialFields <= gameBoardConfiguration.numberOfQuestionFields) ? 'pointer-events-none opacity-50' : ''}`}>
+                Przejdź dalej
+              </a>
             </Link>
           </div>
         </form>
