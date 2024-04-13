@@ -78,9 +78,8 @@ export default function Loader() {
         if (content) {
           const questions = zQuestion.parse(JSON.parse(content));
 
-          // Sprawdź czy tablica questions jest pusta
           if (questions.length === 0) {
-            alert("Wczytany plik JSON jest pusty.");
+            alert("Wczytany plik z pytaniami jest pusty.");
             return;
           }
 
@@ -96,7 +95,7 @@ export default function Loader() {
           loadQuestionsFromList();
         }
       } catch (error) {
-        alert("W wybranym pliku JSON znajduje się błąd, proszę spróbować wybrać inny plik.");
+        alert("W wybranym pliku z pytaniami znajduje się błąd, proszę spróbować wybrać inny plik.");
         console.error("Error loading questions from file:", error);
       }
     };
