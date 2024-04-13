@@ -98,7 +98,7 @@ export default function GameBoardComponent({
 
   let currentColumn = 1;
   let currentRow = 2;
-  let target = numberOfColumns - 2;
+  let target = numberOfRows;
   let upOrDown = "up";
   let colClass = currentColumn;
   let rowClass = currentRow;
@@ -190,7 +190,7 @@ export default function GameBoardComponent({
       )}
       <div
         style={{ gridRow: 1, gridColumn: 1 }}
-        className="bg-childBlack h-32 w-32"
+        className="bg-childBlack h-28 w-28"
       >
         START
       </div>
@@ -209,7 +209,7 @@ export default function GameBoardComponent({
             }}
             className={twMerge(
               mapTypeOnColor(type),
-              "h-32 w-32 flex flex-wrap justify-center content-center items-center p-3"
+              "h-28 w-28 flex flex-wrap justify-center content-center items-center p-3"
             )}
           ></div>
         );

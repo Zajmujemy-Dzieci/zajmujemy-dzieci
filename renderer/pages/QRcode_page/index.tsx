@@ -32,7 +32,8 @@ export default function QRcodePage() {
     }
   }
 
-  const p = [  // for debugging purposes
+  const p = [
+    // for debugging purposes
     {
       orderId: 0,
       nick: "gracz1",
@@ -50,11 +51,47 @@ export default function QRcodePage() {
       nick: "gracz3",
       score: 0,
       background: "bg-blue-400",
-    }
-  ] 
+    },
+    {
+      orderId: 3,
+      nick: "gracz4",
+      score: 0,
+      background: "bg-blue-400",
+    },
+    {
+      orderId: 4,
+      nick: "gracz5",
+      score: 0,
+      background: "bg-blue-400",
+    },
+    {
+      orderId: 5,
+      nick: "gracz6",
+      score: 0,
+      background: "bg-blue-400",
+    },
+    {
+      orderId: 6,
+      nick: "gracz7",
+      score: 0,
+      background: "bg-blue-400",
+    },
+    {
+      orderId: 7,
+      nick: "gracz8",
+      score: 0,
+      background: "bg-blue-400",
+    },
+    {
+      orderId: 8,
+      nick: "gracz9",
+      score: 0,
+      background: "bg-blue-400",
+    },
+  ];
 
   useEffect(() => {
-    setPlayers([]);    // setPlayers(p); for debugging purposes
+    setPlayers(p); // setPlayers(p); for debugging purposes
     axios
       .get<string>("http://localhost:3000/ipaddress")
       .then((response) => handleConnectToServer(response))
