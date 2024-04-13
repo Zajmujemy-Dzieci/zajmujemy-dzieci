@@ -74,9 +74,19 @@ export default function GameBoardComponent({
     numberOfGoodSpecialFields,
     numberOfBadSpecialFields,
   } = configuration;
+  function countNumberOfColumns(numberOfQuestionFields: number) {
+    if (numberOfQuestionFields < 6) return 7;
+    if (numberOfQuestionFields < 10) return 7;
+    if (numberOfQuestionFields < 12) return 8;
+    if (numberOfQuestionFields < 16) return 9;
+    else return 9;
+  }
 
-  const numberOfColumns = Math.floor((numberOfQuestionFields * 2) / 3) - 1;
+  const numberOfColumns = countNumberOfColumns(numberOfQuestionFields);
+  console.log("numberOfColumns", numberOfColumns);
   const totalFields = 2 * numberOfQuestionFields + 2;
+  const numberOfRows = Math.ceil(totalFields / numberOfColumns) + 2;
+  console.log("numberOfRows", numberOfRows);
 
   const getBoardFieldSpecialty = (index: number): BoardFieldSpecialty => {
     if (index === totalFields - 1) return "start";
@@ -103,7 +113,7 @@ export default function GameBoardComponent({
       currentColumn++;
       colClass = currentColumn;
       currentColumn++;
-      target += numberOfColumns - 3;
+      target += numberOfRows;
       if (upOrDown === "up") upOrDown = "down";
       else upOrDown = "up";
       gridPositions.push({
