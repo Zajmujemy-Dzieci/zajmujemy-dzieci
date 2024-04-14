@@ -1,5 +1,5 @@
 export interface ClientMessage {
-	type: "register" | "ping" | "dice" | "answer" | "regPawn" | "movePawn" | "question" | 'NICK' 
+	type: "register" | "ping" | "dice" | "answer" | "regPawn" | "movePawn" | "question" | 'NICK' | 'reset'
 }
 
 export interface RegisterMessage extends ClientMessage {
@@ -85,6 +85,13 @@ export const handleMessage = (msg: ClientMessage, ws: WebSocket) => {
 		case "question":
 			const questionMsg = msg as QuestionMessage
 			handleQuestion(questionMsg);
+			break
+
+		case "reset":
+			console.log("Game ended, resetting state")
+			clients.clear()
+			pawns.clear()
+			order = []
 			break
 
 		default:
