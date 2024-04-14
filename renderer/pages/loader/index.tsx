@@ -59,11 +59,17 @@ export default function Loader() {
     }
   };
 
-  const loadQuestionsFromFile = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const loadQuestionsFromFile = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file: File | undefined = event.target.files?.[0];
     if (!file) return;
+
+    const fileName = file.name;
+    const fileExtension = fileName.split(".").pop()?.toLowerCase();
+    if (fileExtension !== "json") {
+      alert("Proszę wybrać plik w formacie JSON.");
+      return;
+    }
+
     const reader: FileReader = new FileReader();
     reader.onload = (event) => {
       try {
@@ -71,18 +77,25 @@ export default function Loader() {
         const content = event.target?.result?.toString();
         if (content) {
           const questions = zQuestion.parse(JSON.parse(content));
+
+          if (questions.length === 0) {
+            alert("Wczytany plik z pytaniami jest pusty.");
+            return;
+          }
+
           questions.map((question: QuestionType) => {
             questionList.addQuestion(
-              new Question(
-                question.content,
-                question.answers,
-                question.correctAnswerId
-              )
+                new Question(
+                    question.content,
+                    question.answers,
+                    question.correctAnswerId
+                )
             );
           });
           loadQuestionsFromList();
         }
       } catch (error) {
+        alert("W wybranym pliku z pytaniami znajduje się błąd, proszę spróbować wybrać inny plik.");
         console.error("Error loading questions from file:", error);
       }
     };
