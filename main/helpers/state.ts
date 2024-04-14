@@ -28,6 +28,10 @@ class Game {
     this.state = GameState.Throw;
   }
 
+  isInProgress() {
+    return this.state === GameState.Throw || this.state === GameState.Question || this.state === GameState.Answer;
+  }
+
   validateDiceThrow(by: string, value: number): boolean {
     console.log(`Dice thrown by ${by}, ${value}`);
 

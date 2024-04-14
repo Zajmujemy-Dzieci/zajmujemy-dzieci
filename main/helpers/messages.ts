@@ -141,15 +141,31 @@ const handleRegister = (msg: RegisterMessage, ws: WebSocket) => {
 		ws.send(JSON.stringify({ type: "registered" }))
 		return
 	}
-	let nick = nicks[currentTurn]
-	currentTurn++
-	game.clients.set(nick, client)
-	game.order.push(nick)
 
-	console.log("Registered", nick, game.clients.size)
-	ws.send(JSON.stringify({ type: "NICK", nick: nick }))
-	const newPlayerMessage: NewPlayerMessage = { type: "newPlayer", nick }
-	game.clients.get("host")?.sendHost(newPlayerMessage)
+	if (game.isInProgress()) {
+		game.clients.get(msg.nick)?.isOnline((alive) => {
+			if (alive) {
+				console.log("Can't reconnect when client is online", msg.nick)
+			} else {
+				console.log("Player reconnected", msg.nick)
+				game.clients.set(msg.nick, client)
+				if(game.getActivePlayer() === msg.nick) {
+					notifyNextPlayer()
+				} 
+				ws.send(JSON.stringify({ type: "NICK", nick: msg.nick }))
+			}
+		}) 
+	} else {
+		let nick = nicks[currentTurn]
+		currentTurn++
+		game.clients.set(nick, client)
+		game.order.push(nick)
+	
+		console.log("Registered", nick, game.clients.size)
+		ws.send(JSON.stringify({ type: "NICK", nick: nick }))
+		const newPlayerMessage: NewPlayerMessage = { type: "newPlayer", nick }
+		game.clients.get("host")?.sendHost(newPlayerMessage)
+	}
 }
 
 const handlePawnRegister = (msg: PawnRegisterMessage, ws: WebSocket) => {
