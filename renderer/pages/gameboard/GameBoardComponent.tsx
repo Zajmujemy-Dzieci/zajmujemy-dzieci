@@ -95,10 +95,8 @@ export default function GameBoardComponent({
   }
 
   const numberOfColumns = countNumberOfColumns(numberOfQuestionFields);
-  console.log("numberOfColumns", numberOfColumns);
   const totalFields = 2 * numberOfQuestionFields + 2;
   const numberOfRows = Math.ceil(totalFields / numberOfColumns) + 2;
-  console.log("numberOfRows", numberOfRows);
   const { badFields, goodFields } = getSpecialFieldsPlaces(
     numberOfBadSpecialFields,
     numberOfGoodSpecialFields,
@@ -110,9 +108,6 @@ export default function GameBoardComponent({
     badFields: number[],
     goodFields: number[]
   ): BoardFieldSpecialty => {
-    console.log(index % (totalFields / numberOfGoodSpecialFields));
-    console.log(index % (totalFields / numberOfBadSpecialFields));
-    console.log(index, "index");
     if (index === totalFields - 1) return "start";
     if (goodFields.includes(index)) return "good";
     if (badFields.includes(index)) return "bad";
