@@ -8,6 +8,8 @@ import { z } from "zod";
 import { QuestionType } from "../../types/QuestionType";
 import Image from "next/image";
 import QuestionSection from "./QuestionSection";
+import styles from "./styles.module.scss";
+import classNames from "classnames";
 
 const zQuestion = z.array(
   z.object({
@@ -132,8 +134,12 @@ export default function Loader() {
     loadQuestionsFromList();
   };
 
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const handleDeleteAllQuestions = () => {
     questionList.questions = [];
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
     loadQuestionsFromList();
   };
 
@@ -165,11 +171,16 @@ export default function Loader() {
         </button>
         <h1 className="mt-4">Prześlij swój plik z pytaniami: </h1>
         <input
+          id="file-input"
           type="file"
           accept=".json"
+          ref={fileInputRef}
           onChange={loadQuestionsFromFile}
-          className="text-white font-bold py-2 px-4 rounded bg-secondary mx-auto my-3 text-center"
-        />
+          className={classNames(
+            styles.fileInput,
+            "text-white font-bold py-2 px-4 rounded bg-secondary mx-auto my-3"
+          )}
+        ></input>
         <h1 className="mt-4">Aktualne pytania</h1>
         <div className="py-2 h-[40vh] w-[40vw] overflow-auto">
           {loadedQuestions.map((question, index) => (
