@@ -143,7 +143,11 @@ const handleRegister = (msg: RegisterMessage, ws: WebSocket) => {
 	}
 
 	if (game.isInProgress()) {
-		game.clients.get(msg.nick)?.isOnline((alive) => {
+		const replacedClient = game.clients.get(msg.nick)
+		if(replacedClient === undefined) {
+			console.log("Client not connected", msg.nick)
+		}
+		replacedClient!.isOnline((alive) => {
 			if (alive) {
 				console.log("Can't reconnect when client is online", msg.nick)
 			} else {
