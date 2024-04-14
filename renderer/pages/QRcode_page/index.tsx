@@ -91,7 +91,7 @@ export default function QRcodePage() {
   ];
 
   useEffect(() => {
-    setPlayers(p); // setPlayers(p); for debugging purposes
+    setPlayers([]); // setPlayers(p); for debugging purposes
     axios
       .get<string>("http://localhost:3000/ipaddress")
       .then((response) => handleConnectToServer(response))
