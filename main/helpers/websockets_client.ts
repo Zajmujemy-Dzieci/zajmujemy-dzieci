@@ -30,6 +30,8 @@ export const websockets_client = (address: string) => `<!DOCTYPE html>
             document.getElementById('turn').innerText = "Odpowiedz!";
         if(parsed?.type === 'timeout') // only useful for timeout
             document.getElementById('turn').innerText = "No i nie zdążyłeś!";
+        if(parsed?.type === 'ping')
+            ws.send(JSON.stringify({type: 'pong', nick}));
 
     };
 

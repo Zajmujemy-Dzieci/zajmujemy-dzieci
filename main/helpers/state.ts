@@ -1,4 +1,5 @@
 import { handleAnswer, handleDiceThrow } from "./messages";
+import Client from './client'
 
 // Forming a main game loop
 enum GameState {
@@ -11,7 +12,7 @@ enum GameState {
 
 // First Law of Distributed Object Design: "don't distribute your objects"
 class Game {
-  clients = new Map<string, WebSocket>();
+  clients = new Map<string, Client>();
   pawns = new Map<string, WebSocket>();
   order = new Array<string>();
 
@@ -58,7 +59,7 @@ class Game {
       return null;
     }
 
-    const ws = this.clients.get(to);
+    const ws = this.clients.get(to)?.ws;
 
     if (!ws) {
       console.error("No such player");
