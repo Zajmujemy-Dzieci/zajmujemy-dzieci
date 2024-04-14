@@ -52,6 +52,8 @@ export default function GameBoardComponent({
   }
 
   const [ws, setWs] = useAtom(webSocketAtom);
+  const [goodFields, setGoodFields] = useState<number[]>([]);
+  const [badFields, setBadFields] = useState<number[]>([]);
 
   const {
     numberOfQuestionFields,
@@ -97,11 +99,16 @@ export default function GameBoardComponent({
   const numberOfColumns = countNumberOfColumns(numberOfQuestionFields);
   const totalFields = 2 * numberOfQuestionFields + 2;
   const numberOfRows = Math.ceil(totalFields / numberOfColumns) + 2;
-  const { badFields, goodFields } = getSpecialFieldsPlaces(
-    numberOfBadSpecialFields,
-    numberOfGoodSpecialFields,
-    numberOfQuestionFields
-  );
+
+  useEffect(() => {
+    const { badFields, goodFields } = getSpecialFieldsPlaces(
+      numberOfBadSpecialFields,
+      numberOfGoodSpecialFields,
+      numberOfQuestionFields
+    );
+    setBadFields(badFields);
+    setGoodFields(goodFields);
+  }, []);
 
   const getBoardFieldSpecialty = (
     index: number,
