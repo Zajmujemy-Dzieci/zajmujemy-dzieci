@@ -132,8 +132,12 @@ export default function Loader() {
     loadQuestionsFromList();
   };
 
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const handleDeleteAllQuestions = () => {
     questionList.questions = [];
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
     loadQuestionsFromList();
   };
 
@@ -159,6 +163,7 @@ export default function Loader() {
           id="file-input"
           type="file"
           accept=".json"
+          ref={fileInputRef}
           onChange={loadQuestionsFromFile}
           className={classNames(
             styles.fileInput,
