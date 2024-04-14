@@ -10,6 +10,7 @@ import Image from "next/image";
 import QuestionSection from "./QuestionSection";
 import styles from "./styles.module.scss";
 import classNames from "classnames";
+import ActionButton from "./ActionButton";
 
 const zQuestion = z.array(
   z.object({
@@ -150,9 +151,6 @@ export default function Loader() {
 
   return (
     <React.Fragment>
-      <Head>
-        <title>Import to/Eksport from file</title>
-      </Head>
       <div className="flex flex-col gap-2 justify-center items-center content-center p-6 text-2xl w-full text-center">
         <div className="p-5">
           <Image
@@ -163,13 +161,9 @@ export default function Loader() {
             height={128}
           />
         </div>
-        <button
-          onClick={loadQuestionstoFile}
-          className="text-white font-bold py-2 px-4 rounded bg-secondary mx-auto my-3"
-        >
-          Pobierz swoje pytania
-        </button>
-        <h1 className="mt-4">Prześlij swój plik z pytaniami: </h1>
+        <h2 className={styles.questionsHeader}>
+          Prześlij swój plik z pytaniami:{" "}
+        </h2>
         <input
           id="file-input"
           type="file"
@@ -178,33 +172,46 @@ export default function Loader() {
           onChange={loadQuestionsFromFile}
           className={classNames(
             styles.fileInput,
-            "text-white font-bold py-2 px-4 rounded bg-secondary mx-auto my-3"
+            "text-white font-bold py-2 px-4 rounded  mx-auto my-3"
           )}
         ></input>
-        <h1 className="mt-4">Aktualne pytania</h1>
-        <div className="py-2 h-[40vh] w-[40vw] overflow-auto">
-          {loadedQuestions.map((question, index) => (
-            <QuestionSection
-              key={index}
-              question={question}
-              index={index}
-              handleEditQuestion={handleEditQuestion}
-              handleDeleteQuestion={handleDeleteQuestion}
-            />
-          ))}
+        {loadedQuestions.length !== 0 && (
+          <>
+            <h2 className={styles.questionsHeader}>Aktualne pytania</h2>
+            <div
+              className={classNames(
+                "py-2 h-[40vh] w-[40vw] overflow-auto",
+                styles.scrollableElement
+              )}
+            >
+              {loadedQuestions.map((question, index) => (
+                <QuestionSection
+                  key={index}
+                  question={question}
+                  index={index}
+                  handleEditQuestion={handleEditQuestion}
+                  handleDeleteQuestion={handleDeleteQuestion}
+                />
+              ))}
+            </div>
+          </>
+        )}
+        <div className="flex justify-center gap-2">
+          <ActionButton
+            clickHandler={handleAddQuestion}
+            label="Dodaj pytanie"
+            className="bg-childGreen"
+          />
+          <ActionButton
+            clickHandler={handleDeleteAllQuestions}
+            label="Usuń pytania"
+            className="bg-childRed"
+          />
+          <ActionButton
+            clickHandler={loadQuestionstoFile}
+            label="Pobierz pytania"
+          />
         </div>
-        <button
-          className="text-white font-bold py-2 px-4 rounded bg-secondary mx-auto"
-          onClick={handleAddQuestion}
-        >
-          Dodaj pytanie
-        </button>
-        <button
-          className="text-white font-bold py-2 px-4 rounded bg-secondary mx-auto mt-2"
-          onClick={handleDeleteAllQuestions}
-        >
-          Usuń wszystkie pytania
-        </button>
         <div className="has-tooltip mt-3">
           <span className="tooltip rounded shadow-lg p-1 bg-childBlack text-base -mt-8">
             Pytania będą pojawiały się w losowej kolejności po zaznaczeniu tej
