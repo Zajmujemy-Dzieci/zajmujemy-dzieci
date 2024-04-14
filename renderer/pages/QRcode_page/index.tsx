@@ -155,9 +155,9 @@ export default function QRcodePage() {
         ))}
       </div>
       <div className="flex justify-center text-4xl flex-col items-center m-10">
-        <p>Adres do połączenia się: {ipAddress}:3000</p>
+        <p>Adres do połączenia się: http://{ipAddress}:3000</p>
         <div className="m-10">
-          <QRCode value={`${ipAddress}:3000`} className="m-10" size={400} />
+          <QRCode value={`http://${ipAddress}:3000`} className="m-10" size={400} />
         </div>
 
         <Link href="/gameboard">
