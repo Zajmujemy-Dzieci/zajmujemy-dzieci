@@ -1,0 +1,11 @@
+.fileInput {
+  &::file-selector-button {
+    background-color: #301a4b;
+    color: #fff;
+    border: solid 3px #ffeaec;
+    border-radius: 5px;
+    padding: 7px;
+    margin-right: 2rem;
+    margin-left: 1rem;
+  }
+}
