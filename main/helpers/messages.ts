@@ -162,7 +162,7 @@ const handleMessageToClient = (msg: ServerMessage, ws: WebSocket) => {
 	ws.send(JSON.stringify(msg))
 }
 
-const handleDiceThrow = (msg: DiceThrowMessage) => {
+export const handleDiceThrow = (msg: DiceThrowMessage) => {
 	if (game.validateDiceThrow(msg.nick, msg.dice)) {
 		handleMovePawn(msg.nick, msg.dice)
 
