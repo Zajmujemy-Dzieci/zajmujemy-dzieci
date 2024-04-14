@@ -1,5 +1,5 @@
 import path from "path"
-import { app, ipcMain } from "electron"
+import { app, ipcMain, net } from "electron"
 import serve from "electron-serve"
 import { createWindow } from "./helpers"
 import { stringify } from "querystring"
@@ -23,19 +23,22 @@ express_app.use(cors())
 
 function getIpAddress() {
 	const networkInterfaces = os.networkInterfaces()
+	let ipv4Addresses: string[] = []
 	let ipv4Address
 	Object.keys(networkInterfaces).forEach(interfaceName => {
 		networkInterfaces[interfaceName].forEach(networkInterface => {
 			if (
-				networkInterface.family === "IPv4" &&
-				!networkInterface.internal
+				networkInterface.family === "IPv4" && networkInterface.address.startsWith('192.168')
 			) {
-				ipv4Address = networkInterface.address
+				console.log(networkInterface.address)
+				ipv4Addresses.push(networkInterface.address)
 			}
 		})
 	})
-	return ipv4Address
-	// return '192.168.137.1'
+	if ('192.168.137.1' in ipv4Addresses) {
+		return '192.168.137.1';
+	}
+	return ipv4Addresses[0]
 }
 
 express_app.get("/ipaddress", (req, res) => {
