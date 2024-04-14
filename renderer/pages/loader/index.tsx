@@ -6,6 +6,8 @@ import { QuestionList } from "../../models/QuestionList";
 import { Question } from "../../models/Question";
 import { z } from "zod";
 import { QuestionType } from "../../types/QuestionType";
+import styles from "./styles.module.scss";
+import classNames from "classnames";
 
 const zQuestion = z.array(
   z.object({
@@ -59,7 +61,9 @@ export default function Loader() {
     }
   };
 
-  const loadQuestionsFromFile = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const loadQuestionsFromFile = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file: File | undefined = event.target.files?.[0];
     if (!file) return;
 
@@ -85,17 +89,19 @@ export default function Loader() {
 
           questions.map((question: QuestionType) => {
             questionList.addQuestion(
-                new Question(
-                    question.content,
-                    question.answers,
-                    question.correctAnswerId
-                )
+              new Question(
+                question.content,
+                question.answers,
+                question.correctAnswerId
+              )
             );
           });
           loadQuestionsFromList();
         }
       } catch (error) {
-        alert("W wybranym pliku z pytaniami znajduje się błąd, proszę spróbować wybrać inny plik.");
+        alert(
+          "W wybranym pliku z pytaniami znajduje się błąd, proszę spróbować wybrać inny plik."
+        );
         console.error("Error loading questions from file:", error);
       }
     };
@@ -126,8 +132,12 @@ export default function Loader() {
     loadQuestionsFromList();
   };
 
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const handleDeleteAllQuestions = () => {
     questionList.questions = [];
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
     loadQuestionsFromList();
   };
 
@@ -150,11 +160,16 @@ export default function Loader() {
         </button>
         <h1 className="mt-4">Prześlij swój plik z pytaniami: </h1>
         <input
+          id="file-input"
           type="file"
           accept=".json"
+          ref={fileInputRef}
           onChange={loadQuestionsFromFile}
-          className="text-white font-bold py-2 px-4 rounded bg-secondary mx-auto my-3 text-center"
-        />
+          className={classNames(
+            styles.fileInput,
+            "text-white font-bold py-2 px-4 rounded bg-secondary mx-auto my-3"
+          )}
+        ></input>
         <h1 className="mt-4">Aktualne pytania</h1>
         <div className="py-2">
           {loadedQuestions.map((question, index) => (
