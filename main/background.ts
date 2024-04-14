@@ -91,6 +91,7 @@ if (isProd) {
 			sandbox: false,
 			nodeIntegration: true,
 		},
+		autoHideMenuBar: true,
 	})
 
 	if (isProd) {
