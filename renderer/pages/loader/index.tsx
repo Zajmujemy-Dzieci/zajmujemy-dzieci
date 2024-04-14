@@ -6,6 +6,8 @@ import { QuestionList } from "../../models/QuestionList";
 import { Question } from "../../models/Question";
 import { z } from "zod";
 import { QuestionType } from "../../types/QuestionType";
+import Image from "next/image";
+import QuestionSection from "./QuestionSection";
 
 const zQuestion = z.array(
   z.object({
@@ -59,7 +61,9 @@ export default function Loader() {
     }
   };
 
-  const loadQuestionsFromFile = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const loadQuestionsFromFile = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file: File | undefined = event.target.files?.[0];
     if (!file) return;
 
@@ -85,17 +89,19 @@ export default function Loader() {
 
           questions.map((question: QuestionType) => {
             questionList.addQuestion(
-                new Question(
-                    question.content,
-                    question.answers,
-                    question.correctAnswerId
-                )
+              new Question(
+                question.content,
+                question.answers,
+                question.correctAnswerId
+              )
             );
           });
           loadQuestionsFromList();
         }
       } catch (error) {
-        alert("W wybranym pliku z pytaniami znajduje się błąd, proszę spróbować wybrać inny plik.");
+        alert(
+          "W wybranym pliku z pytaniami znajduje się błąd, proszę spróbować wybrać inny plik."
+        );
         console.error("Error loading questions from file:", error);
       }
     };
@@ -141,7 +147,16 @@ export default function Loader() {
       <Head>
         <title>Import to/Eksport from file</title>
       </Head>
-      <div className="grid grid-col-1 text-2xl w-full text-center">
+      <div className="flex flex-col gap-2 justify-center items-center content-center p-6 text-2xl w-full text-center">
+        <div className="p-5">
+          <Image
+            className="ml-auto mr-auto"
+            src="/images/logo.png"
+            alt="Logo image"
+            width={128}
+            height={128}
+          />
+        </div>
         <button
           onClick={loadQuestionstoFile}
           className="text-white font-bold py-2 px-4 rounded bg-secondary mx-auto my-3"
@@ -156,34 +171,15 @@ export default function Loader() {
           className="text-white font-bold py-2 px-4 rounded bg-secondary mx-auto my-3 text-center"
         />
         <h1 className="mt-4">Aktualne pytania</h1>
-        <div className="py-2">
+        <div className="py-2 h-[40vh] w-[40vw] overflow-auto">
           {loadedQuestions.map((question, index) => (
-            <div key={index} className="border border-gray-300 p-4 mb-4">
-              <p className="font-bold">Pytanie {index + 1}:</p>
-              <p>{question.content}</p>
-              <p className="font-bold">Odpowiedzi:</p>
-              <ul>
-                {question.answers.map((answer, idx) => (
-                  <li key={idx}>
-                    {answer}{" "}
-                    {idx === question.correctAnswerId &&
-                      "(Odpowiedź prawidłowa)"}
-                  </li>
-                ))}
-              </ul>
-              <button
-                className="text-white font-bold py-2 px-4 rounded bg-secondary mx-auto my-3"
-                onClick={handleEditQuestion(index)}
-              >
-                Edytuj pytanie
-              </button>
-              <button
-                className="text-white font-bold py-2 px-4 rounded bg-secondary mx-auto my-3 ml-2"
-                onClick={handleDeleteQuestion(index)}
-              >
-                Usuń pytanie
-              </button>
-            </div>
+            <QuestionSection
+              key={index}
+              question={question}
+              index={index}
+              handleEditQuestion={handleEditQuestion}
+              handleDeleteQuestion={handleDeleteQuestion}
+            />
           ))}
         </div>
         <button
@@ -214,9 +210,9 @@ export default function Loader() {
           </label>
         </div>
         {minimumQuestionsNumber <= questionList.getQuestionsNumber() && (
-          <Link href="/config_page">
+          <Link href="/config_page" className="">
             <button
-              className="text-white font-bold py-2 px-4 rounded bg-secondary mx-auto mt-2"
+              className="text-white font-bold py-2 px-4 rounded bg-childBlack border-solid border-2 mx-auto"
               onClick={handleGoNext}
             >
               Przejdź dalej
