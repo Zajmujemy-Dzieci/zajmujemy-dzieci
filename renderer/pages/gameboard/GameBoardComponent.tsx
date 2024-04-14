@@ -37,22 +37,6 @@ function mapTypeOnColor(type: BoardFieldSpecialty) {
   }
 }
 
-// UNUSED PURPOSELY - preparing for future use
-
-function changePosition(
-  players: Player[],
-  currentPlayer: Player,
-  newPosition: number
-) {
-  const newPlayers = players.map((player) => {
-    if (player.orderId === currentPlayer.orderId) {
-      return { ...player, position: newPosition };
-    }
-    return player;
-  });
-  return newPlayers;
-}
-
 export default function GameBoardComponent({
   configuration,
   players,
@@ -76,10 +60,38 @@ export default function GameBoardComponent({
   } = configuration;
   function countNumberOfColumns(numberOfQuestionFields: number) {
     if (numberOfQuestionFields < 6) return 7;
-    if (numberOfQuestionFields < 10) return 7;
-    if (numberOfQuestionFields < 12) return 8;
-    if (numberOfQuestionFields < 16) return 9;
+    if (numberOfQuestionFields < 10) return 8;
+    if (numberOfQuestionFields < 12) return 9;
+    if (numberOfQuestionFields < 16) return 11;
     else return 9;
+  }
+
+  function getSpecialFieldsPlaces(
+    numberOfBadSpecialFields: number,
+    numberOfGoodSpecialFields: number,
+    numberOfQuestionFields: number
+  ) {
+    const badFields: number[] = [];
+    const goodFields: number[] = [];
+    while (goodFields.length < numberOfGoodSpecialFields) {
+      const randomIndex =
+        Math.floor(Math.random() * (numberOfQuestionFields * 2)) + 1;
+      if (randomIndex % 2 === 0 && !goodFields.includes(randomIndex)) {
+        goodFields.push(randomIndex);
+      }
+    }
+    while (badFields.length < numberOfBadSpecialFields) {
+      const randomIndex =
+        Math.floor(Math.random() * (numberOfQuestionFields * 2)) + 1;
+      if (
+        randomIndex % 2 === 0 &&
+        !badFields.includes(randomIndex) &&
+        !goodFields.includes(randomIndex)
+      ) {
+        badFields.push(randomIndex);
+      }
+    }
+    return { badFields, goodFields };
   }
 
   const numberOfColumns = countNumberOfColumns(numberOfQuestionFields);
@@ -87,12 +99,23 @@ export default function GameBoardComponent({
   const totalFields = 2 * numberOfQuestionFields + 2;
   const numberOfRows = Math.ceil(totalFields / numberOfColumns) + 2;
   console.log("numberOfRows", numberOfRows);
+  const { badFields, goodFields } = getSpecialFieldsPlaces(
+    numberOfBadSpecialFields,
+    numberOfGoodSpecialFields,
+    numberOfQuestionFields
+  );
 
-  const getBoardFieldSpecialty = (index: number): BoardFieldSpecialty => {
+  const getBoardFieldSpecialty = (
+    index: number,
+    badFields: number[],
+    goodFields: number[]
+  ): BoardFieldSpecialty => {
+    console.log(index % (totalFields / numberOfGoodSpecialFields));
+    console.log(index % (totalFields / numberOfBadSpecialFields));
+    console.log(index, "index");
     if (index === totalFields - 1) return "start";
-    if (index % (2 * (numberOfGoodSpecialFields - 1)) === 0) return "good";
-    if (index % (2 * (numberOfBadSpecialFields - 1)) === 0) return "bad";
-
+    if (goodFields.includes(index)) return "good";
+    if (badFields.includes(index)) return "bad";
     return index % 2 === 0 ? "empty" : "question";
   };
 
@@ -120,9 +143,13 @@ export default function GameBoardComponent({
         index,
         colClass,
         rowClass,
-        type: getBoardFieldSpecialty(index),
+        type: getBoardFieldSpecialty(index, badFields, goodFields),
       });
-      return { colClass, rowClass, type: getBoardFieldSpecialty(index) };
+      return {
+        colClass,
+        rowClass,
+        type: getBoardFieldSpecialty(index, badFields, goodFields),
+      };
     }
     if (upOrDown === "down") {
       rowClass = currentRow;
@@ -131,18 +158,26 @@ export default function GameBoardComponent({
           index,
           colClass,
           rowClass,
-          type: getBoardFieldSpecialty(index),
+          type: getBoardFieldSpecialty(index, badFields, goodFields),
         });
-        return { colClass, rowClass, type: getBoardFieldSpecialty(index) };
+        return {
+          colClass,
+          rowClass,
+          type: getBoardFieldSpecialty(index, badFields, goodFields),
+        };
       }
       currentRow--;
       gridPositions.push({
         index,
         colClass,
         rowClass,
-        type: getBoardFieldSpecialty(index),
+        type: getBoardFieldSpecialty(index, badFields, goodFields),
       });
-      return { colClass, rowClass, type: getBoardFieldSpecialty(index) };
+      return {
+        colClass,
+        rowClass,
+        type: getBoardFieldSpecialty(index, badFields, goodFields),
+      };
     }
     rowClass = currentRow;
     if (index === target - 1) {
@@ -150,18 +185,26 @@ export default function GameBoardComponent({
         index,
         colClass,
         rowClass,
-        type: getBoardFieldSpecialty(index),
+        type: getBoardFieldSpecialty(index, badFields, goodFields),
       });
-      return { colClass, rowClass, type: getBoardFieldSpecialty(index) };
+      return {
+        colClass,
+        rowClass,
+        type: getBoardFieldSpecialty(index, badFields, goodFields),
+      };
     }
     currentRow++;
     gridPositions.push({
       index,
       colClass,
       rowClass,
-      type: getBoardFieldSpecialty(index),
+      type: getBoardFieldSpecialty(index, badFields, goodFields),
     });
-    return { colClass, rowClass, type: getBoardFieldSpecialty(index) };
+    return {
+      colClass,
+      rowClass,
+      type: getBoardFieldSpecialty(index, badFields, goodFields),
+    };
   };
 
   const [isPopupOpen, setPopupOpen] = useState(false);
@@ -194,12 +237,12 @@ export default function GameBoardComponent({
       >
         START
       </div>
-      {Array.from({ length: totalFields - 2 }, (_, index) => {
+      {Array.from({ length: totalFields - 1 }, (_, index) => {
         const {
           colClass: col,
           rowClass: row,
           type,
-        } = getGridPosition(index + 2, numberOfColumns);
+        } = getGridPosition(index + 1, numberOfColumns);
         return (
           <div
             key={index}
