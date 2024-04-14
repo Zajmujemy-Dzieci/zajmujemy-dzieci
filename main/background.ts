@@ -1,5 +1,5 @@
 import path from "path"
-import { app, ipcMain, net } from "electron"
+import { app, ipcMain } from "electron"
 import serve from "electron-serve"
 import { createWindow } from "./helpers"
 import { stringify } from "querystring"
@@ -30,7 +30,6 @@ function getIpAddress() {
 			if (
 				networkInterface.family === "IPv4" && networkInterface.address.startsWith('192.168')
 			) {
-				console.log(networkInterface.address)
 				ipv4Addresses.push(networkInterface.address)
 			}
 		})
