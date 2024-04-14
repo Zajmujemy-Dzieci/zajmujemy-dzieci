@@ -37,22 +37,6 @@ function mapTypeOnColor(type: BoardFieldSpecialty) {
   }
 }
 
-// UNUSED PURPOSELY - preparing for future use
-
-function changePosition(
-  players: Player[],
-  currentPlayer: Player,
-  newPosition: number
-) {
-  const newPlayers = players.map((player) => {
-    if (player.orderId === currentPlayer.orderId) {
-      return { ...player, position: newPosition };
-    }
-    return player;
-  });
-  return newPlayers;
-}
-
 export default function GameBoardComponent({
   configuration,
   players,
@@ -68,27 +52,78 @@ export default function GameBoardComponent({
   }
 
   const [ws, setWs] = useAtom(webSocketAtom);
+  const [goodFields, setGoodFields] = useState<number[]>([]);
+  const [badFields, setBadFields] = useState<number[]>([]);
 
   const {
     numberOfQuestionFields,
     numberOfGoodSpecialFields,
     numberOfBadSpecialFields,
   } = configuration;
+  function countNumberOfColumns(numberOfQuestionFields: number) {
+    if (numberOfQuestionFields < 6) return 7;
+    if (numberOfQuestionFields < 10) return 8;
+    if (numberOfQuestionFields < 12) return 9;
+    if (numberOfQuestionFields < 16) return 11;
+    else return 9;
+  }
 
-  const numberOfColumns = Math.floor((numberOfQuestionFields * 2) / 3) - 1;
+  function getSpecialFieldsPlaces(
+    numberOfBadSpecialFields: number,
+    numberOfGoodSpecialFields: number,
+    numberOfQuestionFields: number
+  ) {
+    const badFields: number[] = [];
+    const goodFields: number[] = [];
+    while (goodFields.length < numberOfGoodSpecialFields) {
+      const randomIndex =
+        Math.floor(Math.random() * (numberOfQuestionFields * 2)) + 1;
+      if (randomIndex % 2 === 0 && !goodFields.includes(randomIndex)) {
+        goodFields.push(randomIndex);
+      }
+    }
+    while (badFields.length < numberOfBadSpecialFields) {
+      const randomIndex =
+        Math.floor(Math.random() * (numberOfQuestionFields * 2)) + 1;
+      if (
+        randomIndex % 2 === 0 &&
+        !badFields.includes(randomIndex) &&
+        !goodFields.includes(randomIndex)
+      ) {
+        badFields.push(randomIndex);
+      }
+    }
+    return { badFields, goodFields };
+  }
+
+  const numberOfColumns = countNumberOfColumns(numberOfQuestionFields);
   const totalFields = 2 * numberOfQuestionFields + 2;
+  const numberOfRows = Math.ceil(totalFields / numberOfColumns) + 2;
 
-  const getBoardFieldSpecialty = (index: number): BoardFieldSpecialty => {
+  useEffect(() => {
+    const { badFields, goodFields } = getSpecialFieldsPlaces(
+      numberOfBadSpecialFields,
+      numberOfGoodSpecialFields,
+      numberOfQuestionFields
+    );
+    setBadFields(badFields);
+    setGoodFields(goodFields);
+  }, []);
+
+  const getBoardFieldSpecialty = (
+    index: number,
+    badFields: number[],
+    goodFields: number[]
+  ): BoardFieldSpecialty => {
     if (index === totalFields - 1) return "start";
-    if (index % (2 * (numberOfGoodSpecialFields - 1)) === 0) return "good";
-    if (index % (2 * (numberOfBadSpecialFields - 1)) === 0) return "bad";
-
+    if (goodFields.includes(index)) return "good";
+    if (badFields.includes(index)) return "bad";
     return index % 2 === 0 ? "empty" : "question";
   };
 
   let currentColumn = 1;
   let currentRow = 2;
-  let target = numberOfColumns - 2;
+  let target = numberOfRows;
   let upOrDown = "up";
   let colClass = currentColumn;
   let rowClass = currentRow;
@@ -103,16 +138,20 @@ export default function GameBoardComponent({
       currentColumn++;
       colClass = currentColumn;
       currentColumn++;
-      target += numberOfColumns - 3;
+      target += numberOfRows;
       if (upOrDown === "up") upOrDown = "down";
       else upOrDown = "up";
       gridPositions.push({
         index,
         colClass,
         rowClass,
-        type: getBoardFieldSpecialty(index),
+        type: getBoardFieldSpecialty(index, badFields, goodFields),
       });
-      return { colClass, rowClass, type: getBoardFieldSpecialty(index) };
+      return {
+        colClass,
+        rowClass,
+        type: getBoardFieldSpecialty(index, badFields, goodFields),
+      };
     }
     if (upOrDown === "down") {
       rowClass = currentRow;
@@ -121,18 +160,26 @@ export default function GameBoardComponent({
           index,
           colClass,
           rowClass,
-          type: getBoardFieldSpecialty(index),
+          type: getBoardFieldSpecialty(index, badFields, goodFields),
         });
-        return { colClass, rowClass, type: getBoardFieldSpecialty(index) };
+        return {
+          colClass,
+          rowClass,
+          type: getBoardFieldSpecialty(index, badFields, goodFields),
+        };
       }
       currentRow--;
       gridPositions.push({
         index,
         colClass,
         rowClass,
-        type: getBoardFieldSpecialty(index),
+        type: getBoardFieldSpecialty(index, badFields, goodFields),
       });
-      return { colClass, rowClass, type: getBoardFieldSpecialty(index) };
+      return {
+        colClass,
+        rowClass,
+        type: getBoardFieldSpecialty(index, badFields, goodFields),
+      };
     }
     rowClass = currentRow;
     if (index === target - 1) {
@@ -140,18 +187,26 @@ export default function GameBoardComponent({
         index,
         colClass,
         rowClass,
-        type: getBoardFieldSpecialty(index),
+        type: getBoardFieldSpecialty(index, badFields, goodFields),
       });
-      return { colClass, rowClass, type: getBoardFieldSpecialty(index) };
+      return {
+        colClass,
+        rowClass,
+        type: getBoardFieldSpecialty(index, badFields, goodFields),
+      };
     }
     currentRow++;
     gridPositions.push({
       index,
       colClass,
       rowClass,
-      type: getBoardFieldSpecialty(index),
+      type: getBoardFieldSpecialty(index, badFields, goodFields),
     });
-    return { colClass, rowClass, type: getBoardFieldSpecialty(index) };
+    return {
+      colClass,
+      rowClass,
+      type: getBoardFieldSpecialty(index, badFields, goodFields),
+    };
   };
 
   const [isPopupOpen, setPopupOpen] = useState(false);
@@ -180,16 +235,16 @@ export default function GameBoardComponent({
       )}
       <div
         style={{ gridRow: 1, gridColumn: 1 }}
-        className="bg-childBlack h-32 w-32"
+        className="bg-childBlack h-28 w-28"
       >
         START
       </div>
-      {Array.from({ length: totalFields - 2 }, (_, index) => {
+      {Array.from({ length: totalFields - 1 }, (_, index) => {
         const {
           colClass: col,
           rowClass: row,
           type,
-        } = getGridPosition(index + 2, numberOfColumns);
+        } = getGridPosition(index + 1, numberOfColumns);
         return (
           <div
             key={index}
@@ -199,7 +254,7 @@ export default function GameBoardComponent({
             }}
             className={twMerge(
               mapTypeOnColor(type),
-              "h-32 w-32 flex flex-wrap justify-center content-center items-center p-3"
+              "h-28 w-28 flex flex-wrap justify-center content-center items-center p-3"
             )}
           ></div>
         );
