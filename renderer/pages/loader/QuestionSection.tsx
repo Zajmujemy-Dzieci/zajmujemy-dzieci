@@ -20,6 +20,10 @@ export default function QuestionSection({
     setIsContentVisible(!isContentVisible);
   };
 
+  if (!question) {
+    return <div>Brak pytań</div>;
+  }
+
   return (
     <div key={index} className="p-4 mb-4">
       <div
