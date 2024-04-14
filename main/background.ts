@@ -5,6 +5,7 @@ import { createWindow } from "./helpers"
 import { stringify } from "querystring"
 import { ClientMessage, handleMessage } from "./helpers/messages"
 import { websockets_client } from "./helpers/websockets_client"
+import * as http from 'http';
 
 const os = require("os")
 const cors = require("cors")
@@ -59,7 +60,7 @@ express_app.listen(PORT, () => {
 	console.log(`Serwer działa na porcie ${PORT}`)
 })
 
-express_app.ws("/ws", function (ws, req) {
+express_app.ws("/ws", function (ws: WebSocket, req: http.IncomingMessage) {
 	ws.on("message", function (msg) {
 		let parsed = null
 		try {
