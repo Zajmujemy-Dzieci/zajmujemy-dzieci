@@ -151,7 +151,7 @@ export default function Loader() {
 
   return (
     <React.Fragment>
-      <div className="flex flex-col gap-2 justify-center items-center content-center p-6 text-2xl w-full text-center">
+      <div className="flex flex-col gap-4 justify-center items-center content-center p-6 text-2xl w-full text-center">
         <div className="p-5">
           <Image
             className="ml-auto mr-auto"
