@@ -32,16 +32,16 @@ export default function ConfigPage() {
             </label>
             <div className="flex justify-evenly items-center">
               <div>
-                <input type="radio" id="option30" name="numberOfQuestionFields" value="14" defaultChecked onChange={handleInputChange}/>
-                <label>30</label>
+                <input type="radio" id="option29" name="numberOfQuestionFields" value="14" defaultChecked onChange={handleInputChange}/>
+                <label>29</label>
               </div>
               <div>
-                <input type="radio" id="option28" name="numberOfQuestionFields" value="13" onChange={handleInputChange}/>
-                <label>28</label>
+                <input type="radio" id="option27" name="numberOfQuestionFields" value="13" onChange={handleInputChange}/>
+                <label>27</label>
               </div>
               <div>
-                <input type="radio" id="option26" name="numberOfQuestionFields" value="12" onChange={handleInputChange}/>
-                <label>26</label>
+                <input type="radio" id="option25" name="numberOfQuestionFields" value="12" onChange={handleInputChange}/>
+                <label>25</label>
               </div>
             </div>
           </div>
