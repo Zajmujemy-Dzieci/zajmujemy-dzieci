@@ -1,4 +1,4 @@
-import { handleAnswer } from "./messages";
+import { handleAnswer, handleDiceThrow } from "./messages";
 
 // Forming a main game loop
 enum GameState {
@@ -9,7 +9,6 @@ enum GameState {
   End,
 }
 
-
 // First Law of Distributed Object Design: "don't distribute your objects"
 class Game {
   clients = new Map<string, WebSocket>();
@@ -18,7 +17,6 @@ class Game {
 
   timer: NodeJS.Timeout | null = null;
   state: GameState = GameState.Starting;
-
 
   getActivePlayer() {
     return this.order[0];
@@ -93,9 +91,17 @@ class Game {
     this.order = [...this.order.slice(1), this.order[0]];
     this.state = GameState.Throw;
 
+    this.timer = setTimeout(() => {
+      console.log("Timeout dice throw");
+      handleDiceThrow({
+        type: "dice",
+        nick: this.getActivePlayer(),
+        dice: 1,
+      });
+    }, 5000);
+
     return true;
   }
 }
 
 export default new Game();
-
