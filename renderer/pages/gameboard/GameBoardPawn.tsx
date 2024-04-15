@@ -105,9 +105,9 @@ export default function GameBoardPawn({
       } else if (boardFields[newPosition].type === "finish") {
         handleFinishGame(player, ws);
       } else if (boardFields[newPosition].type === "good" && !specialFlag) {
-        handleGoodField(player, ws);
+        handleGoodField();
       } else if (boardFields[newPosition].type === "bad" && !specialFlag) {
-        handleBadField(player, ws);
+        handleBadField();
       }
       return newPosition;
     });
