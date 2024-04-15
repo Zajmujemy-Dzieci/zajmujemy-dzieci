@@ -3,6 +3,7 @@ export type Player = {
   nick: string;
   score: number;
   background: string;
+  iconName: string;
 };
 
 export type PlayersQueue = {

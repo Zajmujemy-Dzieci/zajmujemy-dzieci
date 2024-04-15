@@ -105,7 +105,7 @@ const handlePing = (ws: WebSocket) => {
 	ws.send(JSON.stringify({ type: "pong" }))
 }
 
-const nicks = ["żółw", "wiewiórka", "mysz", "pies", "kot", "słoń", "koń", "ryba", "kruk"]  // rat to mysz
+const nicks = ["żółw", "wiewiórka", "mysz", "pies", "kot", "słoń", "miś", "ryba", "kruk"]  // rat to mysz
 let currentTurn = 0
 
 const handleRegister = (msg: RegisterMessage, ws: WebSocket) => {
