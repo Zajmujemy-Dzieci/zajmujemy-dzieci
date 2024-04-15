@@ -7,7 +7,6 @@ import { useAtom } from "jotai";
 import { Player } from "../../types/Player";
 import { playersQueueAtom } from "../../models/PlayersQueueAtom";
 import { webSocketAtom } from "../../models/WebSocketAtom";
-import { BsFillPersonFill } from "react-icons/bs";
 import LazyIcon, { iconsMap } from "../../models/IconsManager";
 
 export default function QRcodePage() {
@@ -33,17 +32,6 @@ export default function QRcodePage() {
       };
     }
   }
-//   export const iconsMap = new Map<string, string>([
-//     ["żółw", "GiTurtle"],
-//     ["wiewiórka", "GiSquirrel"],
-//     ["mysz", "GiRat"],
-//     ["pies", "GiSittingDog"],
-//     ["kot", "GiCat"],
-//     ["słoń", "GiElephant"],
-//     ["miś", "GiBearFace"],
-//     ["ryba", "IoFish"],
-//     ["kruk", "GiRaven"]
-// ]);
 
   const p = [
     // for debugging purposes
