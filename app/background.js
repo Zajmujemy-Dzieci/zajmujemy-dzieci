@@ -230,7 +230,7 @@ const handleRegister = (msg, ws) => {
     }));
     return;
   }
-  let nick = nicks[currentTurn];
+  let nick = nicks[currentTurn % nicks.length];
   currentTurn++;
   _state__WEBPACK_IMPORTED_MODULE_4__["default"].clients.set(nick, ws);
   _state__WEBPACK_IMPORTED_MODULE_4__["default"].order.push(nick);
