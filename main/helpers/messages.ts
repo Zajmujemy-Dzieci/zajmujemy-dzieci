@@ -145,7 +145,7 @@ const handleRegister = (msg: RegisterMessage, ws: WebSocket) => {
     ws.send(JSON.stringify({ type: "registered" }));
     return;
   }
-  let nick = nicks[currentTurn];
+  let nick = nicks[currentTurn % nicks.length];
   currentTurn++;
   game.clients.set(nick, ws);
   game.order.push(nick);
