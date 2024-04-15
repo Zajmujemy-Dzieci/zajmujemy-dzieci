@@ -50,7 +50,7 @@ export default function GameBoardPawn({
         console.log("Received message: ", event.data);
         console.log("Data type: ", data.type);
         if (data.type === "movePawn" && data.nick == player.nick) {
-          movePawn(data.fieldsToMove);
+          movePawn(data.fieldsToMove, false);
         }
       };
     }
@@ -66,16 +66,28 @@ export default function GameBoardPawn({
   }, []);
 
   async function handleGoodField(player: Player, ws: WebSocket) {
-    await handleOpenSpecialPopup("Idziesz 3 pola do przodu!");
-    // TODO: communicates + actions SCRUM-55
+    const fieldsToMove = Math.floor(Math.random()*4) + 1;
+    if (fieldsToMove == 1){ 
+      await handleOpenSpecialPopup("Idziesz 1 pole do przodu!");
+    }
+    else {
+      await handleOpenSpecialPopup(`Idziesz ${fieldsToMove} pola do przodu`);
+    }
+    movePawn(fieldsToMove, true);
   }
 
   async function handleBadField(player: Player, ws: WebSocket) {
-    await handleOpenSpecialPopup("Idziesz 3 pola do tyłu!");
-    // TODO: communicates + actions SCRUM-55
+    const fieldsToMove = Math.floor(Math.random()*4) + 1;
+    if (fieldsToMove == 1){ 
+      await handleOpenSpecialPopup("Idziesz 1 pole do tyłu!");
+    }
+    else {
+      await handleOpenSpecialPopup(`Idziesz ${fieldsToMove} pola do tyłu`);
+    }
+    movePawn(-fieldsToMove, true);
   }
 
-  async function movePawn(fieldsToMove: number) {
+  async function movePawn(fieldsToMove: number, specialFlag:boolean) {
     await setCurrentPosition((prevPosition) => {
       const newPosition = prevPosition + fieldsToMove;
       if (newPosition >= boardFields.length - 1) {
@@ -83,14 +95,18 @@ export default function GameBoardPawn({
         handleFinishGame(player, ws);
         return boardFields.length - 1;
       }
+      if (newPosition <= 0) {
+        player.score = 0;
+        return 0;
+      }
       player.score = currentPosition + fieldsToMove;
-      if (boardFields[newPosition].type === "question") {
+      if (boardFields[newPosition].type === "question" && !specialFlag) {
         redirectToQuestionPage(player, ws);
       } else if (boardFields[newPosition].type === "finish") {
         handleFinishGame(player, ws);
-      } else if (boardFields[newPosition].type === "good") {
+      } else if (boardFields[newPosition].type === "good" && !specialFlag) {
         handleGoodField(player, ws);
-      } else if (boardFields[newPosition].type === "bad") {
+      } else if (boardFields[newPosition].type === "bad" && !specialFlag) {
         handleBadField(player, ws);
       }
       return newPosition;
@@ -105,7 +121,7 @@ export default function GameBoardPawn({
         transform: `translate(${shift.x}px, ${shift.y}px)`,
       }}
       // TODO: remove after connecting to socket
-      onClick={() => movePawn(1)}
+      onClick={() => movePawn(1, false)}
       className={twMerge(
         "bg-white h-6 w-6 rounded-full my-2.5 mx-2.5",
         player.background
