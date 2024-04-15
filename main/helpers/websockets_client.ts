@@ -27,8 +27,11 @@ export const websockets_client = (address: string) => `<!DOCTYPE html>
             // ws.send(JSON.stringify({ type: 'dice', dice: Math.floor(Math.random() * 6) + 1, nick }));
         }
         if(parsed?.type === 'question')
-            ws.send(JSON.stringify({ type: 'answer', answer: 'C' }));
-      };
+            document.getElementById('turn').innerText = "Odpowiedz!";
+        if(parsed?.type === 'timeout') // only useful for timeout
+            document.getElementById('turn').innerText = "No i nie zdążyłeś!";
+
+    };
 
 
         const init = () => {
@@ -38,6 +41,7 @@ export const websockets_client = (address: string) => `<!DOCTYPE html>
             });
 
           document.getElementById('answer').addEventListener('click', () => {
+              document.getElementById('turn').innerText = "Czekaj..";
               ws.send(JSON.stringify({type: 'answer', answer: 'C'}));
           });
             document.getElementById('throwDice').addEventListener('click', () => {
