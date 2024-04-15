@@ -100,6 +100,9 @@ class Game {
         nick: this.getActivePlayer(),
         dice: 1,
       });
+      this.clients
+        .get(this.getActivePlayer())
+        ?.send(JSON.stringify({ type: "timeout" }));
     }, 5000);
 
     return true;
