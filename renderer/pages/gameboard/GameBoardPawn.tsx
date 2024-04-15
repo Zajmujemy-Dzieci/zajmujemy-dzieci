@@ -65,7 +65,7 @@ export default function GameBoardPawn({
       });
   }, []);
 
-  async function handleGoodField(player: Player, ws: WebSocket) {
+  async function handleGoodField() {
     const fieldsToMove = Math.floor(Math.random()*4) + 1;
     if (fieldsToMove == 1){ 
       await handleOpenSpecialPopup("Idziesz 1 pole do przodu!");
@@ -76,7 +76,7 @@ export default function GameBoardPawn({
     movePawn(fieldsToMove, true);
   }
 
-  async function handleBadField(player: Player, ws: WebSocket) {
+  async function handleBadField() {
     const fieldsToMove = Math.floor(Math.random()*4) + 1;
     if (fieldsToMove == 1){ 
       await handleOpenSpecialPopup("Idziesz 1 pole do tyłu!");
