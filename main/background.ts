@@ -94,6 +94,7 @@ if (isProd) {
 			nodeIntegration: true,
 		},
 		autoHideMenuBar: true,
+		icon: (__dirname + "/../resources/icon.ico")
 	})
 
 	if (isProd) {
