@@ -104,6 +104,10 @@ export default function GameBoardPawn({
         return boardFields.length - 1;
       }
       player.score = currentPosition + fieldsToMove;
+      if (boardFields[newPosition].type !== "question") {
+        ws.send(JSON.stringify({ type: "question", nick: '', possibleAnswers: 0 }));
+        console.log("No question")
+      }
       if (boardFields[newPosition].type === "question") {
         redirectToQuestionPage(player, ws);
       } else if (boardFields[newPosition].type === "finish") {

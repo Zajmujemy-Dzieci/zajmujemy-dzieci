@@ -1,7 +1,7 @@
 //To change what client browser displays use:
 //showWaitForGameStartPage(arg:bool)
 //showDicePage(arg:bool);
-//showAnswersPage(arg:bool)
+//showAnswersPage(arg:number)
 //showFinishGamePage(arg:bool)
 //showWaitForYourTurn(arg:bool)
 //Passing true to one of them automatically passes false to every other.
@@ -25,6 +25,7 @@ export const websockets_client = (address: string) => `<!DOCTYPE html>
         };
 
         ws.onmessage = (msg) => {
+            console.log('Received:', msg.data, Date.now());
             const parsed = JSON.parse(msg.data);
             console.log(parsed);
             if (parsed?.type === 'NICK'){
@@ -43,7 +44,7 @@ export const websockets_client = (address: string) => `<!DOCTYPE html>
                 showAnswersPage(parsed.possibleAnswers); 
             }
             if(parsed?.type === 'timeout') // only useful for timeout
-                showWaitForYourTurn(true);
+            showWaitForYourTurnPage(true);
             if(parsed?.type === 'gameFinish'){
                 showFinishGamePage(true);
             }
@@ -100,7 +101,8 @@ export const websockets_client = (address: string) => `<!DOCTYPE html>
         window.onload = init
         
         
-        function showAnswersPage(howMany){    
+        function showAnswersPage(howMany){ 
+               
             if(howMany == 0){ 
                 let answersDiv = document.getElementById("answers");
                 answersDiv.style.display = "none";
@@ -108,6 +110,7 @@ export const websockets_client = (address: string) => `<!DOCTYPE html>
             }     
             else{ 
                 showWaitForYourTurnPage(false);
+                showDicePage(false);
                 let answersDiv = document.getElementById("answers");
                 answersDiv.style.display = "block";
                 let answers = document.getElementsByClassName("ans");

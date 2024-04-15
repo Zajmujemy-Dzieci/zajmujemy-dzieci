@@ -116,17 +116,6 @@ export const handleMessage = (msg: ClientMessage, ws: WebSocket) => {
   }
 };
 
-export const throwDice = (nick: string) => {
-  const ws = game.clients.get(nick);
-
-  if (!ws) {
-    console.error("No such ws", nick);
-    return;
-  }
-
-  ws.send(JSON.stringify({ type: "throwDice" }));
-};
-
 const handlePing = (ws: WebSocket) => {
   console.log("Ping");
   ws.send(JSON.stringify({ type: "pong" }));
@@ -194,6 +183,14 @@ const handleMovePawn = (nick: string, fieldsToMove: number) => {
 };
 
 const handleQuestion = (msg: QuestionMessage) => {
+  if (msg.nick === "" && msg.possibleAnswers === 0) {
+    game.validateQuestion(game.getActivePlayer());
+    console.log("No question");
+    game.validateAnswer(game.getActivePlayer(), "No Question");
+    notifyNextPlayer();
+    return;
+  }
+
   const ws = game.validateQuestion(msg.nick);
 
   if (ws) {

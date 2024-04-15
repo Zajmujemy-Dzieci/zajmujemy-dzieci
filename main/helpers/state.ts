@@ -1,7 +1,7 @@
 import { handleAnswer, handleDiceThrow } from "./messages";
 
 // Forming a main game loop
-enum GameState {
+export enum GameState {
   Starting,
   Throw,
   Question,
@@ -39,6 +39,8 @@ class Game {
       console.error("Not your turn", by, this.getActivePlayer());
       return false;
     }
+
+    if (this.timer) clearTimeout(this.timer);
 
     this.state = GameState.Question;
 
