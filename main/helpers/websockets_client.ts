@@ -1,5 +1,10 @@
-// This is dumb, but html files do not like building
-
+//To change what client browser displays use:
+//showWaitForGameStartPage(arg:bool)
+//showDicePage(arg:bool);
+//showAnswersPage(arg:bool)
+//showFinishGamePage(arg:bool)
+//showWaitForYourTurn(arg:bool)
+//Passing true to one of them automatically passes false to every other.
 export const websockets_client = (address: string) => `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -25,41 +30,32 @@ export const websockets_client = (address: string) => `<!DOCTYPE html>
             if (parsed?.type === 'NICK'){
                 nick = parsed.nick;
                 console.log('Nick:', nick);
-                showWaitForGameStart(true);
+                showWaitForGameStartPage(true);
 
             }
-            if(parsed?.type === 'throwDice') 
-                ws.send(JSON.stringify({ type: 'dice', dice: Math.floor(Math.random() * 6) + 1 }));
+            if(parsed?.type === 'throwDice') {
+                console.log("received throwDice");
+                showDicePage(true);              
+                
+            }
+                
             if(parsed?.type === 'question'){
-                console.log("call")
-                console.log(parsed.possibleAnswers)
-                showAnswers(parsed.possibleAnswers); //Tu nalezy przeslac ile odpowiedzi trzeba wyswietlic
-                //Przyda sie jeszcze 
+                showAnswersPage(parsed.possibleAnswers); 
             }
             if(parsed?.type === 'timeout') // only useful for timeout
                 showWaitForYourTurn(true);
             if(parsed?.type === 'gameFinish'){
-                showWaitForYourTurn(false); 
-                showAnswers(0); 
-                showFinishGame(true); 
+                showFinishGamePage(true);
             }
         };
 
       
 
         const init = () => {
-            document.getElementById('pinger').addEventListener('click', () => {
-                console.log('Ping');
-                ws.send(JSON.stringify({type: 'ping'}));
-            });
-
-            document.getElementById('answer').addEventListener('click', () => {
-                ws.send(JSON.stringify({type: 'answer', answer: 'C', nick:nick}));
-            });
             document.getElementById('throwDice').addEventListener('click', () => {
-                console.log('Throwing dice' + nick);
-                document.getElementById('turn').innerText = "Czekaj..";
-                ws.send(JSON.stringify({type: 'dice', dice: Math.floor(Math.random() * 6) + 1, nick: nick}));
+                console.log('Throwing dice ' + nick);
+                showDicePage(true);
+                //ws.send(JSON.stringify({type: 'dice', dice: Math.floor(Math.random() * 6) + 1, nick: nick}));
             });
 
             let answers = document.getElementsByClassName("ans");
@@ -71,8 +67,8 @@ export const websockets_client = (address: string) => `<!DOCTYPE html>
                     confirmButton.addEventListener("click",function(event){      
                         let confirmationDiv = document.getElementById("outerDiv");
                         confirmationDiv.style.display = "none";  
-                        showAnswers(0); 
-                        showWaitForYourTurn(true);
+                        showAnswersPage(0); 
+                        showWaitForYourTurnPage(true);
                         sendAnswer(chosenAnswer);
                     });
                 
@@ -85,19 +81,33 @@ export const websockets_client = (address: string) => `<!DOCTYPE html>
                 let confirmationDiv = document.getElementById("outerDiv");
                 confirmationDiv.style.display = "none";     
             });
+
+            let diceImg = document.getElementById("diceDivImg");
+            diceImg.addEventListener('click',function(event){            
+                diceImg.style.animation = "spin 1s linear";
+                setTimeout(function(){
+                    diceImg.style.animation="";
+                },1000)
+                setTimeout(function(){
+                    showDicePage(false);
+                    showWaitForYourTurnPage(true);
+                    ws.send(JSON.stringify({ type: 'dice', dice: Math.floor(Math.random() * 6) + 1,nick:nick }));
+                },2000);            
+                
+            })
         }
 
         window.onload = init
         
         
-        function showAnswers(howMany){    
+        function showAnswersPage(howMany){    
             if(howMany == 0){ 
                 let answersDiv = document.getElementById("answers");
                 answersDiv.style.display = "none";
 
             }     
             else{ 
-                showWaitForYourTurn(false);
+                showWaitForYourTurnPage(false);
                 let answersDiv = document.getElementById("answers");
                 answersDiv.style.display = "block";
                 let answers = document.getElementsByClassName("ans");
@@ -106,28 +116,51 @@ export const websockets_client = (address: string) => `<!DOCTYPE html>
             }              
         }
 
-        function showWaitForYourTurn(showOrNot){
+        function showWaitForYourTurnPage(showOrNot){
+            if(showOrNot == true){
+                showAnswersPage(0); 
+                showFinishGamePage(false);
+                showDicePage(false) 
+            }
+
             let waitDiv = document.getElementById("waitDiv");
             let children = waitDiv.children;
             children[1].innerText = "Czekaj na swoją kolej"
             waitDiv.style.display = showOrNot ? "flex" : "none";        
         }
 
-        function showWaitForGameStart(showOrNot){
+        function showWaitForGameStartPage(showOrNot){
             let waitDiv = document.getElementById("waitDiv");
             let children = waitDiv.children;
             children[1].innerText = "Poczekaj na rozpoczęcie gry"
             waitDiv.style.display = showOrNot ? "flex" : "none";        
         }
 
-        function showFinishGame(showOrNot){
+        function showFinishGamePage(showOrNot){
             let waitDiv = document.getElementById("waitDiv");
             let children = waitDiv.children;
-            children[1].innerText = "Gra zakończyła się"
-            children[0].src = "./images/finishFlag.png"
+            if(showOrNot == true){
+                showAnswersPage(0);
+                showDicePage(false);
 
-            waitDiv.style.display = showOrNot ? "flex" : "none";            
- 
+                children[1].innerText = "Gra zakończyła się"
+                children[0].src = "./images/finishFlag.png"
+                waitDiv.style.display = "flex"
+            }
+            else{
+                waitDiv.style.display = "none"
+            }        
+        }
+
+        function showDicePage(showOrNot){
+            let diceDiv = document.getElementById("diceDiv");
+            if(showOrNot==true){
+                showAnswersPage(0);
+                showWaitForYourTurnPage(false);
+                
+                diceDiv.style.display = "flex"
+            }
+            else diceDiv.style.display = "none"
         }
 
         function askToConfirm(whichAns){
@@ -239,16 +272,27 @@ export const websockets_client = (address: string) => `<!DOCTYPE html>
             display: block;
             width: 20%;
         }
+        #diceDiv{
+            margin-top: 10%;
+            justify-content: center;
+            margin-bottom: 20px;
+            flex-direction: column;
+            align-items: center;
+            font-size: 40px;
+            display: flex;
+            text-align: center;
+            display: none;
+        }
+        @keyframes spin{
+            0% { transform: rotateZ(0deg) }
+            50% {transform: rotateZ(180deg) translateY(-300px)}
+            100% { transform: rotateZ(360deg) translateY(0px)}
+        }
+
     </style>
 
 </head>
 <body>
-
-    <h1 id="nick">Jesteś: </h1>
-    <h1 id="turn">Czekaj..</h1>
-
-    <button id="pinger">Ping</button>
-    <button id="answer">Answer</button>
     <button id="throwDice">Throw dice</button>
 
     <div id="logoDiv">
@@ -258,6 +302,11 @@ export const websockets_client = (address: string) => `<!DOCTYPE html>
     <div id="waitDiv">
         <img src="./images/hourglass.png" id="waitDivImg"></img>
         <p>Poczekaj na rozpoczęcie gry</p>
+    </div>
+
+    <div id="diceDiv">        
+        <img src="./images/dice.png" id="diceDivImg"></img>        
+        <p>Kliknij kostkę, aby nią rzucić</p>
     </div>
 
     <div id="answers">
