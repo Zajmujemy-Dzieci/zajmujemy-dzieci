@@ -31,6 +31,7 @@ export const websockets_client = (address: string) => `<!DOCTYPE html>
             if (parsed?.type === 'NICK'){
                 nick = parsed.nick;
                 console.log('Nick:', nick);
+                displayUsername();
                 showWaitForGameStartPage(true);
 
             }
@@ -53,12 +54,6 @@ export const websockets_client = (address: string) => `<!DOCTYPE html>
       
 
         const init = () => {
-            document.getElementById('throwDice').addEventListener('click', () => {
-                console.log('Throwing dice ' + nick);
-                showDicePage(true);
-                //ws.send(JSON.stringify({type: 'dice', dice: Math.floor(Math.random() * 6) + 1, nick: nick}));
-            });
-
             let answers = document.getElementsByClassName("ans");
             for(let i =0; i<answers.length; i++){
                 answers[i].addEventListener('click',function(){
@@ -100,7 +95,11 @@ export const websockets_client = (address: string) => `<!DOCTYPE html>
 
         window.onload = init
         
-        
+        function displayUsername(){
+            let usernameDiv = document.getElementById("usernameDiv");
+            usernameDiv.children[0].innerText = "Twoj nick: " + nick;
+        }
+
         function showAnswersPage(howMany){ 
                
             if(howMany == 0){ 
@@ -296,7 +295,9 @@ export const websockets_client = (address: string) => `<!DOCTYPE html>
 
 </head>
 <body>
-    <button id="throwDice">Throw dice</button>
+    <div id="usernameDiv">
+        <p>Twoj nick:</p>
+    </div>
 
     <div id="logoDiv">
         <img src="./images/logo.png"></img>
