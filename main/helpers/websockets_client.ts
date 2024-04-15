@@ -2,7 +2,7 @@
 //To change what client browser displays use:
 //showWaitForGameStartPage(arg:bool)
 //showDicePage(arg:bool);  
-//showAnswersPage(arg:bool)
+//showAnswersPage(arg:number)
 //showFinishGamePage(arg:bool)
 //showWaitForYourTurn(arg:bool)
 //Passing true to one of them automatically passes false to every other.
