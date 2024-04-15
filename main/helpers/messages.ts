@@ -110,7 +110,7 @@ export const handleMessage = (msg: ClientMessage, ws: WebSocket) => {
 
 export const throwDice = (nick: string) => {
 	const ws = clients.get(nick)
-	ws.send(JSON.stringify({ type: "throwDice" }))
+	ws?.send(JSON.stringify({ type: "throwDice" }))
 }
 
 const handlePing = (ws: WebSocket) => {
@@ -159,7 +159,7 @@ const handleQuestion = (msg: QuestionMessage) => {
 	const ws = clients.get(msg.nick)
 	const possibleAnswers = msg.possibleAnswers
 	console.log("Question", msg.nick,msg.possibleAnswers)
-	ws?.send(JSON.stringify({ type: "question" ,possibleAnswers: possibleAnswers}))
+	ws?.send(JSON.stringify({ type: "question", possibleAnswers: possibleAnswers}))
 }
 
 const handleMessageToClient = (msg: ServerMessage, ws: WebSocket) => {
