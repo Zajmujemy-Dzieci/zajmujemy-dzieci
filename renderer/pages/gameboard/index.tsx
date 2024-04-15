@@ -17,20 +17,24 @@ export default function GameBoard() {
     gameBoardConfigurationAtom
   );
 
-  const [ws, setWs] = useState<WebSocket>(
-    new WebSocket("ws://localhost:3000/ws")
-  );
-
 
   useEffect(() => {
     console.log("Players queue: ", playersQueue);
     console.log("Configuration: ", configuration);
   }, [playersQueue, configuration]);
 
+
+  function handleClose() {
+    const ws = new WebSocket("ws://localhost:3000/ws")
+    ws.onopen = () => {
+      ws.send(JSON.stringify({ type: "reset" }))
+    }
+  }
+
   return (
     <div className="w-[100vw] h-[100vh] p-32">
       <Link href="/ranking">
-        <a className="btn-blue absolute top-0 right-0 m-5" onClick={() => ws.send(JSON.stringify({ type: 'reset'}))}>Zakończ grę</a>
+        <a className="btn-blue absolute top-0 right-0 m-5" onClick={handleClose}>Zakończ grę</a>
       </Link>
       <GameBoardComponent configuration={configuration} players={playersQueue} />
     </div>
