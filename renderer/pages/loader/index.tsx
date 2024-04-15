@@ -7,10 +7,10 @@ import { Question } from "../../models/Question";
 import { z } from "zod";
 import { QuestionType } from "../../types/QuestionType";
 import Image from "next/image";
-import QuestionSection from "./QuestionSection";
 import styles from "./styles.module.scss";
 import classNames from "classnames";
 import ActionButton from "./ActionButton";
+import QuestionsList from "./QuestionsList";
 
 const zQuestion = z.array(
   z.object({
@@ -23,10 +23,10 @@ const zQuestion = z.array(
 export default function Loader() {
   const [loadedQuestions, setLoadedQuestions] = useState<Question[]>([]);
   const [isPopupOpen, setPopupOpen] = useState(false);
-  const [Outquestion, setOutQuestion] = useState("");
-  const [OutAnswers, setOutAnswers] = useState<string[]>([]);
-  const [OutCorrectAnswerId, setOutCorrectAnswerId] = useState(-1);
-  const [OutQuestionId, setOutQuestionId] = useState(-1);
+  const [outQuestion, setOutQuestion] = useState("");
+  const [outAnswer, setOutAnswers] = useState<string[]>([]);
+  const [outCorrectAnswerId, setOutCorrectAnswerId] = useState(-1);
+  const [outQuestionId, setOutQuestionId] = useState(-1);
   const minimumQuestionsNumber = 20;
   const shuffleCheckboxRef = useRef<HTMLInputElement | null>(null);
 
@@ -151,6 +151,9 @@ export default function Loader() {
 
   return (
     <React.Fragment>
+      <Head>
+        <title>Export/Import files</title>
+      </Head>
       <div className="flex flex-col gap-4 justify-center items-center content-center p-6 text-2xl w-full text-center">
         <div className="p-5">
           <Image
@@ -176,25 +179,11 @@ export default function Loader() {
           )}
         ></input>
         {loadedQuestions.length !== 0 && (
-          <>
-            <h2 className={styles.questionsHeader}>Aktualne pytania</h2>
-            <div
-              className={classNames(
-                "py-2 h-[40vh] w-[40vw] overflow-auto",
-                styles.scrollableElement
-              )}
-            >
-              {loadedQuestions.map((question, index) => (
-                <QuestionSection
-                  key={index}
-                  question={question}
-                  index={index}
-                  handleEditQuestion={handleEditQuestion}
-                  handleDeleteQuestion={handleDeleteQuestion}
-                />
-              ))}
-            </div>
-          </>
+          <QuestionsList
+            loadedQuestions={loadedQuestions}
+            handleEditQuestion={handleEditQuestion}
+            handleDeleteQuestion={handleDeleteQuestion}
+          />
         )}
         <div className="flex justify-center gap-2">
           <ActionButton
@@ -242,14 +231,12 @@ export default function Loader() {
         )}
       </div>
       <QuestionComponent
-        {...{
-          inQuestion: Outquestion,
-          inAnswers: OutAnswers,
-          isOpen: isPopupOpen,
-          onClose: togglePopup,
-          correctAnswerId: OutCorrectAnswerId,
-          inQuestionId: OutQuestionId,
-        }}
+        inQuestion={outQuestion}
+        inAnswers={outAnswer}
+        isOpen={isPopupOpen}
+        onClose={togglePopup}
+        correctAnswerId={outCorrectAnswerId}
+        inQuestionId={outQuestionId}
       />
     </React.Fragment>
   );
