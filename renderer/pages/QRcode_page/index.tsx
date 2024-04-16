@@ -142,36 +142,37 @@ export default function QRcodePage() {
   };
 
   return (
-    <React.Fragment>
-      <Head>
-        <title>Join do game!</title>
-      </Head>
-      <div className="text-3xl absolute m-5 top-0">
-        Gracze:
-        {players.map((player) => (
-          <div key={player.nick} className="text-2xl">
-            {player.nick}
-          </div>
-        ))}
-      </div>
-      <div className="flex justify-center text-4xl flex-col items-center m-10">
-        <p>Adres do połączenia się: http://{ipAddress}:3000</p>
-        <div className="m-10">
-          <QRCode value={`http://${ipAddress}:3000`} className="m-10" size={400} />
+      <React.Fragment>
+        <Head>
+          <title>Join do game!</title>
+        </Head>
+        <div className="text-3xl absolute m-5 top-0">
+          Gracze:
+          {players.map((player) => (
+              <div key={player.nick} className="text-2xl">
+                {player.nick}
+              </div>
+          ))}
         </div>
+        <div className="flex justify-center text-4xl flex-col items-center m-10">
+          <p style={{ fontSize: '3rem' }}>Adres do połączenia się: http://{ipAddress}:3000</p>
+          <div className="m-10">
+            <QRCode value={`http://${ipAddress}:3000`} className="m-10" size={400} />
+          </div>
 
-        <Link href="/gameboard">
-          <button className="btn-blue" onClick={handleStartGame}>
-            Rozpocznij grę
-          </button>
-        </Link>
-        <Link href="/hotspot_instruction_page">
-          <a className="btn-blue m-5">Instrukcja włączenia hotspota</a>
-        </Link>
-        <Link href="/config_page">
-          <a className="btn-blue m-5">Powrót do ustawień</a>
-        </Link>
-      </div>
-    </React.Fragment>
+          <Link href="/gameboard">
+            <button className="btn-blue" onClick={handleStartGame}>
+              Rozpocznij grę
+            </button>
+          </Link>
+          <Link href="/hotspot_instruction_page">
+            <a className="btn-blue m-5">Instrukcja włączenia hotspota</a>
+          </Link>
+          <Link href="/config_page">
+            <a className="btn-blue m-5">Powrót do ustawień</a>
+          </Link>
+        </div>
+      </React.Fragment>
   );
+
 }

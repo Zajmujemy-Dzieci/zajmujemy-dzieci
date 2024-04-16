@@ -14,19 +14,19 @@ export default function hotspotPage() {
             <div className='flex'>
                 <div className="m-10">
                     Dla użytkowników MacOs:
-                    <li>Klikamy w ikonę apple</li>
-                    <li>Wybieramy 'Ustawienia systemowe'</li>
-                    <li>Kliknij w 'ogólne' na pasku bocznym</li>
-                    <li>kliknij w 'Udostępnianie' po prawej</li>
-                    <li>Włącz Udostępnianie Internetu, a następnie kliknij we Włącz, aby potwierdzić.</li>
+                    <li>Klikamy w ikonę Apple</li>
+                    <li>Wybieramy "Ustawienia systemowe"</li>
+                    <li>Kliknij w "Ogólne" na pasku bocznym</li>
+                    <li>kliknij w "Udostępnianie" po prawej</li>
+                    <li>Włącz Udostępnianie Internetu, a następnie kliknij we "Włącz", aby potwierdzić</li>
 
                 </div>
                 <div className="m-10">
-                    Dla użytkowników windowsa:
-                    <li>Klikamy przycisk windows</li>
-                    <li>Wyszukujemy 'hotspot'</li>
-                    <li>Następnie klikamy w zakładce hotspot mobilny: włącz</li>
-                    <li>W zakładce właściwości jest podana nazwa sieci oraz hasło do niej</li>
+                    Dla użytkowników Windowsa:
+                    <li>Klikamy przycisk Windows znajdujący się w lewym dolnym rogu ekranu</li>
+                    <li>Wyszukujemy "Hotspot"</li>
+                    <li>Następnie w zakładce "Hotspot mobilny" klikamy "Włącz"</li>
+                    <li>W zakładce "Właściwości" jest podana nazwa sieci oraz hasło do niej</li>
                 </div>
             </div>
         </div>
