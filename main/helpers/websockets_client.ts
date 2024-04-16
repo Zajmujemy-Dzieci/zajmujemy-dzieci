@@ -187,7 +187,6 @@ export const websockets_client = (address: string) => `<!DOCTYPE html>
             height: 20%;
             text-align: center;
             font-size: 40px;
-            border: 2px solid orange;
             display: none
         }
         #description{
@@ -287,7 +286,7 @@ export const websockets_client = (address: string) => `<!DOCTYPE html>
         }
         @keyframes spin{
             0% { transform: rotateZ(0deg) }
-            50% {transform: rotateZ(180deg) translateY(-300px)}
+            50% {transform: rotateZ(180deg) translateY(-100px)}
             100% { transform: rotateZ(360deg) translateY(0px)}
         }
 

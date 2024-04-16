@@ -1,47 +1,6 @@
 import React, {useState} from 'react'
 import { Question } from '../../models/Question'
 
-// const popupStyle = {
-//     fontSize: '25px',    
-//     borderBottom: '0px',
-//     width: '25%'  ,
-//     borderRadius: "7px",
-//     textAlign: "center",
-// }
-
-// const popupQuestionStyle = {
-//     borderBottom: '2px solid black',
-//     justifyContent: "center",
-//     display: "flex",
-//     alignItems: "center",
-//     paddingTop: "20px",
-//     paddingBottom: "20px",
-//     backgroundColor: "blue"
-// }
-// const popupAnswerStyle = {
-//     border: "0px",
-//     justifyContent: "center",
-//     borderRadius: "20px",
-//     backgroundImage: 'linear-gradient(to bottom right, purple, pink)',
-//     margin: "20px"
-// }
-
-// const popupAnswerArrStyle = {
-//     backgroundColor: 'rgb(51, 51, 51)',
-//     justifyContent: "center",
-//     padding: "10px",
-//     display: "flex"
-// }
-
-
-// const outerDivStyle = {
-//     width: "100%",
-//     height: "100%",
-//     marginTop: "2%",
-//     position: "absolute",
-//     display: "flex",
-//     justifyContent: "center",    
-// }
 
 let globalSetChosen:null|React.Dispatch<React.SetStateAction<number|null>> = null;
 let globalSetQuestion:null|React.Dispatch<React.SetStateAction<Question|null>>  = null; 
@@ -111,6 +70,5 @@ function QuestionPopup() {
     ) : "";
 }
 
-
-
-export {QuestionPopup,loadQuestion,revealAnswer}
+export default QuestionPopup;
+export {loadQuestion,revealAnswer}

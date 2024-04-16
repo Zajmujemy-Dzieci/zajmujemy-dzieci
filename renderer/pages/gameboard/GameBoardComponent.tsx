@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { useAtom } from "jotai";
 import { webSocketAtom } from "../../models/WebSocketAtom";
 import SpecialPopupComponent from "./SpecialPopupComponent";
-import {QuestionPopup} from "./QuestionPopup"
+import QuestionPopup from "./QuestionPopup"
 
 export type BoardFieldSpecialty =
   | "question"

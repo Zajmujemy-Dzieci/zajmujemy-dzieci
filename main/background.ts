@@ -59,7 +59,11 @@ express_app.get("/", (req, res) => {
 
 express_app.get('/images/:imageName', (req, res) => {
     const imageName = req.params.imageName;
-    res.sendFile(`${__dirname}/public/images/${imageName}`);
+	let path = `${__dirname}`
+	path = path.slice(0,-3);
+	console.log("Path to:")
+	console.log(path)
+    res.sendFile(`${path}/main/public/images/${imageName}`);
 });
 
 express_app.listen(PORT, () => {
