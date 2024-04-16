@@ -3,6 +3,7 @@ import { Player } from "../../types/Player";
 import { twMerge } from "tailwind-merge";
 import { BoardField } from "./GameBoardComponent";
 import axios, { Axios, AxiosResponse } from "axios";
+import LazyIcon from "../../models/IconsManager";
 
 type GameBoardPawnProps = {
   player: Player;
@@ -100,6 +101,9 @@ export default function GameBoardPawn({
   return (
     <div
       style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
         gridRow: boardFields[currentPosition].rowClass,
         gridColumn: boardFields[currentPosition].colClass,
         transform: `translate(${shift.x}px, ${shift.y}px)`,
@@ -110,6 +114,8 @@ export default function GameBoardPawn({
         "bg-white h-6 w-6 rounded-full my-2.5 mx-2.5",
         player.background
       )}
-    ></div>
+    >
+      <LazyIcon iconName={player.iconName} style={{height: "80%", width: "80%"}}/>
+    </div>
   );
 }

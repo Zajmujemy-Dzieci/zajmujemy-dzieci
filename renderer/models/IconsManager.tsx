@@ -1,6 +1,6 @@
 import { IconType } from "react-icons";
-// import { GiTurtle, GiSquirrel, GiRat, GiSittingDog, GiCat, GiElephant, GiBearFace, GiRaven } from "react-icons/gi";
-// import { IoFish } from "react-icons/io5";
+import React, { Suspense, lazy, FunctionComponent } from 'react';
+import ClipLoader from "react-spinners/ClipLoader"; // A spinner component for the loading state
 
 export const iconsMap = new Map<string, string>([
     ["żółw", "GiTurtle"],
@@ -15,13 +15,7 @@ export const iconsMap = new Map<string, string>([
     ["default", "BsFillPersonFill"]
 ]);
 
-
-import React, { Suspense, lazy, FunctionComponent } from 'react';
-import { BsFillPersonFill } from "react-icons/bs";
-// import { IconType } from 'react-icons';
-import ClipLoader from "react-spinners/ClipLoader"; // A spinner component for the loading state
-
-// Map your icons to their respective components
+// Map the icons to their respective components
 interface IconComponentsMap {
   [key: string]: React.LazyExoticComponent<IconType>;
 }
@@ -37,16 +31,15 @@ const iconComponents: IconComponentsMap = {
   IoFish: lazy(() => import('react-icons/io5').then(module => ({ default: module.IoFish }))),
   GiRaven: lazy(() => import('react-icons/gi').then(module => ({ default: module.GiRaven }))),
   BsFillPersonFill: lazy(() => import('react-icons/bs').then(module => ({ default: module.BsFillPersonFill }))),
-  // ... other icons
 };
 
-// LazyIcon component that accepts an iconName prop
-const LazyIcon: FunctionComponent<{ iconName: string }> = ({ iconName }) => {
+// LazyIcon component that accepts an iconName prop - to increase loading speed
+const LazyIcon: FunctionComponent<{ iconName: string, style?: React.CSSProperties, className?: string }> = ({ iconName, style, className }) => {
   const IconComponent = iconComponents[iconName] || iconComponents['default'];
 
   return (
     <Suspense fallback={<ClipLoader />}>
-      <IconComponent />
+      <IconComponent style={{...style}} className={className}/>
     </Suspense>
   );
 };

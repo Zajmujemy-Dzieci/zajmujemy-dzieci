@@ -101,7 +101,7 @@ export default function QRcodePage() {
   ];
 
   useEffect(() => {
-    setPlayers(p); // setPlayers(p); for debugging purposes
+    setPlayers([]); // setPlayers(p); for debugging purposes
     axios
       .get<string>("http://localhost:3000/ipaddress")
       .then((response) => handleConnectToServer(response))
@@ -161,7 +161,7 @@ export default function QRcodePage() {
         Gracze:
         {players.map((player) => (
           <div key={player.nick} className="text-2xl flex items-center">
-            <LazyIcon iconName={player.iconName} />
+            <LazyIcon iconName={player.iconName} className="mr-1" />
             {player.nick}
           </div>
         ))}
