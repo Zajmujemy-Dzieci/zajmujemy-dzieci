@@ -5,6 +5,13 @@ import { useAtom } from "jotai";
 import { playersQueueAtom } from "../../models/PlayersQueueAtom";
 import { Player } from "../../types/Player";
 
+function handleClose() {
+  const ws = new WebSocket("ws://localhost:3000/ws")
+  ws.onopen = () => {
+    ws.send(JSON.stringify({ type: "reset" }))
+  }
+}
+
 export default function RankingPage() {
   const [players, setPlayers] = useAtom<Player[]>(playersQueueAtom);
 
@@ -51,6 +58,8 @@ export default function RankingPage() {
 
     currentPlace++;
     currentPlayerIndex = nextPlayerIndex;
+
+
   }
 
   return (
@@ -66,7 +75,7 @@ export default function RankingPage() {
       </div>
       <div className="mt-1 w-full flex-wrap flex justify-center">
         <Link href="/loader">
-          <a className="btn-blue text-5xl">Rozpocznij przygodę od nowa!</a>
+          <a className="btn-blue text-5xl" onClick={handleClose}>Rozpocznij przygodę od nowa!</a>
         </Link>
       </div>
     </React.Fragment>

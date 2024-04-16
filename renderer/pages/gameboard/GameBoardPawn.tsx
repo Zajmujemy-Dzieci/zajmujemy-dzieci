@@ -4,6 +4,8 @@ import { twMerge } from "tailwind-merge";
 import { BoardField } from "./GameBoardComponent";
 import axios, { Axios, AxiosResponse } from "axios";
 import LazyIcon from "../../models/IconsManager";
+import { loadQuestion, revealAnswer } from "./QuestionPopup";
+import { Question } from "../../models/Question";
 
 type GameBoardPawnProps = {
   player: Player;
@@ -13,11 +15,25 @@ type GameBoardPawnProps = {
 };
 
 // TODO: socket communication attachment
-function redirectToQuestionPage(player: Player, ws: WebSocket) {
-  ws.send(JSON.stringify({ type: "question", nick: player.nick }));
+function redirectToQuestionPage(player: Player, ws: WebSocket) {  
+  const sampleQuestion = new Question(
+    "What is the capital of France?",
+    ["Paris", "Berlin", "Madrid", "Yekaterinburgh"],
+    0 
+  );
+
+  const possibleAnswers = sampleQuestion.answers.length; // To powinno byc pobierane z Question
+  console.log("PosAnswers:" + possibleAnswers);
+  loadQuestion(sampleQuestion);
+
+  ws.send(JSON.stringify({ type: "question", possibleAnswers: possibleAnswers, nick: player.nick }));
+
+
 }
 
-function handleFinishGame(player: Player, ws: WebSocket) {}
+function handleFinishGame(player: Player, ws: WebSocket) {
+  ws.send(JSON.stringify({ type: "gameFinish"}));
+}
 
 export default function GameBoardPawn({
   player,
@@ -53,6 +69,9 @@ export default function GameBoardPawn({
         if (data.type === "movePawn" && data.nick == player.nick) {
           movePawn(data.fieldsToMove);
         }
+        else if(data.type == 'answer' && data.nick == player.nick){
+          revealAnswer(data.answer)
+        }
       };
     }
   }
@@ -85,6 +104,10 @@ export default function GameBoardPawn({
         return boardFields.length - 1;
       }
       player.score = currentPosition + fieldsToMove;
+      if (boardFields[newPosition].type !== "question") {
+        ws.send(JSON.stringify({ type: "question", nick: '', possibleAnswers: 0 }));
+        console.log("No question")
+      }
       if (boardFields[newPosition].type === "question") {
         redirectToQuestionPage(player, ws);
       } else if (boardFields[newPosition].type === "finish") {

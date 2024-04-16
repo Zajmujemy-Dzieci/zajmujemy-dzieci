@@ -57,6 +57,15 @@ express_app.get("/", (req, res) => {
 	res.send(websockets_client(address))
 })
 
+express_app.get('/images/:imageName', (req, res) => {
+    const imageName = req.params.imageName;
+	let path = `${__dirname}`
+	path = path.slice(0,-3);
+	console.log("Path to:")
+	console.log(path)
+    res.sendFile(`${path}/main/public/images/${imageName}`);
+});
+
 express_app.listen(PORT, () => {
 	console.log(`Serwer działa na porcie ${PORT}`)
 })
