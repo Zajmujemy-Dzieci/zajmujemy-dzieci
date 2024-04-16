@@ -71,7 +71,7 @@ class Game {
     this.timer = setTimeout(() => {
       console.log("Timeout");
       handleAnswer({ type: "answer", answer: "Timeout", nick: to });
-    }, 5000); // 10 seconds timeout
+    }, 10000); // 10 seconds timeout
 
     return ws;
   }
@@ -103,7 +103,7 @@ class Game {
       this.clients
         .get(this.getActivePlayer())
         ?.send(JSON.stringify({ type: "timeout" }));
-    }, 5000);
+    }, 10000);
 
     return true;
   }
