@@ -11,8 +11,8 @@ type GameBoardPawnProps = {
   player: Player;
   shift: { x: number; y: number };
   boardFields: BoardField[];
-  handleOpenSpecialPopup: (text: string) => void;
-  showGameOverPopup: () => void;
+  handleOpenSpecialPopup: (text: string) => Promise<void>;
+  showGameOverPopup: () => Promise<void>;
 };
 
 const questionList: QuestionList = QuestionList.getInstance();
@@ -34,8 +34,12 @@ function redirectToQuestionPage(player: Player, ws: WebSocket) {
   );
 }
 
-function handleFinishGame(player: Player, ws: WebSocket, showGameOverPopup: () => void) {
-  ws.send(JSON.stringify({ type: "gameFinish"}));
+function handleFinishGame(
+  player: Player,
+  ws: WebSocket,
+  showGameOverPopup: () => void
+) {
+  ws.send(JSON.stringify({ type: "gameFinish" }));
   showGameOverPopup();
 }
 
@@ -46,17 +50,20 @@ export default function GameBoardPawn({
   handleOpenSpecialPopup,
   showGameOverPopup: showFinishGamePopup,
 }: GameBoardPawnProps) {
-  if (!boardFields) {
-    return <div>Nie ma z kim grać...</div>;
-  }
-  if (!player) {
-    return <div>Brak gracza...</div>;
-  }
   const [currentPosition, setCurrentPosition] = useState(0);
   const [ws, setWs] = useState<WebSocket>(
     new WebSocket("ws://localhost:3000/ws")
   );
   const [ipAddress, setIPAddress] = useState<string>("");
+
+  useEffect(() => {
+    axios
+      .get<string>("http://localhost:3000/ipaddress")
+      .then((response) => handleConnection(response))
+      .catch((error) => {
+        console.error("Błąd pobierania danych:", error);
+      });
+  }, []);
 
   function handleConnection(response: AxiosResponse) {
     setIPAddress(response.data);
@@ -82,15 +89,6 @@ export default function GameBoardPawn({
     }
   }
 
-  useEffect(() => {
-    axios
-      .get<string>("http://localhost:3000/ipaddress")
-      .then((response) => handleConnection(response))
-      .catch((error) => {
-        console.error("Błąd pobierania danych:", error);
-      });
-  }, []);
-
   async function handleGoodField() {
     const fieldsToMove = Math.floor(Math.random() * 4) + 1;
     if (fieldsToMove == 1) {
@@ -110,7 +108,7 @@ export default function GameBoardPawn({
     }
     movePawn(-fieldsToMove, true);
   }
-  
+
   function movePawn(fieldsToMove: number, specialFlag: boolean) {
     setCurrentPosition((prevPosition) => {
       const newPosition = prevPosition + fieldsToMove;
@@ -144,6 +142,12 @@ export default function GameBoardPawn({
     });
   }
 
+  if (!boardFields) {
+    return <div>Nie ma z kim grać...</div>;
+  }
+  if (!player) {
+    return <div>Brak gracza...</div>;
+  }
   return (
     <div
       style={{
