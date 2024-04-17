@@ -7,6 +7,7 @@ import { useAtom } from "jotai";
 import { webSocketAtom } from "../../models/WebSocketAtom";
 import SpecialPopupComponent from "./SpecialPopupComponent";
 import QuestionPopup from "./QuestionPopup"
+import GameOverPopup from "./GameOverPopup";
 
 export type BoardFieldSpecialty =
   | "question"
@@ -223,6 +224,13 @@ export default function GameBoardComponent({
     });
   }
 
+  const [isGameOverPopupOpen, setGameOverPopupOpen] = useState(false);
+  async function handleShowGameOverPopup() {
+    return new Promise<void>(() => {
+      setGameOverPopupOpen(true);
+    });
+  }
+
   return (
     <div className={`w-full h-full place-content-center grid gap-4`}>
       {isPopupOpen && (
@@ -235,7 +243,16 @@ export default function GameBoardComponent({
         </div>
       )}
 
-      <QuestionPopup/>
+      {isGameOverPopupOpen && (
+        <div>
+          <GameOverPopup
+            isOpen={isGameOverPopupOpen}
+            onClose={() => setGameOverPopupOpen(false)}
+          />
+        </div>
+      )}
+
+      <QuestionPopup />
 
       <div
         style={{ gridRow: 1, gridColumn: 1 }}
@@ -272,6 +289,7 @@ export default function GameBoardComponent({
           }}
           boardFields={gridPositions}
           handleOpenSpecialPopup={handleOpenSpecialPopup}
+          showGameOverPopup={handleShowGameOverPopup}
         />
       ))}
     </div>
