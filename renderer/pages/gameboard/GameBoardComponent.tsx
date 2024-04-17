@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { useAtom } from "jotai";
 import { webSocketAtom } from "../../models/WebSocketAtom";
 import SpecialPopupComponent from "./SpecialPopupComponent";
-import QuestionPopup from "./QuestionPopup"
+import QuestionPopup from "./QuestionPopup";
 import GameOverPopup from "./GameOverPopup";
 import CountdownClock from "./CountdownClock";
 
@@ -47,22 +47,33 @@ export default function GameBoardComponent({
   configuration: GameBoardConfiguration;
   players: Player[];
 }) {
-  if (!players) {
-    return <div>Nie ma z kim grać...</div>;
-  }
-  if (!configuration) {
-    return <div>Brak konfiguracji planszy...</div>;
-  }
-
   const [ws, setWs] = useAtom(webSocketAtom);
   const [goodFields, setGoodFields] = useState<number[]>([]);
   const [badFields, setBadFields] = useState<number[]>([]);
+  const [isPopupOpen, setPopupOpen] = useState(false);
+  const [popupText, setPopupText] = useState("");
+  const [isGameOverPopupOpen, setGameOverPopupOpen] = useState(false);
+  const [gridPositions, setGridPositions] = useState<BoardField[]>([]);
+  const [numberOfColumns] = useState(
+    countNumberOfColumns(configuration.numberOfQuestionFields)
+  );
+  const [totalFields] = useState(2 * configuration.numberOfQuestionFields + 2);
+  const [numberOfRows] = useState(Math.ceil(totalFields / numberOfColumns) + 2);
 
-  const {
-    numberOfQuestionFields,
-    numberOfGoodSpecialFields,
-    numberOfBadSpecialFields,
-  } = configuration;
+  useEffect(() => {
+    const { tmpBadFields, tmpGoodFields } = getSpecialFieldsPlaces(
+      configuration.numberOfBadSpecialFields,
+      configuration.numberOfGoodSpecialFields,
+      configuration.numberOfQuestionFields
+    );
+    setBadFields(tmpBadFields);
+    setGoodFields(tmpGoodFields);
+    setGridPositions([
+      { index: 1, colClass: 1, rowClass: 1, type: "start" },
+      ...createBoard(numberOfRows, totalFields, tmpGoodFields, tmpBadFields),
+    ]);
+  }, []);
+
   function countNumberOfColumns(numberOfQuestionFields: number) {
     if (numberOfQuestionFields < 6) return 7;
     if (numberOfQuestionFields < 10) return 8;
@@ -76,144 +87,113 @@ export default function GameBoardComponent({
     numberOfGoodSpecialFields: number,
     numberOfQuestionFields: number
   ) {
-    const badFields: number[] = [];
-    const goodFields: number[] = [];
-    while (goodFields.length < numberOfGoodSpecialFields) {
+    const tmpBadFields: number[] = [];
+    const tmpGoodFields: number[] = [];
+    while (tmpGoodFields.length < numberOfGoodSpecialFields) {
       const randomIndex =
         Math.floor(Math.random() * (numberOfQuestionFields * 2)) + 1;
-      if (randomIndex % 2 === 0 && !goodFields.includes(randomIndex)) {
-        goodFields.push(randomIndex);
+      if (randomIndex % 2 === 0 && !tmpGoodFields.includes(randomIndex)) {
+        tmpGoodFields.push(randomIndex);
       }
     }
-    while (badFields.length < numberOfBadSpecialFields) {
+    while (tmpBadFields.length < numberOfBadSpecialFields) {
       const randomIndex =
         Math.floor(Math.random() * (numberOfQuestionFields * 2)) + 1;
       if (
         randomIndex % 2 === 0 &&
-        !badFields.includes(randomIndex) &&
-        !goodFields.includes(randomIndex)
+        !tmpBadFields.includes(randomIndex) &&
+        !tmpGoodFields.includes(randomIndex)
       ) {
-        badFields.push(randomIndex);
+        tmpBadFields.push(randomIndex);
       }
     }
-    return { badFields, goodFields };
+    return { tmpBadFields, tmpGoodFields };
   }
-
-  const numberOfColumns = countNumberOfColumns(numberOfQuestionFields);
-  const totalFields = 2 * numberOfQuestionFields + 2;
-  const numberOfRows = Math.ceil(totalFields / numberOfColumns) + 2;
-
-  useEffect(() => {
-    const { badFields, goodFields } = getSpecialFieldsPlaces(
-      numberOfBadSpecialFields,
-      numberOfGoodSpecialFields,
-      numberOfQuestionFields
-    );
-    setBadFields(badFields);
-    setGoodFields(goodFields);
-  }, []);
 
   const getBoardFieldSpecialty = (
     index: number,
-    badFields: number[],
-    goodFields: number[]
+    newGoodFields: number[],
+    newBadFields: number[]
   ): BoardFieldSpecialty => {
     if (index === totalFields - 1) return "start";
-    if (goodFields.includes(index)) return "good";
-    if (badFields.includes(index)) return "bad";
+    if (newGoodFields.includes(index)) return "good";
+    if (newBadFields.includes(index)) return "bad";
     return index % 2 === 0 ? "empty" : "question";
   };
 
-  let currentColumn = 1;
-  let currentRow = 2;
-  let target = numberOfRows;
-  let upOrDown = "up";
-  let colClass = currentColumn;
-  let rowClass = currentRow;
+  function createBoard(
+    numberOfRows: number,
+    totalFields: number,
+    newGoodFields: number[],
+    newBadFields: number[]
+  ) {
+    const fields: BoardField[] = [];
+    let currentColumn = 1;
+    let currentRow = 2;
+    let target = numberOfRows;
+    let upOrDown = "up";
+    let colClass = currentColumn;
+    let rowClass = currentRow;
 
-  const gridPositions: BoardField[] = [];
-  gridPositions.push({ index: 1, colClass: 1, rowClass: 1, type: "start" });
-
-  const getGridPosition = (index: number, numberOfColumns: number) => {
-    colClass = currentColumn;
-    rowClass = currentRow;
-    if (index === target) {
-      currentColumn++;
+    const getGridPosition = (index: number) => {
       colClass = currentColumn;
-      currentColumn++;
-      target += numberOfRows;
-      if (upOrDown === "up") upOrDown = "down";
-      else upOrDown = "up";
-      gridPositions.push({
-        index,
-        colClass,
-        rowClass,
-        type: getBoardFieldSpecialty(index, badFields, goodFields),
-      });
-      return {
-        colClass,
-        rowClass,
-        type: getBoardFieldSpecialty(index, badFields, goodFields),
-      };
-    }
-    if (upOrDown === "down") {
       rowClass = currentRow;
-      if (index === target - 1) {
-        gridPositions.push({
+      if (index === target) {
+        currentColumn++;
+        colClass = currentColumn;
+        currentColumn++;
+        target += numberOfRows;
+        if (upOrDown === "up") upOrDown = "down";
+        else upOrDown = "up";
+        return {
           index,
           colClass,
           rowClass,
-          type: getBoardFieldSpecialty(index, badFields, goodFields),
-        });
-        return {
-          colClass,
-          rowClass,
-          type: getBoardFieldSpecialty(index, badFields, goodFields),
+          type: getBoardFieldSpecialty(index, newGoodFields, newBadFields),
         };
       }
-      currentRow--;
-      gridPositions.push({
+      if (upOrDown === "down") {
+        rowClass = currentRow;
+        if (index === target - 1) {
+          return {
+            index,
+            colClass,
+            rowClass,
+            type: getBoardFieldSpecialty(index, newGoodFields, newBadFields),
+          };
+        }
+        currentRow--;
+        return {
+          index,
+          colClass,
+          rowClass,
+          type: getBoardFieldSpecialty(index, newGoodFields, newBadFields),
+        };
+      }
+      rowClass = currentRow;
+      if (index === target - 1) {
+        return {
+          index,
+          colClass,
+          rowClass,
+          type: getBoardFieldSpecialty(index, newGoodFields, newBadFields),
+        };
+      }
+      currentRow++;
+      return {
         index,
         colClass,
         rowClass,
-        type: getBoardFieldSpecialty(index, badFields, goodFields),
-      });
-      return {
-        colClass,
-        rowClass,
-        type: getBoardFieldSpecialty(index, badFields, goodFields),
+        type: getBoardFieldSpecialty(index, newGoodFields, newBadFields),
       };
-    }
-    rowClass = currentRow;
-    if (index === target - 1) {
-      gridPositions.push({
-        index,
-        colClass,
-        rowClass,
-        type: getBoardFieldSpecialty(index, badFields, goodFields),
-      });
-      return {
-        colClass,
-        rowClass,
-        type: getBoardFieldSpecialty(index, badFields, goodFields),
-      };
-    }
-    currentRow++;
-    gridPositions.push({
-      index,
-      colClass,
-      rowClass,
-      type: getBoardFieldSpecialty(index, badFields, goodFields),
-    });
-    return {
-      colClass,
-      rowClass,
-      type: getBoardFieldSpecialty(index, badFields, goodFields),
     };
-  };
 
-  const [isPopupOpen, setPopupOpen] = useState(false);
-  const [popupText, setPopupText] = useState("");
+    Array.from({ length: totalFields - 1 }, (_, index) => {
+      fields.push(getGridPosition(index + 1));
+    });
+    return fields;
+  }
+
   async function handleOpenSpecialPopup(text: string) {
     return new Promise<void>((resolve) => {
       setPopupOpen(true);
@@ -225,11 +205,16 @@ export default function GameBoardComponent({
     });
   }
 
-  const [isGameOverPopupOpen, setGameOverPopupOpen] = useState(false);
   async function handleShowGameOverPopup() {
     return new Promise<void>(() => {
       setGameOverPopupOpen(true);
     });
+  }
+  if (!players) {
+    return <div>Nie ma z kim grać...</div>;
+  }
+  if (!configuration) {
+    return <div>Brak konfiguracji planszy...</div>;
   }
 
   const [isClockOpen, setClockOpen] = useState(false);
@@ -277,39 +262,36 @@ export default function GameBoardComponent({
       >
         START
       </div>
-      {Array.from({ length: totalFields - 1 }, (_, index) => {
-        const {
-          colClass: col,
-          rowClass: row,
-          type,
-        } = getGridPosition(index + 1, numberOfColumns);
-        return (
-          <div
-            key={index}
-            style={{
-              gridColumn: col,
-              gridRow: row,
+      {gridPositions.length > 0 &&
+        gridPositions.map(({ index, type, colClass, rowClass }, i) => {
+          return (
+            <div
+              key={i + index}
+              style={{
+                gridColumn: colClass,
+                gridRow: rowClass,
+              }}
+              className={twMerge(
+                mapTypeOnColor(type),
+                "h-28 w-28 flex flex-wrap justify-center content-center items-center p-3"
+              )}
+            ></div>
+          );
+        })}
+      {gridPositions.length > 1 &&
+        players.map((player, i) => (
+          <GameBoardPawn
+            player={player}
+            shift={{
+              x: (i % 3) * 33,
+              y: Math.floor((Math.floor(i / 3) * 100 * 3) / players.length),
             }}
-            className={twMerge(
-              mapTypeOnColor(type),
-              "h-28 w-28 flex flex-wrap justify-center content-center items-center p-3"
-            )}
-          ></div>
-        );
-      })}
-      {players.map((player, i) => (
-        <GameBoardPawn
-          player={player}
-          shift={{
-            x: (i % 3) * 33,
-            y: Math.floor((Math.floor(i / 3) * 100 * 3) / players.length),
-          }}
-          boardFields={gridPositions}
-          handleOpenSpecialPopup={handleOpenSpecialPopup}
-          showGameOverPopup={handleShowGameOverPopup}
-          openClock={openClock}
-        />
-      ))}
+            boardFields={gridPositions}
+            handleOpenSpecialPopup={handleOpenSpecialPopup}
+            showGameOverPopup={handleShowGameOverPopup}
+            openClock={openClock}
+          />
+        ))}
     </div>
   );
 }

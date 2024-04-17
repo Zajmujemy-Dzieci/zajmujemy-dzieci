@@ -12,13 +12,17 @@ type GameBoardPawnProps = {
   player: Player;
   shift: { x: number; y: number };
   boardFields: BoardField[];
-  handleOpenSpecialPopup: (text: string) => void;
-  showGameOverPopup: () => void;
-  openClock: (timeInSeconds: number) => void;
+  handleOpenSpecialPopup: (text: string) => Promise<void>;
+  showGameOverPopup: () => Promise<void>;
+  openClock: (timeInSeconds: number) => Promise<void>;
 };
 
 // TODO: socket communication attachment
-function redirectToQuestionPage(player: Player, ws: WebSocket, showTimer: (timeInSeconds: number) => void) {
+function redirectToQuestionPage(
+  player: Player,
+  ws: WebSocket,
+  showTimer: (timeInSeconds: number) => void
+) {
   const sampleQuestion = new Question(
     "What is the capital of France?",
     ["Paris", "Berlin", "Madrid", "Yekaterinburgh"],
@@ -36,11 +40,15 @@ function redirectToQuestionPage(player: Player, ws: WebSocket, showTimer: (timeI
       nick: player.nick,
     })
   );
-  showTimer(ANSWER_TIMEOUT/1000);
+  showTimer(ANSWER_TIMEOUT / 1000);
 }
 
-function handleFinishGame(player: Player, ws: WebSocket, showGameOverPopup: () => void) {
-  ws.send(JSON.stringify({ type: "gameFinish"}));
+function handleFinishGame(
+  player: Player,
+  ws: WebSocket,
+  showGameOverPopup: () => void
+) {
+  ws.send(JSON.stringify({ type: "gameFinish" }));
   showGameOverPopup();
 }
 
@@ -52,17 +60,20 @@ export default function GameBoardPawn({
   showGameOverPopup: showFinishGamePopup,
   openClock,
 }: GameBoardPawnProps) {
-  if (!boardFields) {
-    return <div>Nie ma z kim grać...</div>;
-  }
-  if (!player) {
-    return <div>Brak gracza...</div>;
-  }
   const [currentPosition, setCurrentPosition] = useState(0);
   const [ws, setWs] = useState<WebSocket>(
     new WebSocket("ws://localhost:3000/ws")
   );
   const [ipAddress, setIPAddress] = useState<string>("");
+
+  useEffect(() => {
+    axios
+      .get<string>("http://localhost:3000/ipaddress")
+      .then((response) => handleConnection(response))
+      .catch((error) => {
+        console.error("Błąd pobierania danych:", error);
+      });
+  }, []);
 
   function handleConnection(response: AxiosResponse) {
     setIPAddress(response.data);
@@ -88,15 +99,6 @@ export default function GameBoardPawn({
     }
   }
 
-  useEffect(() => {
-    axios
-      .get<string>("http://localhost:3000/ipaddress")
-      .then((response) => handleConnection(response))
-      .catch((error) => {
-        console.error("Błąd pobierania danych:", error);
-      });
-  }, []);
-
   async function handleGoodField() {
     const fieldsToMove = Math.floor(Math.random() * 4) + 1;
     if (fieldsToMove == 1) {
@@ -117,8 +119,8 @@ export default function GameBoardPawn({
     movePawn(-fieldsToMove, true);
   }
 
-  async function movePawn(fieldsToMove: number, specialFlag: boolean) {
-    await setCurrentPosition((prevPosition) => {
+  function movePawn(fieldsToMove: number, specialFlag: boolean) {
+    setCurrentPosition((prevPosition) => {
       const newPosition = prevPosition + fieldsToMove;
       if (newPosition >= boardFields.length - 1) {
         player.score = boardFields.length - 1;
@@ -129,6 +131,7 @@ export default function GameBoardPawn({
         player.score = 0;
         return 0;
       }
+      console.log("Current position type: " + boardFields[newPosition].type);
       player.score = currentPosition + fieldsToMove;
       if (boardFields[newPosition].type !== "question") {
         ws.send(
@@ -149,6 +152,12 @@ export default function GameBoardPawn({
     });
   }
 
+  if (!boardFields) {
+    return <div>Nie ma z kim grać...</div>;
+  }
+  if (!player) {
+    return <div>Brak gracza...</div>;
+  }
   return (
     <div
       style={{
