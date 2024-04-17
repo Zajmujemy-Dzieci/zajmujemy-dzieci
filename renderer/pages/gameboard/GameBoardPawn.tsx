@@ -82,7 +82,7 @@ export default function GameBoardPawn({
         console.log("Received message: ", event.data);
         console.log("Data type: ", data.type);
         if (data.type === "movePawn" && data.nick == player.nick) {
-          movePawn(data.fieldsToMove, data.specialFlag);
+          movePawn(data.fieldsToMove, data.shouldMoveFlag);
         } else if (data.type == "answer" && data.nick == player.nick) {
           revealAnswer(data.answer, globalSetQuestion, ws, player.nick);
         }
@@ -110,7 +110,7 @@ export default function GameBoardPawn({
     movePawn(-fieldsToMove, true);
   }
 
-  function movePawn(fieldsToMove: number, specialFlag: boolean) {
+  function movePawn(fieldsToMove: number, shouldMoveFlag: boolean) {
     setCurrentPosition((prevPosition) => {
       const newPosition = prevPosition + fieldsToMove;
       
@@ -130,13 +130,13 @@ export default function GameBoardPawn({
         );
         console.log("No question");
       }
-      if (boardFields[newPosition].type === "question" && !specialFlag) {
+      if (boardFields[newPosition].type === "question" && !shouldMoveFlag) {
         redirectToQuestionPage(player, ws);
       } else if (boardFields[newPosition].type === "finish") {
         handleFinishGame(player, ws, showFinishGamePopup);
-      } else if (boardFields[newPosition].type === "good" && !specialFlag) {
+      } else if (boardFields[newPosition].type === "good" && !shouldMoveFlag) {
         handleGoodField();
-      } else if (boardFields[newPosition].type === "bad" && !specialFlag) {
+      } else if (boardFields[newPosition].type === "bad" && !shouldMoveFlag) {
         handleBadField();
       }
       return newPosition;

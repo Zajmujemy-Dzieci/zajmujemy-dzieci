@@ -44,7 +44,7 @@ export interface MovePawnMessage extends ClientMessage {
   type: "movePawn";
   fieldsToMove: number;
   nick: string;
-  specialFlag: boolean;
+  shouldMoveFlag: boolean;
 }
 
 export interface QuestionMessage extends ClientMessage {
@@ -95,7 +95,7 @@ export const handleMessage = (msg: ClientMessage, ws: WebSocket) => {
 
     case "movePawn":
       const movePawnMsg = msg as MovePawnMessage;
-      handleMovePawn(movePawnMsg.nick, movePawnMsg.fieldsToMove, movePawnMsg.specialFlag);
+      handleMovePawn(movePawnMsg.nick, movePawnMsg.fieldsToMove, movePawnMsg.shouldMoveFlag);
       break;
 
     case "question":
@@ -175,11 +175,11 @@ const handlePawnRegister = (msg: PawnRegisterMessage, ws: WebSocket) => {
   );
 };
 
-const handleMovePawn = (nick: string, fieldsToMove: number, specialFlag: boolean) => {
+const handleMovePawn = (nick: string, fieldsToMove: number, shouldMoveFlag: boolean) => {
   const ws = game.pawns.get(nick);
   console.log("Move pawn", nick, fieldsToMove);
   ws?.send(
-    JSON.stringify({ type: "movePawn", fieldsToMove: fieldsToMove, nick: nick, specialFlag: specialFlag})
+    JSON.stringify({ type: "movePawn", fieldsToMove: fieldsToMove, nick: nick, shouldMoveFlag: shouldMoveFlag})
   );
 };
 
