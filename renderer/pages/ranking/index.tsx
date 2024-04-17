@@ -17,13 +17,6 @@ function handleClose() {
 export default function RankingPage() {
   const players = useAtomValue<Player[]>(playersQueueAtom);
 
-  const sortedPlayers: Player[] = players.sort((a, b) => {
-    if (b.score === a.score) {
-      return a.nick.localeCompare(b.nick);
-    }
-    return b.score - a.score;
-  });
-
   function getThreeBestScores(players: Player[]) {
     return players
       .map((player) => player.score)
@@ -32,14 +25,20 @@ export default function RankingPage() {
       .slice(0, 3);
   }
 
-  // const playersTable: JSX.Element[] = [];
-  const playersWithEndResults = sortedPlayers.map((player, index) => {
-    return {
-      nick: player.nick,
-      score: player.score,
-      placeIcon: getThreeBestScores(players).indexOf(player.score),
-    };
-  });
+  const playersWithEndResults = players
+    .sort((a, b) => {
+      if (b.score === a.score) {
+        return a.nick.localeCompare(b.nick);
+      }
+      return b.score - a.score;
+    })
+    .map((player) => {
+      return {
+        nick: player.nick,
+        score: player.score,
+        placeIcon: getThreeBestScores(players).indexOf(player.score),
+      };
+    });
 
   const emojis = ["🥇", "🥈", "🥉"];
 
@@ -79,7 +78,7 @@ export default function RankingPage() {
         <div className="p-2 mt-5">
           <Link href="/loader">
             <a
-              className="text-childWhite text-4xl font-bold py-2 px-4 rounded bg-childBlack mx-auto hover:bg-childWhite hover:text-childBlack"
+              className="text-childWhite text-4xl font-bold py-2 px-4 rounded bg-childBlack border-solid border-childWhite border-2 mx-auto hover:bg-childWhite hover:text-childBlack"
               onClick={handleClose}
             >
               Rozpocznij od nowa!
