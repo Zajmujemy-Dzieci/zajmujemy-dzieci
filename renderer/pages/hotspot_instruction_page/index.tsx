@@ -12,17 +12,8 @@ export default function hotspotPage() {
         </Head>
         <div className="flex min-w-full flex-col text-4xl" >
             <div className='flex'>
-                <div className="m-10">
-                    Dla użytkowników MacOs:
-                    <li>Klikamy w ikonę Apple</li>
-                    <li>Wybieramy "Ustawienia systemowe"</li>
-                    <li>Kliknij w "Ogólne" na pasku bocznym</li>
-                    <li>kliknij w "Udostępnianie" po prawej</li>
-                    <li>Włącz Udostępnianie Internetu, a następnie kliknij we "Włącz", aby potwierdzić</li>
 
-                </div>
                 <div className="m-10">
-                    Dla użytkowników Windowsa:
                     <li>Klikamy przycisk Windows znajdujący się w lewym dolnym rogu ekranu</li>
                     <li>Wyszukujemy "Hotspot"</li>
                     <li>Następnie w zakładce "Hotspot mobilny" klikamy "Włącz"</li>

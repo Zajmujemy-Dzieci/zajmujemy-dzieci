@@ -21,6 +21,9 @@ export default function HomePage() {
                 </div>
                 <div className="p-5 text-4xl" style={{ fontSize: '3rem' }}>
                     Witaj w Nextron!
+                    <div className="my-5 text-2xl" style={{ fontSize: '2rem' }}>
+                        Zmień lekcje w przygodę - nauczaj poprzez zabawę!
+                    </div>
                 </div>
             </div>
             <div className="mt-5 w-full flex-wrap flex justify-center">
