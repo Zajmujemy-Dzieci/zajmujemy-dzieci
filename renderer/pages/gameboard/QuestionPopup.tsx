@@ -43,9 +43,9 @@ const revealAnswer = (chosen:string|null, question: Question | null, ws: WebSock
             break;
     }
     if (chosenNumber === question?.correctAnswerId) {
-        ws.send(JSON.stringify({ type: "movePawn", nick: nick, fieldsToMove: 1 }));
+        ws.send(JSON.stringify({ type: "movePawn", nick: nick, fieldsToMove: 1, specialFlag: true }));
     } else {
-        ws.send(JSON.stringify({ type: "movePawn", nick: nick, fieldsToMove: -1 }));
+        ws.send(JSON.stringify({ type: "movePawn", nick: nick, fieldsToMove: -1, specialFlag: true }));
     }
 };
 

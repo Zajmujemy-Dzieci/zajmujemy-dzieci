@@ -82,7 +82,7 @@ export default function GameBoardPawn({
         console.log("Received message: ", event.data);
         console.log("Data type: ", data.type);
         if (data.type === "movePawn" && data.nick == player.nick) {
-          movePawn(data.fieldsToMove, false);
+          movePawn(data.fieldsToMove, data.specialFlag);
         } else if (data.type == "answer" && data.nick == player.nick) {
           revealAnswer(data.answer, globalSetQuestion, ws, player.nick);
         }
