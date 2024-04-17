@@ -59,6 +59,8 @@ export default function GameBoardComponent({
   );
   const [totalFields] = useState(2 * configuration.numberOfQuestionFields + 2);
   const [numberOfRows] = useState(Math.ceil(totalFields / numberOfColumns) + 2);
+  const [isClockOpen, setClockOpen] = useState(false);
+  const [timeInSeconds, setTimeInSeconds] = useState(0);
 
   useEffect(() => {
     const { tmpBadFields, tmpGoodFields } = getSpecialFieldsPlaces(
@@ -217,8 +219,6 @@ export default function GameBoardComponent({
     return <div>Brak konfiguracji planszy...</div>;
   }
 
-  const [isClockOpen, setClockOpen] = useState(false);
-  const [timeInSeconds, setTimeInSeconds] = useState(0);
   async function openClock(timeInSeconds: number) {
     setClockOpen(false);
     setTimeout(() => {
