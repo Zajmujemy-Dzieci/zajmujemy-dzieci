@@ -6,6 +6,7 @@ import axios, { Axios, AxiosResponse } from "axios";
 import LazyIcon from "../../models/IconsManager";
 import { loadQuestion, revealAnswer } from "./QuestionPopup";
 import { QuestionList } from "../../models/QuestionList";
+import { Question } from "../../models/Question";
 
 type GameBoardPawnProps = {
   player: Player;
@@ -16,6 +17,7 @@ type GameBoardPawnProps = {
 };
 
 const questionList: QuestionList = QuestionList.getInstance();
+let globalSetQuestion: Question | null = null;
 
 // TODO: socket communication attachment
 function redirectToQuestionPage(player: Player, ws: WebSocket) {
@@ -23,6 +25,7 @@ function redirectToQuestionPage(player: Player, ws: WebSocket) {
 
   const possibleAnswers = sampleQuestion.answers.length; // To powinno byc pobierane z Question
   console.log("PosAnswers:" + possibleAnswers);
+  globalSetQuestion = sampleQuestion;
   loadQuestion(sampleQuestion);
 
   ws.send(
@@ -79,11 +82,9 @@ export default function GameBoardPawn({
         console.log("Received message: ", event.data);
         console.log("Data type: ", data.type);
         if (data.type === "movePawn" && data.nick == player.nick) {
-          movePawn(data.fieldsToMove, false);
+          movePawn(data.fieldsToMove, data.shouldMoveFlag);
         } else if (data.type == "answer" && data.nick == player.nick) {
-          revealAnswer(data.answer);
-        } else if (data.type == "answer" && data.nick == player.nick) {
-          revealAnswer(data.answer);
+          revealAnswer(data.answer, globalSetQuestion, ws, player.nick);
         }
       };
     }
@@ -109,7 +110,7 @@ export default function GameBoardPawn({
     movePawn(-fieldsToMove, true);
   }
 
-  function movePawn(fieldsToMove: number, specialFlag: boolean) {
+  function movePawn(fieldsToMove: number, shouldMoveFlag: boolean) {
     setCurrentPosition((prevPosition) => {
       const newPosition = prevPosition + fieldsToMove;
       
@@ -129,13 +130,13 @@ export default function GameBoardPawn({
         );
         console.log("No question");
       }
-      if (boardFields[newPosition].type === "question" && !specialFlag) {
+      if (boardFields[newPosition].type === "question" && !shouldMoveFlag) {
         redirectToQuestionPage(player, ws);
       } else if (boardFields[newPosition].type === "finish") {
         handleFinishGame(player, ws, showFinishGamePopup);
-      } else if (boardFields[newPosition].type === "good" && !specialFlag) {
+      } else if (boardFields[newPosition].type === "good" && !shouldMoveFlag) {
         handleGoodField();
-      } else if (boardFields[newPosition].type === "bad" && !specialFlag) {
+      } else if (boardFields[newPosition].type === "bad" && !shouldMoveFlag) {
         handleBadField();
       }
       return newPosition;

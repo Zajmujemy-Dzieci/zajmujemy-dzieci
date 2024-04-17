@@ -1,5 +1,6 @@
 import React, {useState} from 'react'
 import { Question } from '../../models/Question'
+import { Player } from '../../types/Player';
 
 
 let globalSetChosen:null|React.Dispatch<React.SetStateAction<number|null>> = null;
@@ -9,42 +10,61 @@ const loadQuestion = (question:Question | null) => {
     if(!globalSetChosen || !globalSetQuestion) return;
     console.log("tutaj1");
     globalSetChosen(null);
-    globalSetQuestion(question);        
+    globalSetQuestion(question);
 };
 
-const revealAnswer = (chosen:string|null) => {
-    if(!globalSetChosen) return;
+const revealAnswer = (chosen:string|null, question: Question | null, ws: WebSocket, nick: string) => {
+    if (!globalSetChosen) return;
+    let chosenNumber:number = -1;
     switch(chosen){
         case "A":
             globalSetChosen(0);
+            chosenNumber = 0;
             break;
         case "B":
             globalSetChosen(1);
+            chosenNumber = 1;
             break;
         case "C":
             globalSetChosen(2);
+            chosenNumber = 2;
             break;
         case "D":
             globalSetChosen(3);
+            chosenNumber = 3;
             break;
         case "E":
             globalSetChosen(4);
+            chosenNumber = 4;
             break;
         case "F":
             globalSetChosen(5);
+            chosenNumber = 5;
             break;
     }
+    if (chosenNumber === question?.correctAnswerId) {
+        handleAnswer(true, ws, nick)
+    } else {
+        handleAnswer(false, ws, nick)
+    }
 };
+
+function handleAnswer(correct: boolean, ws:WebSocket, nick:string){
+    if (correct) {
+        ws.send(JSON.stringify({ type: "movePawn", nick: nick, fieldsToMove: 1, shouldMoveFlag: true }));
+    } else {
+        ws.send(JSON.stringify({ type: "movePawn", nick: nick, fieldsToMove: -1, shouldMoveFlag: true }));
+    }
+}
 
 function QuestionPopup() {
     const [chosen,setChosen] = useState<number|null>(null);
     const [question,setQuestion] = useState<Question | null>(null);
-
+    
     globalSetChosen = setChosen;
     globalSetQuestion = setQuestion;
 
     const correct:number | null = question==null ? null : question.correctAnswerId;
-
     const questionList = question==null ? null : question.answers.map((question :string,index:number)=>{
         if(chosen==null || (index!=correct && index!=chosen)){
             return <div className="border-0 whitespace-normal overflow-wrap-break-word justify-center rounded-[20px] bg-gradient-to-br from-purple-700 to-secondary m-5">{question}</div>;            
