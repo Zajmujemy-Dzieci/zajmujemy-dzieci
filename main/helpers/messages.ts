@@ -36,6 +36,7 @@ export interface DiceThrowMessage extends ClientMessage {
 export interface AnswerMessage extends ClientMessage {
   type: "answer";
   answer: string;
+  nick: string;
 }
 
 export interface ServerMessage {
