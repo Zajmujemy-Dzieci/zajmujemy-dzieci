@@ -4,6 +4,7 @@ import { useAtom } from "jotai";
 import { GameBoardConfiguration } from "../../types/GameBoardConfiguration";
 import { gameBoardConfigurationAtom } from "../../models/GameConfigAtom";
 import Link from "next/link";
+import { handleClose } from "../ranking";
 
 export default function ConfigPage() {
 
@@ -97,7 +98,7 @@ export default function ConfigPage() {
             </Link>
             <Link href="/QRcode_page">
               {/* This ugly beast below is the thing that must stay as the "useState" didn't work properly here */}
-              <a className={`btn-blue mx-4 ${!(gameBoardConfiguration.numberOfBadSpecialFields >= 0 && gameBoardConfiguration.numberOfGoodSpecialFields >= 0 && gameBoardConfiguration.numberOfBadSpecialFields + gameBoardConfiguration.numberOfGoodSpecialFields <= gameBoardConfiguration.numberOfQuestionFields) ? 'pointer-events-none opacity-50' : ''}`}>
+              <a onClick={handleClose} className={`btn-blue mx-4 ${!(gameBoardConfiguration.numberOfBadSpecialFields >= 0 && gameBoardConfiguration.numberOfGoodSpecialFields >= 0 && gameBoardConfiguration.numberOfBadSpecialFields + gameBoardConfiguration.numberOfGoodSpecialFields <= gameBoardConfiguration.numberOfQuestionFields) ? 'pointer-events-none opacity-50' : ''}`}>
                 Przejdź dalej
               </a>
             </Link>

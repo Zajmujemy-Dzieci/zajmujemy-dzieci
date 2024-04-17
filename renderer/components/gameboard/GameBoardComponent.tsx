@@ -217,7 +217,7 @@ export default function GameBoardComponent({
   }
 
   return (
-    <div className={`w-full h-full place-content-center grid gap-4`}>
+    <div className="w-full h-full place-content-center grid gap-4">
       {isPopupOpen && (
         <div onClick={() => setPopupOpen(false)}>
           <SpecialPopupComponent

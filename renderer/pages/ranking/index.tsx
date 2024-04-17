@@ -7,11 +7,12 @@ import { Player } from "../../types/Player";
 import Image from "next/image";
 import styles from "./styles.module.scss";
 
-function handleClose() {
+export function handleClose() {
   const ws = new WebSocket("ws://localhost:3000/ws");
   ws.onopen = () => {
     ws.send(JSON.stringify({ type: "reset" }));
   };
+  console.log("Reseting websocket");
 }
 
 export default function RankingPage() {

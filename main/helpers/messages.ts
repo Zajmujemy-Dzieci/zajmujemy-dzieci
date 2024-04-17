@@ -138,17 +138,6 @@ export const handleMessage = (msg: ClientMessage, ws: WebSocket) => {
   }
 };
 
-export const throwDice = (nick: string) => {
-  const ws = game.clients.get(nick);
-
-  if (!ws) {
-    console.error("No such ws", nick);
-    return;
-  }
-
-  ws.send({ type: "throwDice" });
-};
-
 const handlePing = (ws: WebSocket) => {
   console.log("Ping");
   ws.send(JSON.stringify({ type: "pong" }));
