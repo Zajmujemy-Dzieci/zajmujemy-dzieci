@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import styles from './CountdownClock.module.scss'
 
 interface CountdownClockProps {
   timeoutInSeconds: number;
@@ -29,14 +30,14 @@ const CountdownClock: React.FC<CountdownClockProps> = ({ timeoutInSeconds, onTim
     }
   }, [remainingTime, onTimeout]);
 
-  const setTime = (newTime: number) => {
-    // Validate newTime if needed (e.g., ensure it's positive)
-    setRemainingTime(newTime);
-  };
 
   return (
-      <div>
-        Pozostały czas: {remainingTime}
+      <div className={styles['countdown-clock-container']}>
+        <div className={styles['countdown-clock-oval']}>
+          <div className={`${styles['countdown-clock-text']} ${remainingTime <= 5 && styles['red-text']}`}>
+            Pozostały czas: {remainingTime}
+          </div>
+        </div>
       </div>
   );
 };
