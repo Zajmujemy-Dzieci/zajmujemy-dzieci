@@ -8,6 +8,11 @@ interface CountdownClockProps {
 const CountdownClock: React.FC<CountdownClockProps> = ({ timeoutInSeconds, onTimeout }) => {
   const [remainingTime, setRemainingTime] = useState<number>(timeoutInSeconds);
 
+  // Ten useEffect będzie reagował na zmiany wartości timeoutInSeconds
+  useEffect(() => {
+    setRemainingTime(timeoutInSeconds); // Resetowanie czasu odliczania
+  }, [timeoutInSeconds]);
+
   useEffect(() => {
     const timer = setInterval(() => {
       setRemainingTime((prevTime) => prevTime - 1);
@@ -30,9 +35,9 @@ const CountdownClock: React.FC<CountdownClockProps> = ({ timeoutInSeconds, onTim
   };
 
   return (
-    <div>
-      Pozostały czas: {remainingTime}
-    </div>
+      <div>
+        Pozostały czas: {remainingTime}
+      </div>
   );
 };
 

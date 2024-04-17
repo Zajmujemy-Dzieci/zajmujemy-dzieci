@@ -5,8 +5,9 @@ import { BoardField } from "./GameBoardComponent";
 import axios, { Axios, AxiosResponse } from "axios";
 import LazyIcon from "../../models/IconsManager";
 import { loadQuestion, revealAnswer } from "./QuestionPopup";
+import { QuestionList } from "../../models/QuestionList";
 import { Question } from "../../models/Question";
-import { ANSWER_TIMEOUT } from "../../../main/constants";
+import {ANSWER_TIMEOUT, THROW_DICE_TIMEOUT} from "../../../main/constants";
 
 type GameBoardPawnProps = {
   player: Player;
@@ -17,20 +18,25 @@ type GameBoardPawnProps = {
   openClock: (timeInSeconds: number) => Promise<void>;
 };
 
+function diceTimer(showTimer: (timeInSeconds: number) => void){
+  showTimer(THROW_DICE_TIMEOUT / 1000);
+}
+
+const questionList: QuestionList = QuestionList.getInstance();
+let globalSetQuestion: Question | null = null;
+
 // TODO: socket communication attachment
 function redirectToQuestionPage(
-  player: Player,
-  ws: WebSocket,
-  showTimer: (timeInSeconds: number) => void
+    player: Player,
+    ws: WebSocket,
+    showTimer: (timeInSeconds: number) => void
 ) {
-  const sampleQuestion = new Question(
-    "What is the capital of France?",
-    ["Paris", "Berlin", "Madrid", "Yekaterinburgh"],
-    0
-  );
+
+  const sampleQuestion = questionList.getQuestion();
 
   const possibleAnswers = sampleQuestion.answers.length; // To powinno byc pobierane z Question
   console.log("PosAnswers:" + possibleAnswers);
+  globalSetQuestion = sampleQuestion;
   loadQuestion(sampleQuestion);
 
   ws.send(
@@ -40,6 +46,7 @@ function redirectToQuestionPage(
       nick: player.nick,
     })
   );
+
   showTimer(ANSWER_TIMEOUT / 1000);
 }
 
@@ -88,12 +95,11 @@ export default function GameBoardPawn({
         let data = JSON.parse(event.data);
         console.log("Received message: ", event.data);
         console.log("Data type: ", data.type);
+        diceTimer(openClock);
         if (data.type === "movePawn" && data.nick == player.nick) {
-          movePawn(data.fieldsToMove, false);
+          movePawn(data.fieldsToMove, data.shouldMoveFlag);
         } else if (data.type == "answer" && data.nick == player.nick) {
-          revealAnswer(data.answer);
-        } else if (data.type == "answer" && data.nick == player.nick) {
-          revealAnswer(data.answer);
+          revealAnswer(data.answer, globalSetQuestion, ws, player.nick);
         }
       };
     }
@@ -101,6 +107,8 @@ export default function GameBoardPawn({
 
   async function handleGoodField() {
     const fieldsToMove = Math.floor(Math.random() * 4) + 1;
+    diceTimer(openClock);
+
     if (fieldsToMove == 1) {
       await handleOpenSpecialPopup("Idziesz 1 pole do przodu!");
     } else {
@@ -111,6 +119,7 @@ export default function GameBoardPawn({
 
   async function handleBadField() {
     const fieldsToMove = Math.floor(Math.random() * 4) + 1;
+    diceTimer(openClock);
     if (fieldsToMove == 1) {
       await handleOpenSpecialPopup("Idziesz 1 pole do tyłu!");
     } else {
@@ -119,9 +128,10 @@ export default function GameBoardPawn({
     movePawn(-fieldsToMove, true);
   }
 
-  function movePawn(fieldsToMove: number, specialFlag: boolean) {
+  function movePawn(fieldsToMove: number, shouldMoveFlag: boolean) {
     setCurrentPosition((prevPosition) => {
       const newPosition = prevPosition + fieldsToMove;
+      
       if (newPosition >= boardFields.length - 1) {
         player.score = boardFields.length - 1;
         handleFinishGame(player, ws, showFinishGamePopup);
@@ -131,22 +141,25 @@ export default function GameBoardPawn({
         player.score = 0;
         return 0;
       }
-      console.log("Current position type: " + boardFields[newPosition].type);
-      player.score = currentPosition + fieldsToMove;
+      player.score = newPosition;
       if (boardFields[newPosition].type !== "question") {
         ws.send(
           JSON.stringify({ type: "question", nick: "", possibleAnswers: 0 })
         );
         console.log("No question");
       }
-      if (boardFields[newPosition].type === "question" && !specialFlag) {
+      if (boardFields[newPosition].type === "question" && !shouldMoveFlag) {
         redirectToQuestionPage(player, ws, openClock);
       } else if (boardFields[newPosition].type === "finish") {
         handleFinishGame(player, ws, showFinishGamePopup);
-      } else if (boardFields[newPosition].type === "good" && !specialFlag) {
+      } else if (boardFields[newPosition].type === "good" && !shouldMoveFlag) {
+        diceTimer(openClock);
         handleGoodField();
-      } else if (boardFields[newPosition].type === "bad" && !specialFlag) {
+      } else if (boardFields[newPosition].type === "bad" && !shouldMoveFlag) {
+        diceTimer(openClock);
         handleBadField();
+      } else if(boardFields[newPosition].type === "empty") {
+        diceTimer(openClock);
       }
       return newPosition;
     });

@@ -8,7 +8,7 @@ import { webSocketAtom } from "../../models/WebSocketAtom";
 import SpecialPopupComponent from "./SpecialPopupComponent";
 import QuestionPopup from "./QuestionPopup";
 import GameOverPopup from "./GameOverPopup";
-import CountdownClock from "./CountdownClock";
+import CountdownClock from "../../pages/gameboard/CountdownClock";
 
 export type BoardFieldSpecialty =
   | "question"
@@ -220,8 +220,11 @@ export default function GameBoardComponent({
   const [isClockOpen, setClockOpen] = useState(false);
   const [timeInSeconds, setTimeInSeconds] = useState(0);
   async function openClock(timeInSeconds: number) {
-    setClockOpen(true);
-    setTimeInSeconds(timeInSeconds);
+    setClockOpen(false);
+    setTimeout(() => {
+      setTimeInSeconds(timeInSeconds);
+      setClockOpen(true);
+    }, 0);
   }
 
   return (
