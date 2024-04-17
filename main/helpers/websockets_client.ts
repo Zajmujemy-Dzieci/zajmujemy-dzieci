@@ -90,7 +90,10 @@ export const websockets_client = (address: string) => `<!DOCTYPE html>
                 setTimeout(function(){
                     showDicePage(false);
                     showWaitForYourTurnPage(true);
-                    ws.send(JSON.stringify({ type: 'dice', dice: Math.floor(Math.random() * 6) + 1,nick:nick }));
+                    const availableNumbers = [1, 2, 3, 5];
+                    const randomIndex = Math.floor(Math.random() * availableNumbers.length);
+                    const randomDice = availableNumbers[randomIndex];
+                    ws.send(JSON.stringify({ type: 'dice', dice: randomDice ,nick:nick }));
                 },2000);            
                 
             })
@@ -198,7 +201,8 @@ export const websockets_client = (address: string) => `<!DOCTYPE html>
             text-align: center;
             font-size: 40px;
             border: 2px solid black;
-            background-color: orange;
+            color: white;
+            background-color: #301A4B;
             border-radius: 30px;
 
         }
@@ -208,19 +212,36 @@ export const websockets_client = (address: string) => `<!DOCTYPE html>
             margin: 5px;
         }
         .ansOdd{
-            background: linear-gradient(to bottom right, purple, pink);
+            background: #F39A9D;
         }
         .ansEven{
-            background: linear-gradient(to bottom right, blue, lightgreen);
+            background: #FFEAEC;
         }
         .ansOdd:hover{
-            background: linear-gradient(to bottom right, green, yellow);
+            background: #FFEAEC;
         }
         .ansEven:hover{
-            background: linear-gradient(to bottom right, green, yellow);
+            background: #F39A9D;
         }
         .hidden{
             display: none;
+        }
+
+        #usernameDiv {
+            width: 200px; 
+            margin: 0 auto; 
+            background-color: #301A4B;
+            border-radius: 10px; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center;
+            margin-bottom: 20px;
+        }        
+
+        #usernameDiv p {
+            margin: 0; 
+            color: white;
+            text-transform: uppercase;
         }
 
         #outerDiv{
@@ -236,21 +257,36 @@ export const websockets_client = (address: string) => `<!DOCTYPE html>
             font-size: 30px;
         }
         #confirmationDiv{                   
-            background: purple;
+            background: #301A4B;
             border: 2px solid black;         
             padding: 20px;
             
         }
+
+        #selectionAnnouncement {
+            color: white;
+            text-transform: uppercase;
+        }
+
         #confirmButton{
             width: 200px;
-            height: 100px;
+            height: 70px;
             font-size: 30px;
+            background: #F39A9D;
+            margin-bottom: 20px;
+            color: white;
+            border-radius: 10px; 
         }
+
         #cancelButton{
             width: 200px;
-            height: 100px;
+            height: 70px;
             font-size: 30px;
+            background: #F39A9D;
+            color: white;
+            border-radius: 10px; 
         }
+
         body{
             background-color: lightblue;
             justify-content: center;

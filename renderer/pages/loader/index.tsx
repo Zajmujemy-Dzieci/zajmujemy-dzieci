@@ -1,16 +1,16 @@
 import React, { useState, useEffect, useRef } from "react";
 import Head from "next/head";
 import Link from "next/link";
-import QuestionComponent from "./QuestionComponent";
+import QuestionComponent from "../../components/loader/QuestionComponent";
 import { QuestionList } from "../../models/QuestionList";
 import { Question } from "../../models/Question";
 import { z } from "zod";
 import { QuestionType } from "../../types/QuestionType";
 import Image from "next/image";
-import styles from "./styles.module.scss";
+import styles from "../../components/loader/styles.module.scss";
 import classNames from "classnames";
-import ActionButton from "./ActionButton";
-import QuestionsList from "./QuestionsList";
+import ActionButton from "../../components/loader/ActionButton";
+import QuestionsList from "../../components/loader/QuestionsList";
 
 const zQuestion = z.array(
   z.object({
