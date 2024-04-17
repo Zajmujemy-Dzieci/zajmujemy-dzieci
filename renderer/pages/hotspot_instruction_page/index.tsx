@@ -13,18 +13,18 @@ export default function hotspotPage() {
         <div className="flex min-w-full flex-col text-4xl" >
             <div className='flex'>
                 <div className="m-10">
-                    <li>Klikamy przycisk windows</li>
-                    <li>Wyszukujemy 'hotspot'</li>
-                    <li>Następnie klikamy w zakładce hotspot mobilny: włącz</li>
-                    <li>W zakładce właściwości jest podana nazwa sieci oraz hasło do niej</li>
+                    <li>Klikamy przycisk Windows znajdujący się w lewym dolnym rogu ekranu</li>
+                    <li>Wyszukujemy "Hotspot"</li>
+                    <li>Następnie w zakładce "Hotspot mobilny" klikamy "Włącz"</li>
+                    <li>W zakładce "Właściwości" jest podana nazwa sieci oraz hasło do niej</li>
                 </div>
             </div>
         </div>
-        <div className="mt-1 w-full flex-wrap flex justify-center text-4xl">
-            <Link href="/QRcode_page">
-            <a className="btn-blue">Powrót do QR</a>
-            </Link>
-        </div>
+            <div className="mt-1 w-full flex-wrap flex justify-center text-4xl">
+                <Link href="/QRcode_page">
+                    <a className="btn-blue">Powrót do QR</a>
+                </Link>
+            </div>
         </React.Fragment>
     )
 }
