@@ -6,6 +6,7 @@ import axios, { Axios, AxiosResponse } from "axios";
 import LazyIcon from "../../models/IconsManager";
 import { loadQuestion, revealAnswer } from "./QuestionPopup";
 import { QuestionList } from "../../models/QuestionList";
+import { Question } from "../../models/Question";
 
 type GameBoardPawnProps = {
   player: Player;
@@ -16,6 +17,7 @@ type GameBoardPawnProps = {
 };
 
 const questionList: QuestionList = QuestionList.getInstance();
+let globalSetQuestion: Question | null = null;
 
 // TODO: socket communication attachment
 function redirectToQuestionPage(player: Player, ws: WebSocket) {
@@ -23,6 +25,7 @@ function redirectToQuestionPage(player: Player, ws: WebSocket) {
 
   const possibleAnswers = sampleQuestion.answers.length; // To powinno byc pobierane z Question
   console.log("PosAnswers:" + possibleAnswers);
+  globalSetQuestion = sampleQuestion;
   loadQuestion(sampleQuestion);
 
   ws.send(
@@ -81,9 +84,7 @@ export default function GameBoardPawn({
         if (data.type === "movePawn" && data.nick == player.nick) {
           movePawn(data.fieldsToMove, false);
         } else if (data.type == "answer" && data.nick == player.nick) {
-          revealAnswer(data.answer);
-        } else if (data.type == "answer" && data.nick == player.nick) {
-          revealAnswer(data.answer);
+          revealAnswer(data.answer, globalSetQuestion, ws, player.nick);
         }
       };
     }
