@@ -8,6 +8,8 @@ import { webSocketAtom } from "../../models/WebSocketAtom";
 import SpecialPopupComponent from "./SpecialPopupComponent";
 import QuestionPopup from "./QuestionPopup";
 import GameOverPopup from "./GameOverPopup";
+import { questionAtom } from "../../models/QuestionAtom";
+import { resolve } from "path";
 
 export type BoardFieldSpecialty =
   | "question"
@@ -52,6 +54,7 @@ export default function GameBoardComponent({
   const [isPopupOpen, setPopupOpen] = useState(false);
   const [popupText, setPopupText] = useState("");
   const [isGameOverPopupOpen, setGameOverPopupOpen] = useState(false);
+  const [isQuestionPopupOpen, setIsQuestionPopupOpen] = useState(false);
   const [gridPositions, setGridPositions] = useState<BoardField[]>([]);
   const [numberOfColumns] = useState(
     countNumberOfColumns(configuration.numberOfQuestionFields)
@@ -209,6 +212,16 @@ export default function GameBoardComponent({
       setGameOverPopupOpen(true);
     });
   }
+
+  function handleShowQuestionPopup() {
+    return new Promise<void>((resolve) => {
+      setIsQuestionPopupOpen(true);
+      setTimeout(() => {
+        setIsQuestionPopupOpen(false);
+        resolve();
+      }, 10000);
+    });
+  }
   if (!players) {
     return <div>Nie ma z kim grać...</div>;
   }
@@ -237,7 +250,7 @@ export default function GameBoardComponent({
         </div>
       )}
 
-      <QuestionPopup />
+      {isQuestionPopupOpen && <QuestionPopup />}
 
       <div
         style={{ gridRow: 1, gridColumn: 1 }}
@@ -272,6 +285,7 @@ export default function GameBoardComponent({
             boardFields={gridPositions}
             handleOpenSpecialPopup={handleOpenSpecialPopup}
             showGameOverPopup={handleShowGameOverPopup}
+            showQuestionPopup={handleShowQuestionPopup}
           />
         ))}
     </div>

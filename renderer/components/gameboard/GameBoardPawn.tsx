@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { Dispatch, useEffect, useState } from "react";
 import { Player } from "../../types/Player";
 import { twMerge } from "tailwind-merge";
 import { BoardField } from "./GameBoardComponent";
@@ -7,6 +7,9 @@ import LazyIcon from "../../models/IconsManager";
 import { loadQuestion, revealAnswer } from "./QuestionPopup";
 import { QuestionList } from "../../models/QuestionList";
 import { Question } from "../../models/Question";
+import { SetStateAction, useSetAtom } from "jotai";
+import { chosenAtom } from "../../models/ChosenAtom";
+import { questionAtom } from "../../models/QuestionAtom";
 
 type GameBoardPawnProps = {
   player: Player;
@@ -14,19 +17,27 @@ type GameBoardPawnProps = {
   boardFields: BoardField[];
   handleOpenSpecialPopup: (text: string) => Promise<void>;
   showGameOverPopup: () => Promise<void>;
+  showQuestionPopup: () => Promise<void>;
 };
 
 const questionList: QuestionList = QuestionList.getInstance();
 let globalSetQuestion: Question | null = null;
 
 // TODO: socket communication attachment
-function redirectToQuestionPage(player: Player, ws: WebSocket) {
+function redirectToQuestionPage(
+  player: Player,
+  ws: WebSocket,
+  setQuestion: Dispatch<SetStateAction<Question | null>>,
+  setChosen: Dispatch<SetStateAction<number | null>>,
+  showQuestionPopup: () => Promise<void>
+) {
   const sampleQuestion = questionList.getQuestion();
 
   const possibleAnswers = sampleQuestion.answers.length; // To powinno byc pobierane z Question
   console.log("PosAnswers:" + possibleAnswers);
   globalSetQuestion = sampleQuestion;
-  loadQuestion(sampleQuestion);
+  showQuestionPopup();
+  loadQuestion(sampleQuestion, setChosen, setQuestion);
 
   ws.send(
     JSON.stringify({
@@ -52,12 +63,15 @@ export default function GameBoardPawn({
   boardFields,
   handleOpenSpecialPopup,
   showGameOverPopup: showFinishGamePopup,
+  showQuestionPopup,
 }: GameBoardPawnProps) {
   const [currentPosition, setCurrentPosition] = useState(0);
   const [ws, setWs] = useState<WebSocket>(
     new WebSocket("ws://localhost:3000/ws")
   );
   const [ipAddress, setIPAddress] = useState<string>("");
+  const setChosen = useSetAtom(chosenAtom);
+  const setQuestion = useSetAtom(questionAtom);
 
   useEffect(() => {
     axios
@@ -84,7 +98,13 @@ export default function GameBoardPawn({
         if (data.type === "movePawn" && data.nick == player.nick) {
           movePawn(data.fieldsToMove, data.shouldMoveFlag);
         } else if (data.type == "answer" && data.nick == player.nick) {
-          revealAnswer(data.answer, globalSetQuestion, ws, player.nick);
+          revealAnswer(
+            data.answer,
+            globalSetQuestion,
+            ws,
+            player.nick,
+            setChosen
+          );
         }
       };
     }
@@ -113,7 +133,7 @@ export default function GameBoardPawn({
   function movePawn(fieldsToMove: number, shouldMoveFlag: boolean) {
     setCurrentPosition((prevPosition) => {
       const newPosition = prevPosition + fieldsToMove;
-      
+
       if (newPosition >= boardFields.length - 1) {
         player.score = boardFields.length - 1;
         handleFinishGame(player, ws, showFinishGamePopup);
@@ -131,7 +151,13 @@ export default function GameBoardPawn({
         console.log("No question");
       }
       if (boardFields[newPosition].type === "question" && !shouldMoveFlag) {
-        redirectToQuestionPage(player, ws);
+        redirectToQuestionPage(
+          player,
+          ws,
+          setQuestion,
+          setChosen,
+          showQuestionPopup
+        );
       } else if (boardFields[newPosition].type === "finish") {
         handleFinishGame(player, ws, showFinishGamePopup);
       } else if (boardFields[newPosition].type === "good" && !shouldMoveFlag) {
