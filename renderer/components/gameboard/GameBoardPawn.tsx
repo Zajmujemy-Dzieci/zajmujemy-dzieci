@@ -7,6 +7,7 @@ import LazyIcon from "../../models/IconsManager";
 import { loadQuestion, revealAnswer } from "./QuestionPopup";
 import { QuestionList } from "../../models/QuestionList";
 import { Question } from "../../models/Question";
+import {ANSWER_TIMEOUT, THROW_DICE_TIMEOUT} from "../../../main/constants";
 
 type GameBoardPawnProps = {
   player: Player;
@@ -14,13 +15,23 @@ type GameBoardPawnProps = {
   boardFields: BoardField[];
   handleOpenSpecialPopup: (text: string) => Promise<void>;
   showGameOverPopup: () => Promise<void>;
+  openClock: (timeInSeconds: number) => Promise<void>;
 };
+
+function diceTimer(showTimer: (timeInSeconds: number) => void){
+  showTimer(THROW_DICE_TIMEOUT / 1000);
+}
 
 const questionList: QuestionList = QuestionList.getInstance();
 let globalSetQuestion: Question | null = null;
 
 // TODO: socket communication attachment
-function redirectToQuestionPage(player: Player, ws: WebSocket) {
+function redirectToQuestionPage(
+    player: Player,
+    ws: WebSocket,
+    showTimer: (timeInSeconds: number) => void
+) {
+
   const sampleQuestion = questionList.getQuestion();
 
   const possibleAnswers = sampleQuestion.answers.length; // To powinno byc pobierane z Question
@@ -35,6 +46,8 @@ function redirectToQuestionPage(player: Player, ws: WebSocket) {
       nick: player.nick,
     })
   );
+
+  showTimer(ANSWER_TIMEOUT / 1000);
 }
 
 function handleFinishGame(
@@ -52,6 +65,7 @@ export default function GameBoardPawn({
   boardFields,
   handleOpenSpecialPopup,
   showGameOverPopup: showFinishGamePopup,
+  openClock,
 }: GameBoardPawnProps) {
   const [currentPosition, setCurrentPosition] = useState(0);
   const [ws, setWs] = useState<WebSocket>(
@@ -81,6 +95,7 @@ export default function GameBoardPawn({
         let data = JSON.parse(event.data);
         console.log("Received message: ", event.data);
         console.log("Data type: ", data.type);
+        diceTimer(openClock);
         if (data.type === "movePawn" && data.nick == player.nick) {
           movePawn(data.fieldsToMove, data.shouldMoveFlag);
         } else if (data.type == "answer" && data.nick == player.nick) {
@@ -92,6 +107,8 @@ export default function GameBoardPawn({
 
   async function handleGoodField() {
     const fieldsToMove = Math.floor(Math.random() * 4) + 1;
+    diceTimer(openClock);
+
     if (fieldsToMove == 1) {
       await handleOpenSpecialPopup("Idziesz 1 pole do przodu!");
     } else {
@@ -102,6 +119,7 @@ export default function GameBoardPawn({
 
   async function handleBadField() {
     const fieldsToMove = Math.floor(Math.random() * 4) + 1;
+    diceTimer(openClock);
     if (fieldsToMove == 1) {
       await handleOpenSpecialPopup("Idziesz 1 pole do tyłu!");
     } else {
@@ -131,13 +149,17 @@ export default function GameBoardPawn({
         console.log("No question");
       }
       if (boardFields[newPosition].type === "question" && !shouldMoveFlag) {
-        redirectToQuestionPage(player, ws);
+        redirectToQuestionPage(player, ws, openClock);
       } else if (boardFields[newPosition].type === "finish") {
         handleFinishGame(player, ws, showFinishGamePopup);
       } else if (boardFields[newPosition].type === "good" && !shouldMoveFlag) {
+        diceTimer(openClock);
         handleGoodField();
       } else if (boardFields[newPosition].type === "bad" && !shouldMoveFlag) {
+        diceTimer(openClock);
         handleBadField();
+      } else if(boardFields[newPosition].type === "empty") {
+        diceTimer(openClock);
       }
       return newPosition;
     });
