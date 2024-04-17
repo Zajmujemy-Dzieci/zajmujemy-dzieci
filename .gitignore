@@ -135,3 +135,6 @@ dist
 
 .app 
 app
+
+background.js
+preload.js
