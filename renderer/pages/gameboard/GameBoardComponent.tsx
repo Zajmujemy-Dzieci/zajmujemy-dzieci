@@ -8,6 +8,7 @@ import { webSocketAtom } from "../../models/WebSocketAtom";
 import SpecialPopupComponent from "./SpecialPopupComponent";
 import QuestionPopup from "./QuestionPopup"
 import GameOverPopup from "./GameOverPopup";
+import CountdownClock from "./CountdownClock";
 
 export type BoardFieldSpecialty =
   | "question"
@@ -231,6 +232,13 @@ export default function GameBoardComponent({
     });
   }
 
+  const [isClockOpen, setClockOpen] = useState(false);
+  const [timeInSeconds, setTimeInSeconds] = useState(0);
+  async function openClock(timeInSeconds: number) {
+    setClockOpen(true);
+    setTimeInSeconds(timeInSeconds);
+  }
+
   return (
     <div className={`w-full h-full place-content-center grid gap-4`}>
       {isPopupOpen && (
@@ -248,6 +256,15 @@ export default function GameBoardComponent({
           <GameOverPopup
             isOpen={isGameOverPopupOpen}
             onClose={() => setGameOverPopupOpen(false)}
+          />
+        </div>
+      )}
+
+      {isClockOpen && (
+        <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2">
+          <CountdownClock
+            timeoutInSeconds={timeInSeconds}
+            onTimeout={() => setClockOpen(false)}
           />
         </div>
       )}
@@ -290,6 +307,7 @@ export default function GameBoardComponent({
           boardFields={gridPositions}
           handleOpenSpecialPopup={handleOpenSpecialPopup}
           showGameOverPopup={handleShowGameOverPopup}
+          openClock={openClock}
         />
       ))}
     </div>

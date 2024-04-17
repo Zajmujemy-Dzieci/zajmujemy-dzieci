@@ -1,3 +1,4 @@
+import { ANSWER_TIMEOUT, THROW_DICE_TIMEOUT } from "../constants";
 import { handleAnswer, handleDiceThrow } from "./messages";
 
 // Forming a main game loop
@@ -71,7 +72,7 @@ class Game {
     this.timer = setTimeout(() => {
       console.log("Timeout");
       handleAnswer({ type: "answer", answer: "Timeout", nick: to });
-    }, 10000); // 10 seconds timeout
+    }, ANSWER_TIMEOUT); // 30 seconds timeout
 
     return ws;
   }
@@ -103,7 +104,7 @@ class Game {
       this.clients
         .get(this.getActivePlayer())
         ?.send(JSON.stringify({ type: "timeout" }));
-    }, 10000);
+    }, THROW_DICE_TIMEOUT);
 
     return true;
   }

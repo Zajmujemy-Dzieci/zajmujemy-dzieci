@@ -6,6 +6,7 @@ import axios, { Axios, AxiosResponse } from "axios";
 import LazyIcon from "../../models/IconsManager";
 import { loadQuestion, revealAnswer } from "./QuestionPopup";
 import { Question } from "../../models/Question";
+import { ANSWER_TIMEOUT } from "../../../main/constants";
 
 type GameBoardPawnProps = {
   player: Player;
@@ -13,10 +14,11 @@ type GameBoardPawnProps = {
   boardFields: BoardField[];
   handleOpenSpecialPopup: (text: string) => void;
   showGameOverPopup: () => void;
+  openClock: (timeInSeconds: number) => void;
 };
 
 // TODO: socket communication attachment
-function redirectToQuestionPage(player: Player, ws: WebSocket) {
+function redirectToQuestionPage(player: Player, ws: WebSocket, showTimer: (timeInSeconds: number) => void) {
   const sampleQuestion = new Question(
     "What is the capital of France?",
     ["Paris", "Berlin", "Madrid", "Yekaterinburgh"],
@@ -34,6 +36,7 @@ function redirectToQuestionPage(player: Player, ws: WebSocket) {
       nick: player.nick,
     })
   );
+  showTimer(ANSWER_TIMEOUT/1000);
 }
 
 function handleFinishGame(player: Player, ws: WebSocket, showGameOverPopup: () => void) {
@@ -47,6 +50,7 @@ export default function GameBoardPawn({
   boardFields,
   handleOpenSpecialPopup,
   showGameOverPopup: showFinishGamePopup,
+  openClock,
 }: GameBoardPawnProps) {
   if (!boardFields) {
     return <div>Nie ma z kim grać...</div>;
@@ -133,7 +137,7 @@ export default function GameBoardPawn({
         console.log("No question");
       }
       if (boardFields[newPosition].type === "question" && !specialFlag) {
-        redirectToQuestionPage(player, ws);
+        redirectToQuestionPage(player, ws, openClock);
       } else if (boardFields[newPosition].type === "finish") {
         handleFinishGame(player, ws, showFinishGamePopup);
       } else if (boardFields[newPosition].type === "good" && !specialFlag) {
