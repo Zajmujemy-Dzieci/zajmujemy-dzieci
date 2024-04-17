@@ -87,7 +87,10 @@ export const websockets_client = (address: string) => `<!DOCTYPE html>
                 setTimeout(function(){
                     showDicePage(false);
                     showWaitForYourTurnPage(true);
-                    ws.send(JSON.stringify({ type: 'dice', dice: Math.floor(Math.random() * 6) + 1,nick:nick }));
+                    const availableNumbers = [1, 2, 3, 5];
+                    const randomIndex = Math.floor(Math.random() * availableNumbers.length);
+                    const randomDice = availableNumbers[randomIndex];
+                    ws.send(JSON.stringify({ type: 'dice', dice: randomDice ,nick:nick }));
                 },2000);            
                 
             })
