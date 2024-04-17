@@ -12,6 +12,7 @@ type GameBoardPawnProps = {
   shift: { x: number; y: number };
   boardFields: BoardField[];
   handleOpenSpecialPopup: (text: string) => void;
+  showGameOverPopup: () => void;
 };
 
 // TODO: socket communication attachment
@@ -35,15 +36,17 @@ function redirectToQuestionPage(player: Player, ws: WebSocket) {
   );
 }
 
-function handleFinishGame(player: Player, ws: WebSocket) {
-  ws.send(JSON.stringify({ type: "gameFinish" }));
+function handleFinishGame(player: Player, ws: WebSocket, showGameOverPopup: () => void) {
+  ws.send(JSON.stringify({ type: "gameFinish"}));
+  showGameOverPopup();
 }
 
 export default function GameBoardPawn({
   player,
   shift,
   boardFields,
-  handleOpenSpecialPopup = (text: string) => {},
+  handleOpenSpecialPopup,
+  showGameOverPopup: showFinishGamePopup,
 }: GameBoardPawnProps) {
   if (!boardFields) {
     return <div>Nie ma z kim grać...</div>;
@@ -115,7 +118,7 @@ export default function GameBoardPawn({
       const newPosition = prevPosition + fieldsToMove;
       if (newPosition >= boardFields.length - 1) {
         player.score = boardFields.length - 1;
-        handleFinishGame(player, ws);
+        handleFinishGame(player, ws, showFinishGamePopup);
         return boardFields.length - 1;
       }
       if (newPosition <= 0) {
@@ -132,7 +135,7 @@ export default function GameBoardPawn({
       if (boardFields[newPosition].type === "question" && !specialFlag) {
         redirectToQuestionPage(player, ws);
       } else if (boardFields[newPosition].type === "finish") {
-        handleFinishGame(player, ws);
+        handleFinishGame(player, ws, showFinishGamePopup);
       } else if (boardFields[newPosition].type === "good" && !specialFlag) {
         handleGoodField();
       } else if (boardFields[newPosition].type === "bad" && !specialFlag) {
