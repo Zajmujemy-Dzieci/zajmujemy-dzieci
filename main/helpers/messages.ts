@@ -180,11 +180,29 @@ const handleRegister = (msg: RegisterMessage, ws: WebSocket) => {
     return;
   }
 
-  if (game.isInProgress()) {
-    const replacedClient = game.clients.get(msg.nick);
-    if (replacedClient === undefined) {
+  const replacedClient = game.clients.get(msg.nick);
+  if (replacedClient === undefined) {
+    if (game.isInProgress()) {
       console.log("Client not connected", msg.nick);
+    } else {
+      let nick = undefined;
+
+      while (nick === undefined || game.clients.has(nick)) {
+        nick = nicks[currentTurn % nicks.length];
+        currentTurn++;
+      }
+
+      nicks[currentTurn % nicks.length];
+      currentTurn++;
+      game.clients.set(nick, client);
+      game.order.push(nick);
+
+      console.log("Registered", nick, game.clients.size);
+      ws.send(JSON.stringify({ type: "NICK", nick: nick }));
+      const newPlayerMessage: NewPlayerMessage = { type: "newPlayer", nick };
+      game.clients.get("host")?.sendHost(newPlayerMessage);
     }
+  } else {
     replacedClient!.isOnline((alive) => {
       if (alive) {
         console.log("Can't reconnect when client is online", msg.nick);
@@ -197,16 +215,6 @@ const handleRegister = (msg: RegisterMessage, ws: WebSocket) => {
         ws.send(JSON.stringify({ type: "NICK", nick: msg.nick }));
       }
     });
-  } else {
-    let nick = nicks[currentTurn % nicks.length];
-    currentTurn++;
-    game.clients.set(nick, client);
-    game.order.push(nick);
-
-    console.log("Registered", nick, game.clients.size);
-    ws.send(JSON.stringify({ type: "NICK", nick: nick }));
-    const newPlayerMessage: NewPlayerMessage = { type: "newPlayer", nick };
-    game.clients.get("host")?.sendHost(newPlayerMessage);
   }
 };
 

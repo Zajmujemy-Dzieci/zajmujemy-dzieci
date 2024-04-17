@@ -30,7 +30,7 @@ export default class Client {
             this.checks.forEach((check) => check(false));
             this.checks = [];
             this.ws.close();
-        }, 5000);
+        }, 500);
     }
 
     handlePong() {
