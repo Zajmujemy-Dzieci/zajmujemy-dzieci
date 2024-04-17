@@ -17,6 +17,8 @@ export default function hotspotPage() {
                     <li>Wyszukujemy "Hotspot"</li>
                     <li>Następnie w zakładce "Hotspot mobilny" klikamy "Włącz"</li>
                     <li>W zakładce "Właściwości" jest podana nazwa sieci oraz hasło do niej</li>
+                    <li>Istnieje również możliwość udostępnienia Hotspota z telefonu komórkowego.
+                        Informacje jak to zrobić znajdziesz pod linkiem : https://www.youtube.com/watch?v=WMK9Zzjduzo</li>
                 </div>
             </div>
         </div>

@@ -20,9 +20,10 @@ export default function HomePage() {
                   />
               </div>
               <div className="p-5 text-4xl" style={{fontSize: '3rem'}}>
-                  Witaj w Nextron!
-                  <div className="my-5 text-2xl" style={{fontSize: '2rem'}}>
-                      Zmień lekcje w przygodę - nauczaj poprzez zabawę!
+                  Zmień lekcje w przygodę
+
+                  <div className="my-5 text-2xl" style={{fontSize: '3rem'}}>
+                      Nauczaj poprzez zabawę!
                   </div>
               </div>
           </div>
