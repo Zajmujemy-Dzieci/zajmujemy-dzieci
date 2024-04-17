@@ -1,7 +1,7 @@
 import { handleAnswer, handleDiceThrow } from "./messages";
 
 // Forming a main game loop
-enum GameState {
+export enum GameState {
   Starting,
   Throw,
   Question,
@@ -40,6 +40,8 @@ class Game {
       return false;
     }
 
+    if (this.timer) clearTimeout(this.timer);
+
     this.state = GameState.Question;
 
     return true;
@@ -68,8 +70,8 @@ class Game {
     this.state = GameState.Answer;
     this.timer = setTimeout(() => {
       console.log("Timeout");
-      handleAnswer({ type: "answer", answer: "Timeout" });
-    }, 5000); // 10 seconds timeout
+      handleAnswer({ type: "answer", answer: "Timeout", nick: to });
+    }, 10000); // 10 seconds timeout
 
     return ws;
   }
@@ -98,7 +100,10 @@ class Game {
         nick: this.getActivePlayer(),
         dice: 1,
       });
-    }, 5000);
+      this.clients
+        .get(this.getActivePlayer())
+        ?.send(JSON.stringify({ type: "timeout" }));
+    }, 10000);
 
     return true;
   }

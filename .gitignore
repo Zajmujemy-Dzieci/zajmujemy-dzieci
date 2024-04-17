@@ -133,5 +133,5 @@ dist
 .vscode/*
 .history/*
 
-.app
+.app 
 app
