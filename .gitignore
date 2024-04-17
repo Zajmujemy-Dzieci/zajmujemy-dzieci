@@ -133,5 +133,8 @@ dist
 .vscode/*
 .history/*
 
-.app
+.app 
 app
+
+background.js
+preload.js

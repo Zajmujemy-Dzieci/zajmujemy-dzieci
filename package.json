@@ -13,6 +13,7 @@
   "dependencies": {
     "@next/font": "^14.1.4",
     "axios": "^1.6.8",
+    "classnames": "^2.5.1",
     "cors": "^2.8.5",
     "electron-serve": "^1.3.0",
     "electron-store": "^8.1.0",
@@ -20,6 +21,8 @@
     "express-ws": "^5.0.2",
     "jotai": "^2.7.1",
     "qrcode.react": "^3.1.0",
+    "react-icons": "^5.1.0",
+    "react-spinners": "^0.13.8",
     "sass": "^1.72.0",
     "tailwind-merge": "^2.2.2",
     "zod": "^3.22.4"
@@ -31,10 +34,12 @@
       "output": "release"
     },
     "win": {
-      "target": "nsis"
+      "target": "nsis",
+      "icon": "resources/icon.ico"
     },
     "mac": {
-      "target": "dmg"
+      "target": "dmg",
+      "icon": "resources/icon.icns"
     }
   },
   "devDependencies": {

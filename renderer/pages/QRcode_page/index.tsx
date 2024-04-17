@@ -7,6 +7,7 @@ import { useAtom } from "jotai";
 import { Player } from "../../types/Player";
 import { playersQueueAtom } from "../../models/PlayersQueueAtom";
 import { webSocketAtom } from "../../models/WebSocketAtom";
+import LazyIcon, { iconsMap } from "../../models/IconsManager";
 
 export default function QRcodePage() {
   const [ipAddress, setIPAddress] = useState<string>("192.168.137.1");
@@ -32,29 +33,75 @@ export default function QRcodePage() {
     }
   }
 
-  const p = [  // for debugging purposes
+  const p = [
+    // for debugging purposes
     {
       orderId: 0,
-      nick: "gracz1",
+      nick: "żółw",
       score: 0,
       background: "bg-blue-400",
+      iconName: "GiTurtle",
     },
     {
       orderId: 1,
-      nick: "gracz2",
+      nick: "wiewiórka",
       score: 0,
       background: "bg-blue-400",
+      iconName: "GiSquirrel",
     },
     {
       orderId: 2,
-      nick: "gracz3",
+      nick: "mysz",
       score: 0,
       background: "bg-blue-400",
-    }
-  ] 
+      iconName: "GiRat",
+    },
+    {
+      orderId: 3,
+      nick: "pies",
+      score: 0,
+      background: "bg-blue-400",
+      iconName: "GiSittingDog",
+    },
+    {
+      orderId: 4,
+      nick: "kot",
+      score: 0,
+      background: "bg-blue-400",
+      iconName: "GiCat",
+    },
+    {
+      orderId: 5,
+      nick: "słoń",
+      score: 0,
+      background: "bg-blue-400",
+      iconName: "GiElephant",
+    },
+    {
+      orderId: 6,
+      nick: "miś",
+      score: 0,
+      background: "bg-blue-400",
+      iconName: "GiBearFace",
+    },
+    {
+      orderId: 7,
+      nick: "ryba",
+      score: 0,
+      background: "bg-blue-400",
+      iconName: "IoFish",
+    },
+    {
+      orderId: 8,
+      nick: "kruk",
+      score: 0,
+      background: "bg-blue-400",
+      iconName: "GiRaven",
+    },
+  ];
 
   useEffect(() => {
-    setPlayers([]);    // setPlayers(p); for debugging purposes
+    setPlayers([]); // setPlayers(p); for debugging purposes
     axios
       .get<string>("http://localhost:3000/ipaddress")
       .then((response) => handleConnectToServer(response))
@@ -72,6 +119,7 @@ export default function QRcodePage() {
         score: 0,
         // TODO: randomize background
         background: "bg-blue-400",
+        iconName: iconsMap.get(nick) || "BsFillPersonFill",
       };
       const updatedPlayers = [...prevPlayers, newPlayer];
       console.log("Gracze: ", updatedPlayers);
@@ -112,15 +160,16 @@ export default function QRcodePage() {
       <div className="text-3xl absolute m-5 top-0">
         Gracze:
         {players.map((player) => (
-          <div key={player.nick} className="text-2xl">
+          <div key={player.nick} className="text-2xl flex items-center">
+            <LazyIcon iconName={player.iconName} className="mr-1" />
             {player.nick}
           </div>
         ))}
       </div>
       <div className="flex justify-center text-4xl flex-col items-center m-10">
-        <p>Adres do połączenia się: {ipAddress}:3000</p>
+        <p>Adres do połączenia się: http://{ipAddress}:3000</p>
         <div className="m-10">
-          <QRCode value={`${ipAddress}:3000`} className="m-10" size={400} />
+          <QRCode value={`http://${ipAddress}:3000`} className="m-10" size={400} />
         </div>
 
         <Link href="/gameboard">

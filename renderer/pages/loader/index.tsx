@@ -6,6 +6,11 @@ import { QuestionList } from "../../models/QuestionList";
 import { Question } from "../../models/Question";
 import { z } from "zod";
 import { QuestionType } from "../../types/QuestionType";
+import Image from "next/image";
+import styles from "./styles.module.scss";
+import classNames from "classnames";
+import ActionButton from "./ActionButton";
+import QuestionsList from "./QuestionsList";
 
 const zQuestion = z.array(
   z.object({
@@ -18,10 +23,10 @@ const zQuestion = z.array(
 export default function Loader() {
   const [loadedQuestions, setLoadedQuestions] = useState<Question[]>([]);
   const [isPopupOpen, setPopupOpen] = useState(false);
-  const [Outquestion, setOutQuestion] = useState("");
-  const [OutAnswers, setOutAnswers] = useState<string[]>([]);
-  const [OutCorrectAnswerId, setOutCorrectAnswerId] = useState(-1);
-  const [OutQuestionId, setOutQuestionId] = useState(-1);
+  const [outQuestion, setOutQuestion] = useState("");
+  const [outAnswer, setOutAnswers] = useState<string[]>([]);
+  const [outCorrectAnswerId, setOutCorrectAnswerId] = useState(-1);
+  const [outQuestionId, setOutQuestionId] = useState(-1);
   const minimumQuestionsNumber = 20;
   const shuffleCheckboxRef = useRef<HTMLInputElement | null>(null);
 
@@ -64,6 +69,14 @@ export default function Loader() {
   ) => {
     const file: File | undefined = event.target.files?.[0];
     if (!file) return;
+
+    const fileName = file.name;
+    const fileExtension = fileName.split(".").pop()?.toLowerCase();
+    if (fileExtension !== "json") {
+      alert("Proszę wybrać plik w formacie JSON.");
+      return;
+    }
+
     const reader: FileReader = new FileReader();
     reader.onload = (event) => {
       try {
@@ -71,6 +84,12 @@ export default function Loader() {
         const content = event.target?.result?.toString();
         if (content) {
           const questions = zQuestion.parse(JSON.parse(content));
+
+          if (questions.length === 0) {
+            alert("Wczytany plik z pytaniami jest pusty.");
+            return;
+          }
+
           questions.map((question: QuestionType) => {
             questionList.addQuestion(
               new Question(
@@ -83,6 +102,9 @@ export default function Loader() {
           loadQuestionsFromList();
         }
       } catch (error) {
+        alert(
+          "W wybranym pliku z pytaniami znajduje się błąd, proszę spróbować wybrać inny plik."
+        );
         console.error("Error loading questions from file:", error);
       }
     };
@@ -113,8 +135,12 @@ export default function Loader() {
     loadQuestionsFromList();
   };
 
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const handleDeleteAllQuestions = () => {
     questionList.questions = [];
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
     loadQuestionsFromList();
   };
 
@@ -126,67 +152,57 @@ export default function Loader() {
   return (
     <React.Fragment>
       <Head>
-        <title>Import to/Eksport from file</title>
+        <title>Export/Import files</title>
       </Head>
-      <div className="grid grid-col-1 text-2xl w-full text-center">
-        <button
-          onClick={loadQuestionstoFile}
-          className="text-white font-bold py-2 px-4 rounded bg-secondary mx-auto my-3"
-        >
-          Pobierz swoje pytania
-        </button>
-        <h1 className="mt-4">Prześlij swój plik z pytaniami: </h1>
+      <div className="flex flex-col gap-4 justify-center items-center content-center p-6 text-2xl w-full text-center">
+        <div className="p-5">
+          <Image
+            className="ml-auto mr-auto"
+            src="/images/logo.png"
+            alt="Logo image"
+            width={128}
+            height={128}
+          />
+        </div>
+        <h2 className={styles.questionsHeader}>
+          Prześlij swój plik z pytaniami:{" "}
+        </h2>
         <input
+          id="file-input"
           type="file"
           accept=".json"
+          ref={fileInputRef}
           onChange={loadQuestionsFromFile}
-          className="text-white font-bold py-2 px-4 rounded bg-secondary mx-auto my-3 text-center"
-        />
-        <h1 className="mt-4">Aktualne pytania</h1>
-        <div className="py-2">
-          {loadedQuestions.map((question, index) => (
-            <div key={index} className="border border-gray-300 p-4 mb-4">
-              <p className="font-bold">Pytanie {index + 1}:</p>
-              <p>{question.content}</p>
-              <p className="font-bold">Odpowiedzi:</p>
-              <ul>
-                {question.answers.map((answer, idx) => (
-                  <li key={idx}>
-                    {answer}{" "}
-                    {idx === question.correctAnswerId &&
-                      "(Odpowiedź prawidłowa)"}
-                  </li>
-                ))}
-              </ul>
-              <button
-                className="text-white font-bold py-2 px-4 rounded bg-secondary mx-auto my-3"
-                onClick={handleEditQuestion(index)}
-              >
-                Edytuj pytanie
-              </button>
-              <button
-                className="text-white font-bold py-2 px-4 rounded bg-secondary mx-auto my-3 ml-2"
-                onClick={handleDeleteQuestion(index)}
-              >
-                Usuń pytanie
-              </button>
-            </div>
-          ))}
+          className={classNames(
+            styles.fileInput,
+            "text-white font-bold py-2 px-4 rounded  mx-auto my-3"
+          )}
+        ></input>
+        {loadedQuestions.length !== 0 && (
+          <QuestionsList
+            loadedQuestions={loadedQuestions}
+            handleEditQuestion={handleEditQuestion}
+            handleDeleteQuestion={handleDeleteQuestion}
+          />
+        )}
+        <div className="flex justify-center gap-2">
+          <ActionButton
+            clickHandler={handleAddQuestion}
+            label="Dodaj pytanie"
+            className="bg-childGreen"
+          />
+          <ActionButton
+            clickHandler={handleDeleteAllQuestions}
+            label="Usuń pytania"
+            className="bg-childRed"
+          />
+          <ActionButton
+            clickHandler={loadQuestionstoFile}
+            label="Pobierz pytania"
+          />
         </div>
-        <button
-          className="text-white font-bold py-2 px-4 rounded bg-secondary mx-auto"
-          onClick={handleAddQuestion}
-        >
-          Dodaj pytanie
-        </button>
-        <button
-          className="text-white font-bold py-2 px-4 rounded bg-secondary mx-auto mt-2"
-          onClick={handleDeleteAllQuestions}
-        >
-          Usuń wszystkie pytania
-        </button>
         <div className="has-tooltip mt-3">
-          <span className="tooltip rounded shadow-lg p-1 bg-gray-900 text-base -mt-8">
+          <span className="tooltip rounded shadow-lg p-1 bg-childBlack text-base -mt-8">
             Pytania będą pojawiały się w losowej kolejności po zaznaczeniu tej
             opcji
           </span>
@@ -201,9 +217,9 @@ export default function Loader() {
           </label>
         </div>
         {minimumQuestionsNumber <= questionList.getQuestionsNumber() && (
-          <Link href="/config_page">
+          <Link href="/config_page" className="">
             <button
-              className="text-white font-bold py-2 px-4 rounded bg-secondary mx-auto mt-2"
+              className="text-white font-bold py-2 px-4 rounded bg-childBlack border-solid border-2 mx-auto"
               onClick={handleGoNext}
             >
               Przejdź dalej
@@ -215,14 +231,12 @@ export default function Loader() {
         )}
       </div>
       <QuestionComponent
-        {...{
-          inQuestion: Outquestion,
-          inAnswers: OutAnswers,
-          isOpen: isPopupOpen,
-          onClose: togglePopup,
-          correctAnswerId: OutCorrectAnswerId,
-          inQuestionId: OutQuestionId,
-        }}
+        inQuestion={outQuestion}
+        inAnswers={outAnswer}
+        isOpen={isPopupOpen}
+        onClose={togglePopup}
+        correctAnswerId={outCorrectAnswerId}
+        inQuestionId={outQuestionId}
       />
     </React.Fragment>
   );

@@ -1,8 +1,8 @@
 import { handleAnswer, handleDiceThrow } from "./messages";
-import Client from './client'
+import Client from "./client";
 
 // Forming a main game loop
-enum GameState {
+export enum GameState {
   Starting,
   Throw,
   Question,
@@ -29,7 +29,11 @@ class Game {
   }
 
   isInProgress() {
-    return this.state === GameState.Throw || this.state === GameState.Question || this.state === GameState.Answer;
+    return (
+      this.state === GameState.Throw ||
+      this.state === GameState.Question ||
+      this.state === GameState.Answer
+    );
   }
 
   validateDiceThrow(by: string, value: number): boolean {
@@ -44,6 +48,8 @@ class Game {
       console.error("Not your turn", by, this.getActivePlayer());
       return false;
     }
+
+    if (this.timer) clearTimeout(this.timer);
 
     this.state = GameState.Question;
 
@@ -73,8 +79,8 @@ class Game {
     this.state = GameState.Answer;
     this.timer = setTimeout(() => {
       console.log("Timeout");
-      handleAnswer({ type: "answer", answer: "Timeout" });
-    }, 5000); // 10 seconds timeout
+      handleAnswer({ type: "answer", answer: "Timeout", nick: to });
+    }, 10000); // 10 seconds timeout
 
     return ws;
   }
@@ -103,7 +109,8 @@ class Game {
         nick: this.getActivePlayer(),
         dice: 1,
       });
-    }, 5000);
+      this.clients.get(this.getActivePlayer())?.send({ type: "timeout" });
+    }, 10000);
 
     return true;
   }
