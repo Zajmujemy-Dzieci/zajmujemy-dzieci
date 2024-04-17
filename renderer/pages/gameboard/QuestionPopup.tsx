@@ -43,11 +43,19 @@ const revealAnswer = (chosen:string|null, question: Question | null, ws: WebSock
             break;
     }
     if (chosenNumber === question?.correctAnswerId) {
+        handleAnswer(true, ws, nick)
+    } else {
+        handleAnswer(false, ws, nick)
+    }
+};
+
+function handleAnswer(correct: boolean, ws:WebSocket, nick:string){
+    if (correct) {
         ws.send(JSON.stringify({ type: "movePawn", nick: nick, fieldsToMove: 1, shouldMoveFlag: true }));
     } else {
         ws.send(JSON.stringify({ type: "movePawn", nick: nick, fieldsToMove: -1, shouldMoveFlag: true }));
     }
-};
+}
 
 function QuestionPopup() {
     const [chosen,setChosen] = useState<number|null>(null);
