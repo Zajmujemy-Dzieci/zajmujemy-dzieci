@@ -5,7 +5,7 @@ import { BoardField } from "./GameBoardComponent";
 import axios, { Axios, AxiosResponse } from "axios";
 import LazyIcon from "../../models/IconsManager";
 import { loadQuestion, revealAnswer } from "./QuestionPopup";
-import { Question } from "../../models/Question";
+import { QuestionList } from "../../models/QuestionList";
 
 type GameBoardPawnProps = {
   player: Player;
@@ -14,13 +14,11 @@ type GameBoardPawnProps = {
   handleOpenSpecialPopup: (text: string) => void;
 };
 
+const questionList: QuestionList = QuestionList.getInstance();
+
 // TODO: socket communication attachment
 function redirectToQuestionPage(player: Player, ws: WebSocket) {
-  const sampleQuestion = new Question(
-    "What is the capital of France?",
-    ["Paris", "Berlin", "Madrid", "Yekaterinburgh"],
-    0
-  );
+  const sampleQuestion = questionList.getQuestion();
 
   const possibleAnswers = sampleQuestion.answers.length; // To powinno byc pobierane z Question
   console.log("PosAnswers:" + possibleAnswers);
@@ -109,10 +107,11 @@ export default function GameBoardPawn({
     }
     movePawn(-fieldsToMove, true);
   }
-
-  async function movePawn(fieldsToMove: number, specialFlag: boolean) {
-    await setCurrentPosition((prevPosition) => {
+  
+  function movePawn(fieldsToMove: number, specialFlag: boolean) {
+    setCurrentPosition((prevPosition) => {
       const newPosition = prevPosition + fieldsToMove;
+      
       if (newPosition >= boardFields.length - 1) {
         player.score = boardFields.length - 1;
         handleFinishGame(player, ws);
@@ -122,7 +121,7 @@ export default function GameBoardPawn({
         player.score = 0;
         return 0;
       }
-      player.score = currentPosition + fieldsToMove;
+      player.score = newPosition;
       if (boardFields[newPosition].type !== "question") {
         ws.send(
           JSON.stringify({ type: "question", nick: "", possibleAnswers: 0 })
