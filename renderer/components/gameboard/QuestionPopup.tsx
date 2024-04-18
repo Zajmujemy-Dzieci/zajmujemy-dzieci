@@ -42,11 +42,14 @@ const revealAnswer = (chosen:string|null, question: Question | null, ws: WebSock
             chosenNumber = 5;
             break;
     }
-    if (chosenNumber === question?.correctAnswerId) {
-        handleAnswer(true, ws, nick)
-    } else {
-        handleAnswer(false, ws, nick)
-    }
+    setTimeout(() => {
+        loadQuestion(null);
+        if (chosenNumber === question?.correctAnswerId) {
+            handleAnswer(true, ws, nick)
+        } else {
+            handleAnswer(false, ws, nick)
+        }
+    }, 10000);
 };
 
 function handleAnswer(correct: boolean, ws:WebSocket, nick:string){
