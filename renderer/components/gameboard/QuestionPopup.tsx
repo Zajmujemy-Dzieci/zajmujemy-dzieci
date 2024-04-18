@@ -22,6 +22,7 @@ const revealAnswer = (
   nick: string,
   setChosen: Dispatch<SetStateAction<number | null>>
 ) => {
+  console.log("tutaj3 ", chosen, question?.correctAnswerId);
   let chosenNumber: number = -1;
   switch (chosen) {
     case "A":
@@ -50,8 +51,10 @@ const revealAnswer = (
       break;
   }
   if (chosenNumber === question?.correctAnswerId) {
+    console.log("dupa true");
     handleAnswer(true, ws, nick);
   } else {
+    console.log("dupa false");
     handleAnswer(false, ws, nick);
   }
 };
@@ -123,7 +126,9 @@ function QuestionPopup() {
             {question?.answers.map((answer: string) => {
               console.log(
                 "tutaj2",
-                chosen != null && correct == question.answers.indexOf(answer)
+                chosen,
+                correct,
+                question.answers.indexOf(answer)
               );
               return (
                 <div

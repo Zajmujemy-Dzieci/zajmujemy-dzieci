@@ -7,7 +7,7 @@ import LazyIcon from "../../models/IconsManager";
 import { loadQuestion, revealAnswer } from "./QuestionPopup";
 import { QuestionList } from "../../models/QuestionList";
 import { Question } from "../../models/Question";
-import { SetStateAction, useSetAtom } from "jotai";
+import { SetStateAction, useAtom, useSetAtom } from "jotai";
 import { chosenAtom } from "../../models/ChosenAtom";
 import { questionAtom } from "../../models/QuestionAtom";
 
@@ -21,7 +21,7 @@ type GameBoardPawnProps = {
 };
 
 const questionList: QuestionList = QuestionList.getInstance();
-let globalSetQuestion: Question | null = null;
+// let globalSetQuestion: Question | null = null;
 
 // TODO: socket communication attachment
 function redirectToQuestionPage(
@@ -35,7 +35,7 @@ function redirectToQuestionPage(
 
   const possibleAnswers = sampleQuestion.answers.length; // To powinno byc pobierane z Question
   console.log("PosAnswers:" + possibleAnswers);
-  globalSetQuestion = sampleQuestion;
+  setQuestion(sampleQuestion);
   showQuestionPopup();
   loadQuestion(sampleQuestion, setChosen, setQuestion);
 
@@ -71,7 +71,7 @@ export default function GameBoardPawn({
   );
   const [ipAddress, setIPAddress] = useState<string>("");
   const setChosen = useSetAtom(chosenAtom);
-  const setQuestion = useSetAtom(questionAtom);
+  const [question, setQuestion] = useAtom(questionAtom);
 
   useEffect(() => {
     axios
@@ -98,13 +98,8 @@ export default function GameBoardPawn({
         if (data.type === "movePawn" && data.nick == player.nick) {
           movePawn(data.fieldsToMove, data.shouldMoveFlag);
         } else if (data.type == "answer" && data.nick == player.nick) {
-          revealAnswer(
-            data.answer,
-            globalSetQuestion,
-            ws,
-            player.nick,
-            setChosen
-          );
+          console.log("Answer received: ", data.answer);
+          revealAnswer(data.answer, question, ws, player.nick, setChosen);
         }
       };
     }
