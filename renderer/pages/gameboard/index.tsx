@@ -33,7 +33,7 @@ export default function GameBoard() {
     <div className="w-[100vw] h-[100vh] p-32">
       <Link href="/ranking">
         <a
-          className="btn-blue absolute top-0 right-0 m-5"
+          className="text-childWhite text-2xl font-bold py-2 px-4 rounded bg-childBlack border-solid border-childWhite border-2 mx-auto hover:bg-childWhite hover:text-childBlack"
           onClick={handleClose}
         >
           Zakończ grę
