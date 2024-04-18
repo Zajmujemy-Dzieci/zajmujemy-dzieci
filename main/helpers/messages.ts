@@ -122,7 +122,16 @@ const handlePing = (ws: WebSocket) => {
   ws.send(JSON.stringify({ type: "pong" }));
 };
 
-const nicks = [
+  function shuffleArray<T>(array: T[]): T[] {
+    const shuffledArray = [...array];
+    for (let i = shuffledArray.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffledArray[i], shuffledArray[j]] = [shuffledArray[j], shuffledArray[i]];
+    }
+    return shuffledArray;
+  }
+
+let nicks = [
   "żółw",
   "wiewiórka",
   "mysz",
@@ -132,7 +141,8 @@ const nicks = [
   "miś",
   "ryba",
   "kruk",
-]; // rat to mysz
+]
+nicks = shuffleArray(nicks)
 let currentTurn = 0;
 
 const handleRegister = (msg: RegisterMessage, ws: WebSocket) => {
@@ -252,4 +262,5 @@ const handleGameFinish = (msg: GameFinishMessage) => {
   game.clients.clear();
   game.pawns.clear();
   game.order = [];
+  currentTurn = 0;
 };
