@@ -95,20 +95,23 @@ export default function GameBoardPawn({
         let data = JSON.parse(event.data);
         console.log("Received message: ", event.data);
         console.log("Data type: ", data.type);
-        diceTimer(openClock);
         if (data.type === "movePawn" && data.nick == player.nick) {
           movePawn(data.fieldsToMove, data.shouldMoveFlag);
+          if (!data.shouldMoveFlag){
+            diceTimer(openClock);
+          }
         } else if (data.type == "answer" && data.nick == player.nick) {
           revealAnswer(data.answer, globalSetQuestion, ws, player.nick);
+          diceTimer(openClock);
         }
       };
     }
   }
 
   async function handleGoodField() {
-    const fieldsToMove = Math.floor(Math.random() * 4) + 1;
     diceTimer(openClock);
-
+    const fieldsToMove = Math.floor(Math.random() * 4) + 1;
+    
     if (fieldsToMove == 1) {
       await handleOpenSpecialPopup("Idziesz 1 pole do przodu!");
     } else {
@@ -118,8 +121,8 @@ export default function GameBoardPawn({
   }
 
   async function handleBadField() {
-    const fieldsToMove = Math.floor(Math.random() * 4) + 1;
     diceTimer(openClock);
+    const fieldsToMove = Math.floor(Math.random() * 4) + 1;
     if (fieldsToMove == 1) {
       await handleOpenSpecialPopup("Idziesz 1 pole do tyłu!");
     } else {
@@ -153,10 +156,10 @@ export default function GameBoardPawn({
       } else if (boardFields[newPosition].type === "finish") {
         handleFinishGame(player, ws, showFinishGamePopup);
       } else if (boardFields[newPosition].type === "good" && !shouldMoveFlag) {
-        diceTimer(openClock);
+        // diceTimer(openClock);
         handleGoodField();
       } else if (boardFields[newPosition].type === "bad" && !shouldMoveFlag) {
-        diceTimer(openClock);
+        // diceTimer(openClock);
         handleBadField();
       } else if(boardFields[newPosition].type === "empty") {
         diceTimer(openClock);
