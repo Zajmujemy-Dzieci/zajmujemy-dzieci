@@ -8,7 +8,7 @@ import { webSocketAtom } from "../../models/WebSocketAtom";
 import SpecialPopupComponent from "./SpecialPopupComponent";
 import QuestionPopup from "./QuestionPopup";
 import GameOverPopup from "./GameOverPopup";
-import CountdownClock from "../../pages/gameboard/CountdownClock";
+import CountdownClock from "./CountdownClock";
 
 export type BoardFieldSpecialty =
   | "question"
