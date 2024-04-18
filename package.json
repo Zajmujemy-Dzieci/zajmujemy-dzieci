@@ -1,0 +1,59 @@
+{
+  "private": true,
+  "name": "my-nextron-app",
+  "description": "My application description",
+  "version": "1.0.0",
+  "author": "Yoshihide Shiono <shiono.yoshihide@gmail.com>",
+  "main": "app/background.js",
+  "scripts": {
+    "dev": "nextron",
+    "build": "nextron build",
+    "postinstall": "electron-builder install-app-deps"
+  },
+  "dependencies": {
+    "@next/font": "^14.1.4",
+    "axios": "^1.6.8",
+    "classnames": "^2.5.1",
+    "cors": "^2.8.5",
+    "electron-serve": "^1.3.0",
+    "electron-store": "^8.1.0",
+    "express": "^4.18.3",
+    "express-ws": "^5.0.2",
+    "jotai": "^2.7.1",
+    "qrcode.react": "^3.1.0",
+    "react-icons": "^5.1.0",
+    "react-spinners": "^0.13.8",
+    "sass": "^1.72.0",
+    "tailwind-merge": "^2.2.2",
+    "zod": "^3.22.4"
+  },
+  "build": {
+    "appId": "com.example.app",
+    "productName": "Zajmujemy dzieci",
+    "directories": {
+      "output": "release"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "resources/icon.ico"
+    },
+    "mac": {
+      "target": "dmg",
+      "icon": "resources/icon.icns"
+    }
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.16",
+    "@types/react": "^18.2.52",
+    "autoprefixer": "^10.4.16",
+    "electron": "^28.2.1",
+    "electron-builder": "^24.9.1",
+    "next": "^12.3.4",
+    "nextron": "^8.13.0",
+    "postcss": "^8.4.30",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5.3.3"
+  }
+}
