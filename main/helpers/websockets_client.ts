@@ -22,6 +22,8 @@ export const websockets_client = (address: string) => `<!DOCTYPE html>
         ws.onopen = () => {
             console.log('connected');
             const rememberedNick = localStorage.getItem('nick');
+            nick = rememberedNick;
+            displayUsername();
             console.log('Remembered nick:', rememberedNick);
             ws.send(JSON.stringify({ type: 'register', nick: rememberedNick }));
         };
