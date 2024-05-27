@@ -156,14 +156,68 @@ const handleRegister = (msg: RegisterMessage, ws: WebSocket) => {
     ws.send(JSON.stringify({ type: "registered" }));
     return;
   }
-  let nick = nicks[currentTurn % nicks.length];
-  currentTurn++;
-  game.clients.set(nick, ws);
-  game.order.push(nick);
+  const replacedClient = game.clients.get(msg.nick);
+  if (replacedClient === undefined) {
+    if (game.isInProgress()) {
+      console.log("Client not connected", msg.nick);
+    } else {
+      let nick = undefined;
 
-  console.log("Registered", nick, game.clients.size);
-  ws.send(JSON.stringify({ type: "NICK", nick: nick }));
-  game.clients.get("host")?.send(JSON.stringify({ type: "newPlayer", nick }));
+      while (nick === undefined || game.clients.has(nick)) {
+        nick = nicks[currentTurn % nicks.length];
+        currentTurn++;
+      }
+
+      nicks[currentTurn % nicks.length];
+      currentTurn++;
+      game.clients.set(nick, client);
+      game.order.push(nick);
+
+      console.log("Registered", nick, game.clients.size);
+      ws.send(JSON.stringify({ type: "NICK", nick: nick }));
+      const newPlayerMessage: NewPlayerMessage = { type: "newPlayer", nick };
+      game.clients.get("host")?.sendHost(newPlayerMessage);
+    }
+  } else {
+    replacedClient!.isOnline((alive) => {
+      if (alive) {
+        console.log("Can't reconnect when client is online", msg.nick);
+      } else {
+        console.log("Player reconnected", msg.nick);
+        game.clients.set(msg.nick, client);
+        if (game.getActivePlayer() === msg.nick) {
+          notifyNextPlayer();
+        }
+        ws.send(JSON.stringify({ type: "NICK", nick: msg.nick }));
+      }
+    });
+  }
+  // let nick = "SAMPLE";
+  // // let nick = nicks[currentTurn % nicks.length];
+  // for (const [key, value] of Array.from(game.clients.entries())) {
+  //   if (value === ws) {
+  //     nick = key;
+  //     break;
+  //   }
+  // }
+  // if (nick === "SAMPLE") {
+  //   nick = nicks[currentTurn % nicks.length];
+  //   currentTurn++;
+  //   game.clients.set(nick, ws);
+  //   game.order.push(nick);
+  
+  //   console.log("Registered", nick, game.clients.size);
+  //   ws.send(JSON.stringify({ type: "NICK", nick: nick }));
+  //   game.clients.get("host")?.send(JSON.stringify({ type: "newPlayer", nick }));
+  //   return;
+  // }
+  // // currentTurn++;
+  // // game.clients.set(nick, ws);
+  // // game.order.push(nick);
+
+  // console.log("Already registered", nick, game.clients.size);
+  // ws.send(JSON.stringify({ type: "NICK", nick: nick }));
+  // // game.clients.get("host")?.send(JSON.stringify({ type: "newPlayer", nick }));
 };
 
 const handlePawnRegister = (msg: PawnRegisterMessage, ws: WebSocket) => {
@@ -217,7 +271,7 @@ const handleMessageToClient = (msg: ServerMessage, ws: WebSocket) => {
 
 export const handleDiceThrow = (msg: DiceThrowMessage) => {
   if (game.validateDiceThrow(msg.nick, msg.dice)) {
-    handleMovePawn(msg.nick, msg.dice);
+    handleMovePawn(msg.nick, msg.dice, true);
 
     // handleQuestion({ type: "question", nick: game.order[0] }) // TEST FLOW! REMOVE LATER!
   }

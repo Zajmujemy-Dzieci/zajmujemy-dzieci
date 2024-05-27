@@ -5,15 +5,20 @@ import { createWindow } from "./helpers";
 import { stringify } from "querystring";
 import { ClientMessage, handleMessage } from "./helpers/messages";
 import { websockets_client } from "./helpers/websockets_client";
+import express, { Request, Response } from 'express';
+import expressWs from 'express-ws';
+import { WebSocket } from 'ws';
+import os from "os";
 
-const os = require("os");
+// const os = require("os");
 const cors = require("cors");
 
-const express = require("express");
+// const express = require("express");
 const bodyParser = require("body-parser");
 
 const express_app = express();
-var expressWs = require("express-ws")(express_app);
+// var expressWs = require("express-ws")(express_app);
+expressWs(express_app);
 const PORT = 3000;
 
 express_app.use(bodyParser.urlencoded({ extended: true }));
@@ -22,11 +27,11 @@ express_app.use(bodyParser.urlencoded({ extended: true }));
 express_app.use(cors());
 
 function getIpAddress() {
-  const networkInterfaces = os.networkInterfaces();
+  const networkInterfaces = os.networkInterfaces()!;
   let ipv4Addresses: string[] = [];
   let ipv4Address;
   Object.keys(networkInterfaces).forEach((interfaceName) => {
-    networkInterfaces[interfaceName].forEach((networkInterface) => {
+    networkInterfaces[interfaceName]!.forEach((networkInterface) => {
       if (
         networkInterface.family === "IPv4" &&
         networkInterface.address.startsWith("192.168")
@@ -41,6 +46,7 @@ function getIpAddress() {
   return ipv4Addresses[0];
 }
 
+// used for receiving player list in the game
 express_app.get("/ipaddress", (req, res) => {
   const networkInterfaces = os.networkInterfaces();
   let ipv4Address = getIpAddress();
@@ -75,11 +81,12 @@ express_app.ws("/ws", function (ws, req) {
     let parsed = null;
     try {
       parsed = JSON.parse(msg) as ClientMessage;
+      handleMessage(parsed, ws);
     } catch (error) {
       console.error("Invalid message", msg);
     }
 
-    handleMessage(parsed, ws);
+    
   });
 });
 
