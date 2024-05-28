@@ -15,6 +15,8 @@ class Game {
   clients = new Map<string, WebSocket>();
   pawns = new Map<string, WebSocket>();
   order = new Array<string>();
+  ip_to_nick = new Map<string, string>();
+  ip_to_ws = new Map<string, WebSocket>();
 
   timer: NodeJS.Timeout | null = null;
   state: GameState = GameState.Starting;
@@ -26,6 +28,14 @@ class Game {
   start() {
     console.log("Game started");
     this.state = GameState.Throw;
+  }
+
+  isInProgress() {
+    return (
+      this.state === GameState.Throw ||
+      this.state === GameState.Question ||
+      this.state === GameState.Answer
+    );
   }
 
   validateDiceThrow(by: string, value: number): boolean {

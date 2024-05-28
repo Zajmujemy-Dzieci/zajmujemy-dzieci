@@ -11,7 +11,9 @@ export interface ClientMessage {
     | "question"
     | "NICK"
     | "gameFinish"
-    | "reset";
+    | "reset"
+    | "remove"
+    | "startGame";
 }
 
 export interface RegisterMessage extends ClientMessage {
@@ -62,6 +64,12 @@ export interface GameFinishMessage extends ClientMessage {
   type: "gameFinish";
 }
 
+export interface RemoveMessage extends ClientMessage {
+  type: "remove";
+  nick: string;
+}
+
+
 export type TurnMessage = {
   type: "yourTurn";
   nick: string;
@@ -76,6 +84,11 @@ export const handleMessage = (msg: ClientMessage, ws: WebSocket) => {
     case "register":
       const registerMsg = msg as RegisterMessage;
       handleRegister(registerMsg, ws);
+      break;
+
+    case "remove":
+      const removeMsg = msg as RemoveMessage;
+      handleRemove(removeMsg);
       break;
 
     case "dice":
@@ -101,6 +114,10 @@ export const handleMessage = (msg: ClientMessage, ws: WebSocket) => {
     case "question":
       const questionMsg = msg as QuestionMessage;
       handleQuestion(questionMsg);
+      break;
+
+    case "startGame":
+      handleStartGame();
       break;
 
     case "reset":
@@ -156,6 +173,13 @@ const handleRegister = (msg: RegisterMessage, ws: WebSocket) => {
     ws.send(JSON.stringify({ type: "registered" }));
     return;
   }
+  if(game.isInProgress() || currentTurn >= nicks.length)
+    return;
+  // console.log("Ip address for registration: ", ws._socket.address());
+  // if (Array.from(game.ip_to_nick.values()).some(ip => ip === ws._socket.remoteAddress)) {
+  //   ws.send(JSON.stringify({ type: "NICK", nick: game.ip_to_nick.get(ws._socket.remoteAddress) }));
+  //   return;
+  // }
   let nick = nicks[currentTurn % nicks.length];
   currentTurn++;
   game.clients.set(nick, ws);
@@ -175,10 +199,10 @@ const handlePawnRegister = (msg: PawnRegisterMessage, ws: WebSocket) => {
   game.pawns.set(msg.nick, ws);
 
   // when all connected clients except 'host' have registered their pawns
-  if (game.pawns.size + 1 === game.clients.size) {
-    game.start();
-    notifyNextPlayer();
-  }
+  // if (game.pawns.size + 1 === game.clients.size) {
+  //   game.start();
+  //   notifyNextPlayer();
+  // }
 
   console.log(
     `Pawn registered: ${msg.nick}, ${game.pawns.size} of ${game.clients.size} pawns registered`
@@ -264,3 +288,15 @@ const handleGameFinish = (msg: GameFinishMessage) => {
   game.order = [];
   currentTurn = 0;
 };
+
+const handleRemove = (msg: RemoveMessage) => {
+  console.log("Remove ", msg.nick);
+  game.clients.delete(msg.nick);
+  game.order = game.order.filter(item => item !== msg.nick);
+  game.pawns.delete(msg.nick);
+}
+
+const handleStartGame = () => {
+  game.start();
+  notifyNextPlayer();
+}

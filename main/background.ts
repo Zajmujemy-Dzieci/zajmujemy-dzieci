@@ -6,11 +6,11 @@ import { stringify } from "querystring";
 import { ClientMessage, handleMessage } from "./helpers/messages";
 import { websockets_client } from "./helpers/websockets_client";
 
-const os = require("os");
+import os from "os";
 const cors = require("cors");
 
-const express = require("express");
-const bodyParser = require("body-parser");
+import express from "express";
+import bodyParser from "body-parser";
 
 const express_app = express();
 var expressWs = require("express-ws")(express_app);
@@ -53,6 +53,11 @@ express_app.get("/ipaddress", (req, res) => {
 
 express_app.get("/", (req, res) => {
   const address = getIpAddress() as any as string;
+  console.log("Request ip in get: ", req.ip);
+  console.log("Request hostname in get: ", req.hostname);
+  console.log("Request ips in get: ", req.ips);
+  console.log("Request port in get: ", req.socket._peername.port);
+  console.log("Request peername in get: ", req.socket._peername);
   console.log("here", address);
   res.send(websockets_client(address));
 });

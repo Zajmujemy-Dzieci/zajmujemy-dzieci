@@ -151,8 +151,16 @@ export default function QRcodePage() {
     console.log(players);
     const playersWithOrderIds = assignOrderIds(players);
     setPlayers(playersWithOrderIds);
+    ws?.send(JSON.stringify({ type: 'startGame' }));
   };
 
+  const handlePlayerClick = (nick: string) => {
+    console.log('Player clicked:', nick);
+    ws?.send(JSON.stringify({ type: 'remove', nick:nick }));
+    setPlayers((prevPlayers) => prevPlayers.filter(player => player.nick !== nick));
+    // You can perform any action you want here
+  };
+// TODO : add styling when hovering over player to emphasize the possibility of deletion
   return (
     <React.Fragment>
       <Head>
@@ -161,7 +169,7 @@ export default function QRcodePage() {
       <div className="text-3xl absolute m-5 top-0">
         Gracze:
         {players.map((player) => (
-          <div key={player.nick} className="text-2xl flex items-center">
+          <div key={player.nick} className="text-2xl flex items-center" onClick={() => handlePlayerClick(player.nick)}>
             <LazyIcon iconName={player.iconName} className="mr-1" />
             {player.nick}
           </div>
