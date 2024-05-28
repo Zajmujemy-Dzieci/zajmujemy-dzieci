@@ -16,9 +16,14 @@ class Game {
   clients = new Map<string, Client>();
   pawns = new Map<string, WebSocket>();
   order = new Array<string>();
-
+  sessionId: string;
   timer: NodeJS.Timeout | null = null;
   state: GameState = GameState.Starting;
+
+  constructor() {
+    let date = new Date();
+    this.sessionId = date.getTime().toString();
+  }
 
   getActivePlayer() {
     return this.order[0];

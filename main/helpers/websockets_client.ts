@@ -22,10 +22,11 @@ export const websockets_client = (address: string) => `<!DOCTYPE html>
         ws.onopen = () => {
             console.log('connected');
             const rememberedNick = localStorage.getItem('nick');
+            const rememberedSessionId = localStorage.getItem('sessionId');
             nick = rememberedNick;
             displayUsername();
             console.log('Remembered nick:', rememberedNick);
-            ws.send(JSON.stringify({ type: 'register', nick: rememberedNick }));
+            ws.send(JSON.stringify({ type: 'register', nick: rememberedNick, sessionId: rememberedSessionId }));
         };
 
         ws.onmessage = (msg) => {
@@ -35,6 +36,7 @@ export const websockets_client = (address: string) => `<!DOCTYPE html>
             if (parsed?.type === 'NICK'){
                 nick = parsed.nick;
                 localStorage.setItem('nick', nick);
+                localStorage.setItem('sessionId', parsed.sessionId);
                 console.log('Nick:', nick);
                 displayUsername();
                 showWaitForGameStartPage(true);
