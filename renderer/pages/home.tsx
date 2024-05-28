@@ -26,9 +26,14 @@ export default function HomePage() {
           </div>
         </div>
       </div>
-      <div className="mt-1 w-full flex-wrap flex justify-center">
+      <div className="mt-1 w-full flex-wrap flex justify-center gap-8">
+        <Link href="/hotspot_instruction_page">
+          <a className="text-childWhite text-4xl font-bold py-2 px-4 rounded bg-childBlack border-solid border-childWhite border-2 hover:bg-childWhite hover:text-childBlack">
+            Instrukcja włączenia hotspota
+          </a>
+        </Link>
         <Link href="/loader">
-          <a className="text-childWhite text-4xl font-bold py-2 px-4 rounded bg-childBlack border-solid border-childWhite border-2 mx-auto hover:bg-childWhite hover:text-childBlack">
+          <a className="text-childWhite text-4xl font-bold py-2 px-4 rounded bg-childBlack border-solid border-childWhite border-2 hover:bg-childWhite hover:text-childBlack">
             Rozpocznij przygodę!
           </a>
         </Link>
