@@ -181,9 +181,6 @@ export default function QRcodePage() {
             Rozpocznij grę
           </button>
         </Link>
-        <Link href="/hotspot_instruction_page">
-          <a className="btn-blue m-5">Instrukcja włączenia hotspota</a>
-        </Link>
         <Link href="/config_page">
           <a className="btn-blue m-5">Powrót do ustawień</a>
         </Link>
