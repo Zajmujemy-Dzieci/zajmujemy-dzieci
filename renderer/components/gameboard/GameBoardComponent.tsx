@@ -257,7 +257,7 @@ export default function GameBoardComponent({
         </div>
       )}
 
-      <QuestionPopup />
+      <QuestionPopup ws={ws as WebSocket}/>
 
       <div
         style={{ gridRow: 1, gridColumn: 1 }}

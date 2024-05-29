@@ -3,20 +3,21 @@ import Client from "./client";
 
 export interface ClientMessage {
   type:
-    | "register"
-    | "ping"
-    | "pong"
-    | "dice"
-    | "answer"
-    | "regPawn"
-    | "movePawn"
-    | "question"
-    | "NICK"
-    | "throwDice"
-    | "gameFinish"
-    | "reset"
-    | "remove"
-    | "startGame";
+  | "register"
+  | "ping"
+  | "pong"
+  | "dice"
+  | "answer"
+  | "regPawn"
+  | "movePawn"
+  | "question"
+  | "NICK"
+  | "throwDice"
+  | "gameFinish"
+  | "reset"
+  | "remove"
+  | "startGame"
+  | "boardEventEnd";
 }
 
 export interface PongMessage extends ClientMessage {
@@ -102,7 +103,7 @@ export const handleMessage = (msg: ClientMessage, ws: WebSocket) => {
       handleRegister(registerMsg, ws);
       break;
 
-  
+
     case "remove":
       const removeMsg = msg as RemoveMessage;
       handleRemove(removeMsg);
@@ -135,6 +136,10 @@ export const handleMessage = (msg: ClientMessage, ws: WebSocket) => {
 
     case "startGame":
       handleStartGame();
+      break;
+
+    case "boardEventEnd":
+      handleBoardEventEnd();
       break;
 
     case "pong":
@@ -230,7 +235,7 @@ const handleRegister = (msg: RegisterMessage, ws: WebSocket) => {
         console.log("Player reconnected", msg.nick);
         game.clients.set(msg.nick, client);
         if (game.getActivePlayer() === msg.nick && game.isInProgress()) {
-          
+
           if (game.state === GameState.Throw)
             notifyNextPlayer();
         }
@@ -243,7 +248,6 @@ const handleRegister = (msg: RegisterMessage, ws: WebSocket) => {
 
 const handlePawnRegister = (msg: PawnRegisterMessage, ws: WebSocket) => {
   if (game.pawns.has(msg.nick)) {
-    // TODO: handle on reconnect
     console.error("Pawn already registered");
     return;
   }
@@ -258,7 +262,7 @@ const handleMovePawn = (nick: string, fieldsToMove: number, shouldMoveFlag: bool
   const ws = game.pawns.get(nick);
   console.log("Move pawn", nick, fieldsToMove);
   ws?.send(
-    JSON.stringify({ type: "movePawn", fieldsToMove: fieldsToMove, nick: nick, shouldMoveFlag: shouldMoveFlag})
+    JSON.stringify({ type: "movePawn", fieldsToMove: fieldsToMove, nick: nick, shouldMoveFlag: shouldMoveFlag })
   );
 };
 
@@ -292,14 +296,17 @@ export const handleDiceThrow = (msg: DiceThrowMessage) => {
   }
 };
 
+export const handleBoardEventEnd = () => {
+  game.boardEventEnd();
+  notifyNextPlayer();
+}
+
 export const handleAnswer = (msg: AnswerMessage) => {
   const who = game.getActivePlayer();
   if (game.validateAnswer(who, msg.answer)) {
-    notifyNextPlayer();
     if (msg.answer === "Timeout") {
       game.clients.get(who)?.send({ type: "timeout" });
     }
-    // Added
     const ws = game.pawns.get(msg.nick);
 
     ws?.send(
@@ -307,7 +314,6 @@ export const handleAnswer = (msg: AnswerMessage) => {
     );
 
     console.log("Answer", msg.answer, msg.nick);
-    // End added
   }
 };
 
