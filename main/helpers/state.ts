@@ -1,5 +1,6 @@
 import { ANSWER_TIMEOUT, THROW_DICE_TIMEOUT } from "../constants";
 import { handleAnswer, handleDiceThrow } from "./messages";
+import Client from "./client";
 
 // Forming a main game loop
 export enum GameState {
@@ -12,12 +13,17 @@ export enum GameState {
 
 // First Law of Distributed Object Design: "don't distribute your objects"
 class Game {
-  clients = new Map<string, WebSocket>();
+  clients = new Map<string, Client>();
   pawns = new Map<string, WebSocket>();
   order = new Array<string>();
-
+  sessionId: string;
   timer: NodeJS.Timeout | null = null;
   state: GameState = GameState.Starting;
+
+  constructor() {
+    let date = new Date();
+    this.sessionId = date.getTime().toString();
+  }
 
   getActivePlayer() {
     return this.order[0];
@@ -28,11 +34,19 @@ class Game {
     this.state = GameState.Throw;
   }
 
+  isInProgress() {
+    return (
+      this.state === GameState.Throw ||
+      this.state === GameState.Question ||
+      this.state === GameState.Answer
+    );
+  }
+
   validateDiceThrow(by: string, value: number): boolean {
     console.log(`Dice thrown by ${by}, ${value}`);
 
     if (this.state !== GameState.Throw) {
-      console.error("Not a time for throwing dice");
+      console.error("Not a time for throwing dice, current state is: " + this.state);
       return false;
     }
 
@@ -61,7 +75,7 @@ class Game {
       return null;
     }
 
-    const ws = this.clients.get(to);
+    const ws = this.clients.get(to)?.ws;
 
     if (!ws) {
       console.error("No such player");
@@ -102,8 +116,8 @@ class Game {
         dice: 1,
       });
       this.clients
-        .get(this.getActivePlayer())
-        ?.send(JSON.stringify({ type: "timeout" }));
+      .get(this.getActivePlayer())
+      ?.send({ type: "timeout" });
     }, THROW_DICE_TIMEOUT);
 
     return true;
