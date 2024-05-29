@@ -195,11 +195,6 @@ export default function QRcodePage() {
           />
         </div>
         <div className="flex flex-wrap-reverse w-[50vw] gap-2 text-center">
-          <Link href="/hotspot_instruction_page">
-            <a className="text-childWhite text-4xl font-bold py-2 px-4 rounded bg-childBlack border-solid border-childWhite border-2 mx-auto hover:bg-childWhite hover:text-childBlack">
-              Instrukcja włączenia hotspota
-            </a>
-          </Link>
           <Link href="/config_page">
             <a className="text-childWhite text-4xl font-bold py-2 px-4 rounded bg-childBlack border-solid border-childWhite border-2 mx-auto hover:bg-childWhite hover:text-childBlack">
               Powrót do ustawień
