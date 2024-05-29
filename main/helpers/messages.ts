@@ -249,12 +249,6 @@ const handlePawnRegister = (msg: PawnRegisterMessage, ws: WebSocket) => {
   }
   game.pawns.set(msg.nick, ws);
 
-  // when all connected clients except 'host' have registered their pawns
-  // if (game.pawns.size + 1 === game.clients.size) {
-  //   game.start();
-  //   notifyNextPlayer();
-  // }
-
   console.log(
     `Pawn registered: ${msg.nick}, ${game.pawns.size} of ${game.clients.size} pawns registered`
   );
