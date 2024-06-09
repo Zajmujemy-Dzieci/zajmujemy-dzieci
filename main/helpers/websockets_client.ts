@@ -114,7 +114,7 @@ export const websockets_client = (address: string) => `<!DOCTYPE html>
             if (nick === "pies") color = "#47290c";
             if (nick === "kot") color = "#e342de";
             if (nick === "słoń") color = "#580e8a";
-            if (nick === "miś") color = "#381f28";
+            if (nick === "miś") color = "#a39e0d";
             if (nick === "ryba") color = "#42ade3";
             if (nick === "kruk") color = "#1c2529";
             document.body.style.backgroundColor = color;

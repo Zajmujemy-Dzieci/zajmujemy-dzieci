@@ -170,9 +170,9 @@ export default function QRcodePage() {
     if (icon === "GiSittingDog") return "bg-[#47290c]";
     if (icon === "GiCat") return "bg-[#e342de]";
     if (icon === "GiElephant") return "bg-[#580e8a]";
-    if (icon === "GiBearFace") return "bg-[#381f28]";
+    if (icon === "GiBearFace") return "bg-[#a39e0d]";
     if (icon === "IoFish") return "bg-[#42ade3]";
-    if (icon === "GiRaven") return "bg-[#1c2529]";
+    if (icon === "GiRaven") return "bg-[#153d03]";
     return "bg-[#ffffff]";
   }
 
@@ -183,16 +183,20 @@ export default function QRcodePage() {
       </Head>
       <div className="text-3xl absolute m-5 top-0">
         Gracze:
-        {players.map((player) => (
-          <div
-            key={player.nick}
-            className="text-2xl flex items-center cursor-pointer"
-            onClick={() => handlePlayerClick(player.nick)}
-          >
-            <LazyIcon iconName={player.iconName} className="mr-1" />
-            <span className={`${player.background}`}>{player.nick}</span>
-          </div>
-        ))}
+        <div className="flex flex-col gap-2">
+          {players.map((player) => (
+            <div
+              key={player.nick}
+              className="text-2xl flex items-center cursor-pointer"
+              onClick={() => handlePlayerClick(player.nick)}
+            >
+              <LazyIcon iconName={player.iconName} className="mr-1" />
+              <span className={`${player.background} rounded-md p-1`}>
+                {player.nick}
+              </span>
+            </div>
+          ))}
+        </div>
       </div>
       <div className="flex justify-center text-4xl flex-col items-center m-10">
         <div className="p-5">
