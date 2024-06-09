@@ -240,7 +240,7 @@ const handleRegister = (msg: RegisterMessage, ws: WebSocket) => {
             notifyNextPlayer();
         }
         else
-          ws.send(JSON.stringify({ type: "NICK", nick: msg.nick }));
+          ws.send(JSON.stringify({ type: "NICK", nick: msg.nick, sessionId: game.sessionId }));
       }
     });
   }
