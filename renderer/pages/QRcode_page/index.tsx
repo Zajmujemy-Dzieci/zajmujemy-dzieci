@@ -114,13 +114,14 @@ export default function QRcodePage() {
   const addPlayer = (nick: string) => {
     setPlayers((prevPlayers) => {
       console.log("Dodaję gracza: ", nick);
+      const icon = iconsMap.get(nick) || "BsFillPersonFill";
       const newPlayer: Player = {
         orderId: 0,
         nick: nick,
         score: 0,
         // TODO: randomize background
-        background: "bg-blue-400",
-        iconName: iconsMap.get(nick) || "BsFillPersonFill",
+        background: iconToColor(icon),
+        iconName: icon,
       };
       const updatedPlayers = [...prevPlayers, newPlayer];
       console.log("Gracze: ", updatedPlayers);
@@ -151,14 +152,29 @@ export default function QRcodePage() {
     console.log(players);
     const playersWithOrderIds = assignOrderIds(players);
     setPlayers(playersWithOrderIds);
-    ws?.send(JSON.stringify({ type: 'startGame' }));
+    ws?.send(JSON.stringify({ type: "startGame" }));
   };
 
   const handlePlayerClick = (nick: string) => {
-    console.log('Player clicked:', nick);
-    ws?.send(JSON.stringify({ type: 'remove', nick:nick }));
-    setPlayers((prevPlayers) => prevPlayers.filter(player => player.nick !== nick));
+    console.log("Player clicked:", nick);
+    ws?.send(JSON.stringify({ type: "remove", nick: nick }));
+    setPlayers((prevPlayers) =>
+      prevPlayers.filter((player) => player.nick !== nick)
+    );
   };
+
+  function iconToColor(icon: string) {
+    if (icon === "GiTurtle") return "bg-[#56c918]";
+    if (icon === "GiSquirrel") return "bg-[#c96e18]";
+    if (icon === "GiRat") return "bg-[#454443]";
+    if (icon === "GiSittingDog") return "bg-[#47290c]";
+    if (icon === "GiCat") return "bg-[#e342de]";
+    if (icon === "GiElephant") return "bg-[#580e8a]";
+    if (icon === "GiBearFace") return "bg-[#381f28]";
+    if (icon === "IoFish") return "bg-[#42ade3]";
+    if (icon === "GiRaven") return "bg-[#1c2529]";
+    return "bg-[#ffffff]";
+  }
 
   return (
     <React.Fragment>
@@ -168,9 +184,13 @@ export default function QRcodePage() {
       <div className="text-3xl absolute m-5 top-0">
         Gracze:
         {players.map((player) => (
-          <div key={player.nick} className="text-2xl flex items-center" onClick={() => handlePlayerClick(player.nick)}>
+          <div
+            key={player.nick}
+            className="text-2xl flex items-center cursor-pointer"
+            onClick={() => handlePlayerClick(player.nick)}
+          >
             <LazyIcon iconName={player.iconName} className="mr-1" />
-            {player.nick}
+            <span className={`${player.background}`}>{player.nick}</span>
           </div>
         ))}
       </div>
