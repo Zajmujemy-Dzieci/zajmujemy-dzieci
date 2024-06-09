@@ -6,12 +6,11 @@ import { stringify } from "querystring";
 import { ClientMessage, handleMessage } from "./helpers/messages";
 import { websockets_client } from "./helpers/websockets_client";
 import * as http from "http";
+import express from "express";
+import bodyParser from "body-parser";
+import os from "os";
 
-const os = require("os");
 const cors = require("cors");
-
-const express = require("express");
-const bodyParser = require("body-parser");
 
 const express_app = express();
 var expressWs = require("express-ws")(express_app);
@@ -27,7 +26,7 @@ function getIpAddress() {
   let ipv4Addresses: string[] = [];
   let ipv4Address;
   Object.keys(networkInterfaces).forEach((interfaceName) => {
-    networkInterfaces[interfaceName].forEach((networkInterface) => {
+    networkInterfaces[interfaceName]!.forEach((networkInterface) => {
       if (
         networkInterface.family === "IPv4" &&
         networkInterface.address.startsWith("192.168")
