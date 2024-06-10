@@ -21,7 +21,12 @@ export const websockets_client = (address: string) => `<!DOCTYPE html>
         let nick = "";
         ws.onopen = () => {
             console.log('connected');
-            ws.send(JSON.stringify({ type: 'register', nick: 'test' }));
+            const rememberedNick = localStorage.getItem('nick');
+            const rememberedSessionId = localStorage.getItem('sessionId');
+            nick = rememberedNick;
+            displayUsername();
+            console.log('Remembered nick:', rememberedNick);
+            ws.send(JSON.stringify({ type: 'register', nick: rememberedNick, sessionId: rememberedSessionId }));
         };
 
         ws.onmessage = (msg) => {
@@ -30,6 +35,8 @@ export const websockets_client = (address: string) => `<!DOCTYPE html>
             console.log(parsed);
             if (parsed?.type === 'NICK'){
                 nick = parsed.nick;
+                localStorage.setItem('nick', nick);
+                localStorage.setItem('sessionId', parsed.sessionId);
                 console.log('Nick:', nick);
                 displayUsername();
                 showWaitForGameStartPage(true);
@@ -106,6 +113,17 @@ export const websockets_client = (address: string) => `<!DOCTYPE html>
         
         function displayUsername(){
             let usernameDiv = document.getElementById("usernameDiv");
+            let color = "#ffffff";
+            if (nick === "żółw") color = "#56c918";
+            if (nick === "wiewiórka") color = "#c96e18";
+            if (nick === "mysz") color = "#454443";
+            if (nick === "pies") color = "#47290c";
+            if (nick === "kot") color = "#e342de";
+            if (nick === "słoń") color = "#580e8a";
+            if (nick === "miś") color = "#a39e0d";
+            if (nick === "ryba") color = "#42ade3";
+            if (nick === "kruk") color = "#1c2529";
+            document.body.style.backgroundColor = color;
             usernameDiv.children[0].innerText = "Twoj nick: " + nick;
         }
 
@@ -301,7 +319,7 @@ export const websockets_client = (address: string) => `<!DOCTYPE html>
         }
 
         body{
-            background-color: lightblue;
+            // background-color: lightblue;
             justify-content: center;
             display: flex;
             flex-direction: column;

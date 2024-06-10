@@ -5,12 +5,12 @@ import { createWindow } from "./helpers";
 import { stringify } from "querystring";
 import { ClientMessage, handleMessage } from "./helpers/messages";
 import { websockets_client } from "./helpers/websockets_client";
+import * as http from "http";
+import express from "express";
+import bodyParser from "body-parser";
+import os from "os";
 
-const os = require("os");
 const cors = require("cors");
-
-const express = require("express");
-const bodyParser = require("body-parser");
 
 const express_app = express();
 var expressWs = require("express-ws")(express_app);
@@ -25,8 +25,7 @@ function getIpAddress() {
   const networkInterfaces = os.networkInterfaces();
   let ipv4Addresses: string[] = [];
   Object.keys(networkInterfaces).forEach((interfaceName) => {
-    networkInterfaces[interfaceName].forEach((networkInterface) => {
-      console.log(networkInterface);
+    networkInterfaces[interfaceName]!.forEach((networkInterface) => {
       if (
         networkInterface.family === "IPv4" &&
         networkInterface.internal === false
@@ -70,13 +69,14 @@ express_app.listen(PORT, () => {
   console.log(`Serwer działa na porcie ${PORT}`);
 });
 
-express_app.ws("/ws", function (ws, req) {
+express_app.ws("/ws", function (ws: WebSocket, req: http.IncomingMessage) {
   ws.on("message", function (msg) {
     let parsed = null;
     try {
       parsed = JSON.parse(msg) as ClientMessage;
     } catch (error) {
       console.error("Invalid message", msg);
+      return;
     }
 
     handleMessage(parsed, ws);

@@ -118,6 +118,7 @@ export default function GameBoardPawn({
       await handleOpenSpecialPopup(`Idziesz ${fieldsToMove} pola do przodu`);
     }
     movePawn(fieldsToMove, true);
+    ws.send(JSON.stringify({ type: "boardEventEnd" }));
   }
 
   async function handleBadField() {
@@ -129,6 +130,7 @@ export default function GameBoardPawn({
       await handleOpenSpecialPopup(`Idziesz ${fieldsToMove} pola do tyłu`);
     }
     movePawn(-fieldsToMove, true);
+    ws.send(JSON.stringify({ type: "boardEventEnd" }));
   }
 
   function movePawn(fieldsToMove: number, shouldMoveFlag: boolean) {
@@ -145,24 +147,17 @@ export default function GameBoardPawn({
         return 0;
       }
       player.score = newPosition;
-      if (boardFields[newPosition].type !== "question") {
-        ws.send(
-          JSON.stringify({ type: "question", nick: "", possibleAnswers: 0 })
-        );
-        console.log("No question");
-      }
       if (boardFields[newPosition].type === "question" && !shouldMoveFlag) {
         redirectToQuestionPage(player, ws, openClock);
       } else if (boardFields[newPosition].type === "finish") {
         handleFinishGame(player, ws, showFinishGamePopup);
       } else if (boardFields[newPosition].type === "good" && !shouldMoveFlag) {
-        // diceTimer(openClock);
         handleGoodField();
       } else if (boardFields[newPosition].type === "bad" && !shouldMoveFlag) {
-        // diceTimer(openClock);
         handleBadField();
       } else if(boardFields[newPosition].type === "empty") {
         diceTimer(openClock);
+        ws.send(JSON.stringify({ type: "boardEventEnd" }));
       }
       return newPosition;
     });

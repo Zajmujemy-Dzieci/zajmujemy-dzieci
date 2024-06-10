@@ -8,6 +8,7 @@ import { Player } from "../../types/Player";
 import { playersQueueAtom } from "../../models/PlayersQueueAtom";
 import { webSocketAtom } from "../../models/WebSocketAtom";
 import LazyIcon, { iconsMap } from "../../models/IconsManager";
+import Image from "next/image";
 
 export default function QRcodePage() {
   const [ipAddress, setIPAddress] = useState<string>("192.168.137.1");
@@ -113,13 +114,14 @@ export default function QRcodePage() {
   const addPlayer = (nick: string) => {
     setPlayers((prevPlayers) => {
       console.log("Dodaję gracza: ", nick);
+      const icon = iconsMap.get(nick) || "BsFillPersonFill";
       const newPlayer: Player = {
         orderId: 0,
         nick: nick,
         score: 0,
         // TODO: randomize background
-        background: "bg-blue-400",
-        iconName: iconsMap.get(nick) || "BsFillPersonFill",
+        background: iconToColor(icon),
+        iconName: icon,
       };
       const updatedPlayers = [...prevPlayers, newPlayer];
       console.log("Gracze: ", updatedPlayers);
@@ -150,7 +152,29 @@ export default function QRcodePage() {
     console.log(players);
     const playersWithOrderIds = assignOrderIds(players);
     setPlayers(playersWithOrderIds);
+    ws?.send(JSON.stringify({ type: "startGame" }));
   };
+
+  const handlePlayerClick = (nick: string) => {
+    console.log("Player clicked:", nick);
+    ws?.send(JSON.stringify({ type: "remove", nick: nick }));
+    setPlayers((prevPlayers) =>
+      prevPlayers.filter((player) => player.nick !== nick)
+    );
+  };
+
+  function iconToColor(icon: string) {
+    if (icon === "GiTurtle") return "bg-[#56c918]";
+    if (icon === "GiSquirrel") return "bg-[#c96e18]";
+    if (icon === "GiRat") return "bg-[#454443]";
+    if (icon === "GiSittingDog") return "bg-[#47290c]";
+    if (icon === "GiCat") return "bg-[#e342de]";
+    if (icon === "GiElephant") return "bg-[#580e8a]";
+    if (icon === "GiBearFace") return "bg-[#a39e0d]";
+    if (icon === "IoFish") return "bg-[#42ade3]";
+    if (icon === "GiRaven") return "bg-[#153d03]";
+    return "bg-[#ffffff]";
+  }
 
   return (
     <React.Fragment>
@@ -159,34 +183,56 @@ export default function QRcodePage() {
       </Head>
       <div className="text-3xl absolute m-5 top-0">
         Gracze:
-        {players.map((player) => (
-          <div key={player.nick} className="text-2xl flex items-center">
-            <LazyIcon iconName={player.iconName} className="mr-1" />
-            {player.nick}
-          </div>
-        ))}
+        <div className="flex flex-col gap-2">
+          {players.map((player) => (
+            <div
+              key={player.nick}
+              className="text-2xl flex items-center cursor-pointer"
+              onClick={() => handlePlayerClick(player.nick)}
+            >
+              <LazyIcon iconName={player.iconName} className="mr-1" />
+              <span className={`${player.background} rounded-md p-1`}>
+                {player.nick}
+              </span>
+            </div>
+          ))}
+        </div>
       </div>
       <div className="flex justify-center text-4xl flex-col items-center m-10">
-        <p>Adres do połączenia się: http://{ipAddress}:3000</p>
-        <div className="m-10">
+        <div className="p-5">
+          <Image
+            className="ml-auto mr-auto"
+            src="/images/logo.png"
+            alt="Logo image"
+            width="128px"
+            height="128px"
+          />
+        </div>
+        <p className="text-childBlack">
+          Adres do połączenia się: http://{ipAddress}:3000
+        </p>
+        <div className="m-5">
           <QRCode
             value={`http://${ipAddress}:3000`}
             className="m-10"
             size={400}
           />
         </div>
-
-        <Link href="/gameboard">
-          <button className="btn-blue" onClick={handleStartGame}>
-            Rozpocznij grę
-          </button>
-        </Link>
-        <Link href="/hotspot_instruction_page">
-          <a className="btn-blue m-5">Instrukcja włączenia hotspota</a>
-        </Link>
-        <Link href="/config_page">
-          <a className="btn-blue m-5">Powrót do ustawień</a>
-        </Link>
+        <div className="flex flex-wrap-reverse w-[50vw] gap-2 text-center">
+          <Link href="/config_page">
+            <a className="text-childWhite text-4xl font-bold py-2 px-4 rounded bg-childBlack border-solid border-childWhite border-2 mx-auto hover:bg-childWhite hover:text-childBlack">
+              Powrót do ustawień
+            </a>
+          </Link>
+          <Link href="/gameboard">
+            <button
+              className="text-childWhite text-4xl font-bold py-2 px-4 rounded bg-childBlack border-solid border-childWhite border-2 mx-auto hover:bg-childWhite hover:text-childBlack"
+              onClick={handleStartGame}
+            >
+              Rozpocznij grę
+            </button>
+          </Link>
+        </div>
       </div>
     </React.Fragment>
   );

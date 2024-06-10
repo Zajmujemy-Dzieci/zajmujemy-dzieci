@@ -5,10 +5,10 @@ import { Player } from '../../types/Player';
 
 let globalSetChosen:null|React.Dispatch<React.SetStateAction<number|null>> = null;
 let globalSetQuestion:null|React.Dispatch<React.SetStateAction<Question|null>>  = null; 
+let timer: NodeJS.Timeout | null = null;
 
 const loadQuestion = (question:Question | null) => {
     if(!globalSetChosen || !globalSetQuestion) return;
-    console.log("tutaj1");
     globalSetChosen(null);
     globalSetQuestion(question);
 };
@@ -42,13 +42,9 @@ const revealAnswer = (chosen:string|null, question: Question | null, ws: WebSock
             chosenNumber = 5;
             break;
     }
-    setTimeout(() => {
-        loadQuestion(null);
-        if (chosenNumber === question?.correctAnswerId) {
-            handleAnswer(true, ws, nick)
-        } else {
-            handleAnswer(false, ws, nick)
-        }
+    handleAnswer(chosenNumber === question?.correctAnswerId, ws, nick);
+    timer = setTimeout(() => {
+        handleCloseQuestion(ws);
     }, 10000);
 };
 
@@ -60,7 +56,21 @@ function handleAnswer(correct: boolean, ws:WebSocket, nick:string){
     }
 }
 
-function QuestionPopup() {
+function handleCloseQuestion(ws: WebSocket) {
+    if (timer !== null){
+        console.log("Now question is beeing closed");
+        ws.send(JSON.stringify({ type: "boardEventEnd" }));
+        clearTimeout(timer);
+        timer = null;
+        loadQuestion(null);
+    }
+}
+
+interface QuestionPopupProps {
+    ws: WebSocket;
+}
+
+function QuestionPopup({ ws }: QuestionPopupProps) {
     const [chosen,setChosen] = useState<number|null>(null);
     const [question,setQuestion] = useState<Question | null>(null);
     
@@ -80,9 +90,9 @@ function QuestionPopup() {
         } 
 
     });
-    //}
+    
     return (question) ? (
-        <div className="w-full h-full mt-2 absolute left-0 top-0 flex justify-center items-center z-10" onClick={()=>loadQuestion(null)} > 
+        <div className="w-full h-full mt-2 absolute left-0 top-0 flex justify-center items-center z-10" onClick={() => handleCloseQuestion(ws)} > 
             <div className="text-5xl border-b-5 w-2/5 text-center mt-3">
                 <div className="border-b-0 border-black justify-center flex items-center pt-10 pb-10 bg-blue-600">{question.content}</div>
                 <div className="bg-childBlack justify-center p-5 flex"><div className="w-3/4">{questionList}</div></div>            

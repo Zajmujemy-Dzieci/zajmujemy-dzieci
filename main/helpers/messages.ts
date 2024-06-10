@@ -1,22 +1,34 @@
-import game from "./state";
+import game, { GameState } from "./state";
+import Client from "./client";
 
 export interface ClientMessage {
   type:
-    | "register"
-    | "ping"
-    | "dice"
-    | "answer"
-    | "regPawn"
-    | "movePawn"
-    | "question"
-    | "NICK"
-    | "gameFinish"
-    | "reset";
+  | "register"
+  | "ping"
+  | "pong"
+  | "dice"
+  | "answer"
+  | "regPawn"
+  | "movePawn"
+  | "question"
+  | "NICK"
+  | "throwDice"
+  | "gameFinish"
+  | "reset"
+  | "remove"
+  | "startGame"
+  | "boardEventEnd";
+}
+
+export interface PongMessage extends ClientMessage {
+  type: "pong";
+  nick: string;
 }
 
 export interface RegisterMessage extends ClientMessage {
   type: "register";
   nick: string;
+  sessionId: string;
 }
 
 export interface DiceThrowMessage extends ClientMessage {
@@ -32,7 +44,7 @@ export interface AnswerMessage extends ClientMessage {
 }
 
 export interface ServerMessage {
-  type: "pong" | "throwDice" | "registered";
+  type: "pong" | "throwDice" | "registered" | "timeout" | "gameFinish";
 }
 
 export interface PawnRegisterMessage extends ClientMessage {
@@ -58,8 +70,21 @@ export interface NickMessage extends ClientMessage {
   nick: string;
 }
 
+export interface HostMessage {
+  type: "pong" | "newPlayer";
+}
+
+export interface NewPlayerMessage extends HostMessage {
+  type: "newPlayer";
+  nick: string;
+}
 export interface GameFinishMessage extends ClientMessage {
   type: "gameFinish";
+}
+
+export interface RemoveMessage extends ClientMessage {
+  type: "remove";
+  nick: string;
 }
 
 export type TurnMessage = {
@@ -76,6 +101,12 @@ export const handleMessage = (msg: ClientMessage, ws: WebSocket) => {
     case "register":
       const registerMsg = msg as RegisterMessage;
       handleRegister(registerMsg, ws);
+      break;
+
+
+    case "remove":
+      const removeMsg = msg as RemoveMessage;
+      handleRemove(removeMsg);
       break;
 
     case "dice":
@@ -103,6 +134,19 @@ export const handleMessage = (msg: ClientMessage, ws: WebSocket) => {
       handleQuestion(questionMsg);
       break;
 
+    case "startGame":
+      handleStartGame();
+      break;
+
+    case "boardEventEnd":
+      handleBoardEventEnd();
+      break;
+
+    case "pong":
+      const keepAliveMessage = msg as PongMessage;
+      game.clients.get(keepAliveMessage.nick)?.handlePong();
+      break;
+
     case "reset":
       console.log("Game ended, resetting state");
 
@@ -122,14 +166,14 @@ const handlePing = (ws: WebSocket) => {
   ws.send(JSON.stringify({ type: "pong" }));
 };
 
-  function shuffleArray<T>(array: T[]): T[] {
-    const shuffledArray = [...array];
-    for (let i = shuffledArray.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [shuffledArray[i], shuffledArray[j]] = [shuffledArray[j], shuffledArray[i]];
-    }
-    return shuffledArray;
+function shuffleArray<T>(array: T[]): T[] {
+  const shuffledArray = [...array];
+  for (let i = shuffledArray.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffledArray[i], shuffledArray[j]] = [shuffledArray[j], shuffledArray[i]];
   }
+  return shuffledArray;
+}
 
 let nicks = [
   "żółw",
@@ -141,44 +185,73 @@ let nicks = [
   "miś",
   "ryba",
   "kruk",
-]
+]; // rat to mysz
 nicks = shuffleArray(nicks)
 let currentTurn = 0;
 
 const handleRegister = (msg: RegisterMessage, ws: WebSocket) => {
+  const client = new Client(ws, msg.nick);
+
   if (msg.nick === "host") {
     if (game.clients.has("host")) {
       console.error("Host already registered");
       return;
     }
-    game.clients.set("host", ws);
+    game.clients.set("host", client);
     console.log("Host registered");
     ws.send(JSON.stringify({ type: "registered" }));
     return;
   }
-  let nick = nicks[currentTurn % nicks.length];
-  currentTurn++;
-  game.clients.set(nick, ws);
-  game.order.push(nick);
 
-  console.log("Registered", nick, game.clients.size);
-  ws.send(JSON.stringify({ type: "NICK", nick: nick }));
-  game.clients.get("host")?.send(JSON.stringify({ type: "newPlayer", nick }));
+  const replacedClient = game.clients.get(msg.nick);
+  console.log("Current session id: ", game.sessionId);
+  console.log("Client session id: ", msg.sessionId);
+  if (replacedClient === undefined || msg.sessionId != game.sessionId) {
+    if (game.isInProgress()) {
+      console.log("Client not connected", msg.nick);
+    } else {
+      let nick = undefined;
+
+      while (nick === undefined || game.clients.has(nick)) {
+        nick = nicks[currentTurn % nicks.length];
+        currentTurn++;
+      }
+
+      nicks[currentTurn % nicks.length];
+      currentTurn++;
+      game.clients.set(nick, client);
+      game.order.push(nick);
+
+      console.log("Registered", nick, game.clients.size);
+      ws.send(JSON.stringify({ type: "NICK", nick: nick, sessionId: game.sessionId }));
+      const newPlayerMessage: NewPlayerMessage = { type: "newPlayer", nick };
+      game.clients.get("host")?.sendHost(newPlayerMessage);
+    }
+  } else {
+    replacedClient!.isOnline((alive) => {
+      if (alive) {
+        console.log("Can't reconnect when client is online", msg.nick);
+      } else {
+        console.log("Player reconnected", msg.nick);
+        game.clients.set(msg.nick, client);
+        if (game.getActivePlayer() === msg.nick && game.isInProgress()) {
+
+          if (game.state === GameState.Throw)
+            notifyNextPlayer();
+        }
+        else
+          ws.send(JSON.stringify({ type: "NICK", nick: msg.nick, sessionId: game.sessionId }));
+      }
+    });
+  }
 };
 
 const handlePawnRegister = (msg: PawnRegisterMessage, ws: WebSocket) => {
   if (game.pawns.has(msg.nick)) {
-    // TODO: handle on reconnect
     console.error("Pawn already registered");
     return;
   }
   game.pawns.set(msg.nick, ws);
-
-  // when all connected clients except 'host' have registered their pawns
-  if (game.pawns.size + 1 === game.clients.size) {
-    game.start();
-    notifyNextPlayer();
-  }
 
   console.log(
     `Pawn registered: ${msg.nick}, ${game.pawns.size} of ${game.clients.size} pawns registered`
@@ -189,7 +262,7 @@ const handleMovePawn = (nick: string, fieldsToMove: number, shouldMoveFlag: bool
   const ws = game.pawns.get(nick);
   console.log("Move pawn", nick, fieldsToMove);
   ws?.send(
-    JSON.stringify({ type: "movePawn", fieldsToMove: fieldsToMove, nick: nick, shouldMoveFlag: shouldMoveFlag})
+    JSON.stringify({ type: "movePawn", fieldsToMove: fieldsToMove, nick: nick, shouldMoveFlag: shouldMoveFlag })
   );
 };
 
@@ -217,20 +290,23 @@ const handleMessageToClient = (msg: ServerMessage, ws: WebSocket) => {
 
 export const handleDiceThrow = (msg: DiceThrowMessage) => {
   if (game.validateDiceThrow(msg.nick, msg.dice)) {
-    handleMovePawn(msg.nick, msg.dice);
+    handleMovePawn(msg.nick, msg.dice, false);
 
     // handleQuestion({ type: "question", nick: game.order[0] }) // TEST FLOW! REMOVE LATER!
   }
 };
 
+export const handleBoardEventEnd = () => {
+  game.boardEventEnd();
+  notifyNextPlayer();
+}
+
 export const handleAnswer = (msg: AnswerMessage) => {
   const who = game.getActivePlayer();
   if (game.validateAnswer(who, msg.answer)) {
-    notifyNextPlayer();
     if (msg.answer === "Timeout") {
-      game.clients.get(who)?.send(JSON.stringify({ type: "timeout" }));
+      game.clients.get(who)?.send({ type: "timeout" });
     }
-
     const ws = game.pawns.get(msg.nick);
 
     ws?.send(
@@ -248,7 +324,7 @@ const notifyNextPlayer = () => {
     console.error("No next player");
     return;
   }
-  next.send(JSON.stringify({ type: "throwDice", nick: game.order[0] }));
+  next.send({ type: "throwDice" });
 };
 
 const handleGameFinish = (msg: GameFinishMessage) => {
@@ -256,11 +332,22 @@ const handleGameFinish = (msg: GameFinishMessage) => {
   const clientEntries = Array.from(game.clients.entries());
   clientEntries.forEach(([key, value]) => {
     const ws = value;
-    ws?.send(JSON.stringify({ type: "gameFinish" }));
+    ws?.send({ type: "gameFinish" });
   });
 
   game.clients.clear();
   game.pawns.clear();
   game.order = [];
-  currentTurn = 0;
 };
+
+const handleRemove = (msg: RemoveMessage) => {
+  console.log("Remove ", msg.nick);
+  game.clients.delete(msg.nick);
+  game.order = game.order.filter(item => item !== msg.nick);
+  game.pawns.delete(msg.nick);
+}
+
+const handleStartGame = () => {
+  game.start();
+  notifyNextPlayer();
+}
