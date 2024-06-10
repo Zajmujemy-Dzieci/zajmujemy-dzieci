@@ -107,6 +107,17 @@ export const websockets_client = (address: string) => `<!DOCTYPE html>
         
         function displayUsername(){
             let usernameDiv = document.getElementById("usernameDiv");
+            let color = "#ffffff";
+            if (nick === "żółw") color = "#56c918";
+            if (nick === "wiewiórka") color = "#c96e18";
+            if (nick === "mysz") color = "#454443";
+            if (nick === "pies") color = "#47290c";
+            if (nick === "kot") color = "#e342de";
+            if (nick === "słoń") color = "#580e8a";
+            if (nick === "miś") color = "#a39e0d";
+            if (nick === "ryba") color = "#42ade3";
+            if (nick === "kruk") color = "#1c2529";
+            document.body.style.backgroundColor = color;
             usernameDiv.children[0].innerText = "Twoj nick: " + nick;
         }
 
@@ -292,7 +303,7 @@ export const websockets_client = (address: string) => `<!DOCTYPE html>
         }
 
         body{
-            background-color: lightblue;
+            // background-color: lightblue;
             justify-content: center;
             display: flex;
             flex-direction: column;
