@@ -42,7 +42,9 @@ export const websockets_client = (address: string) => `<!DOCTYPE html>
             }
                 
             if(parsed?.type === 'question'){
-                showAnswersPage(parsed.possibleAnswers); 
+                setTimeout(function(){
+                    showAnswersPage(parsed.possibleAnswers);
+                },2000)
             }
             if(parsed?.type === 'timeout') // only useful for timeout
             showWaitForYourTurnPage(true);
@@ -86,11 +88,15 @@ export const websockets_client = (address: string) => `<!DOCTYPE html>
                 },1000)
                 setTimeout(function(){
                     showDicePage(false);
-                    showWaitForYourTurnPage(true);
                     const availableNumbers = [1, 2, 3, 5];
                     const randomIndex = Math.floor(Math.random() * availableNumbers.length);
                     const randomDice = availableNumbers[randomIndex];
+                    showRollResult(randomDice);
                     ws.send(JSON.stringify({ type: 'dice', dice: randomDice ,nick:nick }));
+                    setTimeout(function(){
+                        hideRollResult();
+                        showWaitForYourTurnPage(true);
+                    },2000)
                 },2000);            
                 
             })
@@ -101,6 +107,16 @@ export const websockets_client = (address: string) => `<!DOCTYPE html>
         function displayUsername(){
             let usernameDiv = document.getElementById("usernameDiv");
             usernameDiv.children[0].innerText = "Twoj nick: " + nick;
+        }
+
+        function showRollResult(result){
+            let diceDiv = document.getElementById("diceDiv2");
+            diceDiv.innerText = "Wyrzucono: " + result;
+        }
+
+        function hideRollResult(){
+            let diceDiv = document.getElementById("diceDiv2");
+            diceDiv.innerText = "";
         }
 
         function showAnswersPage(howMany){ 
@@ -320,6 +336,13 @@ export const websockets_client = (address: string) => `<!DOCTYPE html>
             text-align: center;
             display: none;
         }
+        #diceDiv2{
+            font-size: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+        }
         @keyframes spin{
             0% { transform: rotateZ(0deg) }
             50% {transform: rotateZ(180deg) translateY(-100px)}
@@ -347,6 +370,10 @@ export const websockets_client = (address: string) => `<!DOCTYPE html>
         <img src="./images/dice.png" id="diceDivImg"></img>        
         <p>Kliknij kostkę, aby nią rzucić</p>
     </div>
+
+    <div id="diceDiv2">
+    </div>
+        
 
     <div id="answers">
         <div id="description">Wybierz odpowiedź</div>
