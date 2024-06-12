@@ -164,6 +164,14 @@ export default function Loader() {
             height={128}
           />
         </div>
+        <Link href="/home">
+          <button
+            className="absolute top-5 left-5 text-childWhite text-2xl font-bold py-2 px-4 rounded bg-childBlack border-solid border-childWhite border-2 mx-auto hover:bg-childWhite hover:text-childBlack"
+            onClick={handleGoNext}
+          >
+            Wróć
+          </button>
+        </Link>
         <h2 className={styles.questionsHeader}>
           Prześlij swój plik z pytaniami:{" "}
         </h2>
@@ -219,7 +227,7 @@ export default function Loader() {
         {minimumQuestionsNumber <= questionList.getQuestionsNumber() && (
           <Link href="/config_page" className="">
             <button
-              className="text-white font-bold py-2 px-4 rounded bg-childBlack border-solid border-2 mx-auto"
+              className="text-childWhite text-2xl font-bold py-2 px-4 rounded bg-childBlack border-solid border-childWhite border-2 mx-auto hover:bg-childWhite hover:text-childBlack"
               onClick={handleGoNext}
             >
               Przejdź dalej
